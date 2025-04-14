@@ -26,6 +26,11 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/debug",
     icon: <BugAntIcon className="h-4 w-4" />,
   },
+  {
+    label: "Game",
+    href: "/game",
+    icon: <BugAntIcon className="h-4 w-4" />,
+  },
 ];
 
 export const HeaderMenuLinks = () => {
