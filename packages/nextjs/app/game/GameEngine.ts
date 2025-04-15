@@ -1,4 +1,5 @@
 import {
+  Character,
   Direction,
   GameState,
   INITIAL_INVENTORY,
@@ -31,7 +32,7 @@ export class GameEngine {
     if (!ctx) throw new Error("Could not get canvas context");
     this.ctx = ctx;
 
-    // Initialize game state
+    // Initialize game state with character stats
     this.state = {
       player: {
         position: { x: MAP_WIDTH / 2, y: MAP_HEIGHT / 2 },
@@ -40,8 +41,24 @@ export class GameEngine {
         inventory: INITIAL_INVENTORY,
         selectedItem: 0,
         energy: 100,
+        character: {
+          level: 1,
+          experience: 0,
+          stats: {
+            strength: 5,
+            agility: 5,
+            stamina: 5,
+            intelligence: 5,
+          },
+          skills: {
+            farming: 1,
+            mining: 1,
+            fishing: 1,
+            crafting: 1,
+          },
+        },
       },
-      map: this.generateInitialMap(),
+      map: this.generateImprovedMap(),
       time: 0,
       money: 500,
       npcs: NPCS,
@@ -55,144 +72,546 @@ export class GameEngine {
     this.canvas.height = height;
   }
 
-  private generateInitialMap(): Tile[][] {
+  private generateImprovedMap(): Tile[][] {
     const map: Tile[][] = [];
+    // Initialize map with base terrain
     for (let y = 0; y < MAP_HEIGHT; y++) {
       map[y] = [];
       for (let x = 0; x < MAP_WIDTH; x++) {
-        // Create different biomes and areas
-        if (this.isInRange(x, y, 0, 0, 20, 20)) {
-          // Starting farm area
-          map[y][x] = { type: TileType.GRASS, walkable: true, interactable: true };
-        } else if (this.isInRange(x, y, 85, 5, 95, 15)) {
-          // Marketplace
-          map[y][x] = { type: TileType.PATH, walkable: true, interactable: true };
-        } else if (this.isInRange(x, y, 30, 30, 50, 50)) {
-          // Lake area
-          map[y][x] = { type: TileType.WATER, walkable: false, interactable: true };
-        } else if (this.isInRange(x, y, 60, 10, 70, 20)) {
-          // Forest area
-          map[y][x] = {
-            type: Math.random() < 0.4 ? TileType.TREE : TileType.GRASS,
-            walkable: true,
-            interactable: true,
-          };
-        } else if (this.isInRange(x, y, 75, 40, 85, 50)) {
-          // Stone quarry
-          map[y][x] = { type: TileType.STONE, walkable: true, interactable: true };
-        } else {
-          // Random wilderness
-          const rand = Math.random();
-          if (rand < 0.1) {
-            map[y][x] = { type: TileType.TREE, walkable: false, interactable: true };
-          } else if (rand < 0.15) {
-            map[y][x] = { type: TileType.FLOWER, walkable: true, interactable: true };
-          } else {
-            map[y][x] = { type: TileType.GRASS, walkable: true, interactable: true };
-          }
-        }
-
-        // Add paths connecting areas
-        if (this.isPath(x, y)) {
-          map[y][x] = { type: TileType.PATH, walkable: true, interactable: false };
-        }
+        map[y][x] = { type: TileType.GRASS, walkable: true, interactable: true };
       }
     }
 
-    // Place NPCs on the map
-    this.npcs.forEach(npc => {
-      const { x, y } = npc.position;
-      if (map[y] && map[y][x]) {
-        map[y][x].npcId = npc.id;
-      }
-    });
+    // Generate biomes in order
+    // this.generateSnowRegion(map);
+    this.generateWaterBodies(map);
+    this.generateMountains(map);
+    // this.generateSwamps(map);
+    this.generateForests(map);
+    // Add special locations and interactive elements
+    this.addSpecialLocations(map);
+    // this.addInteractiveElements(map);
+    // Generate paths between locations
+    this.generatePaths(map);
+    // Add bridges over water
+    this.addBridges(map);
 
     return map;
   }
 
-  private isInRange(x: number, y: number, x1: number, y1: number, x2: number, y2: number): boolean {
-    return x >= x1 && x <= x2 && y >= y1 && y <= y2;
-  }
+  // private generateSnowRegion(map: Tile[][]): void {
+  //   // Create a snow biome in the northern region
+  //   const snowStartY = 5;
+  //   const snowEndY = 20;
+  //   for (let y = snowStartY; y < snowEndY; y++) {
+  //     for (let x = 0; x < MAP_WIDTH; x++) {
+  //       const snowChance = 1 - (y - snowStartY) / (snowEndY - snowStartY);
+  //       if (Math.random() < snowChance) {
+  //         const isIce = Math.random() < 0.2;
+  //         map[y][x] = {
+  //           type: isIce ? TileType.ICE : TileType.SNOW,
+  //           walkable: true,
+  //           interactable: true
+  //         };
+  //       }
+  //     }
+  //   }
+  // Add hot springs in the snow region
+  //   for (let i = 0; i < 3; i++) {
+  //     const x = Math.floor(Math.random() * MAP_WIDTH);
+  //     const y = snowStartY + Math.floor(Math.random() * (snowEndY - snowStartY));
+  //     this.createHotSpring(map, x, y);
+  //   }
+  // }
 
-  private isPath(x: number, y: number): boolean {
-    // Main paths connecting areas
-    const isHorizontalPath = (y === 20 || y === 40) && x < MAP_WIDTH;
-    const isVerticalPath = (x === 20 || x === 50) && y < MAP_HEIGHT;
-    return isHorizontalPath || isVerticalPath;
-  }
+  // private createHotSpring(map: Tile[][], centerX: number, centerY: number): void {
+  //   const radius = 2;
+  //   for (let y = -radius; y <= radius; y++) {
+  //     for (let x = -radius; x <= radius; x++) {
+  //       const currentX = centerX + x;
+  //       const currentY = centerY + y;
+  //       if (this.isInBounds(currentX, currentY)) {
+  //         const distance = Math.sqrt(x * x + y * y);
+  //         if (distance <= radius) {
+  //           map[currentY][currentX] = {
+  //             type: TileType.HOT_SPRING,
+  //             walkable: false,
+  //             interactable: true,
+  //             resources: {
+  //               type: "HERB",
+  //               quantity: 1,
+  //               respawnTime: 300,
+  //             },
+  //           };
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
-  private async loadSprites() {
-    const spriteList = {
-      // Ground tiles
-      grass: "/assets/tiles/grass.png",
-      dirt: "/assets/tiles/dirt.png",
-      tilledSoil: "/assets/tiles/tilled_soil.png",
-      wateredSoil: "/assets/tiles/watered_soil.png",
-      tree: "/assets/tiles/tree.png",
-      path: "",
-      water: "/assets/tiles/water.png",
-      stone: "/assets/tiles/stone.png",
-      flower: "/assets/tiles/flower.png",
-      house: "/assets/tiles/house.png",
-      shop: "/assets/tiles/shop.png",
+  // private generateSwamps(map: Tile[][]): void {
+  //   const swampCenters = [
+  //     { x: 25, y: 60 },
+  //     { x: 75, y: 30 },
+  //   ];
 
-      // Player sprites - make sure these match your actual file names
-      playerDown: "/assets/player/down.png",
-      playerUp: "/assets/player/up.png",
-      playerLeft: "/assets/player/left.png",
-      playerRight: "/assets/player/right.png",
+  //   swampCenters.forEach(center => {
+  //     const radius = 8;
+  //     for (let y = -radius; y <= radius; y++) {
+  //       for (let x = -radius; x <= radius; x++) {
+  //         const currentX = center.x + x;
+  //         const currentY = center.y + y;
+  //         if (this.isInBounds(currentX, currentY) && map[currentY][currentX].type === TileType.GRASS) {
+  //           const distance = Math.sqrt(x * x + y * y);
+  //           if (distance <= radius) {
+  //             const isSwamp = Math.random() < 0.7;
+  //             if (isSwamp) {
+  //               map[currentY][currentX] = {
+  //                 type: TileType.SWAMP,
+  //                 walkable: true,
+  //                 interactable: true,
+  //                 resources: Math.random() < 0.2 ? {
+  //                   type: "MUSHROOM",
+  //                   quantity: 1,
+  //                   respawnTime: 120
+  //                 } : undefined
+  //               };
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
-      // NPCs
-      merchant: "/assets/sprites/merchant.png",
-      farmer: "/assets/sprites/farmer.png",
+  // private addInteractiveElements(map: Tile[][]): void {
+  //   // Add berry bushes in forest edges
+  //   this.addResourceNodes(map, TileType.BERRY_BUSH, 20, tile =>
+  //     this.isNearType(map, tile.x, tile.y, TileType.TREE));
 
-      // Crops
-      crop1: "/assets/sprites/crop.png",
-      crop2: "/assets/sprites/crop.png",
-      crop3: "/assets/sprites/crop.png",
-      cropReady: "/assets/sprites/crop.png",
-    };
+  //   // Add mushrooms in forest and swamp
+  //   this.addResourceNodes(map, TileType.MUSHROOM, 15, tile =>
+  //     this.isNearType(map, tile.x, tile.y, TileType.TREE) ||
+  //     this.isNearType(map, tile.x, tile.y, TileType.SWAMP));
 
-    const loadImage = (key: string, path: string): Promise<void> => {
-      return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => {
-          this.sprites[key] = img;
-          resolve();
-        };
-        img.onerror = () => {
-          console.warn(`Failed to load sprite: ${path}`);
-          resolve();
-        };
-        img.src = path;
-      });
-    };
+  //   // Add fishing spots near water
+  //   this.addResourceNodes(map, TileType.FISHING_SPOT, 10, tile =>
+  //     this.isNearType(map, tile.x, tile.y, TileType.WATER));
 
-    try {
-      await Promise.all(Object.entries(spriteList).map(([key, path]) => loadImage(key, path)));
-      console.log("Sprites loaded:", Object.keys(this.sprites));
-    } catch (error) {
-      console.error("Error loading sprites:", error);
+  //   // Add mine entrances near mountains
+  //   this.addResourceNodes(map, TileType.MINE_ENTRANCE, 5, tile =>
+  //     this.isNearType(map, tile.x, tile.y, TileType.MOUNTAIN));
+
+  //   // Add farm plots near the starting house
+  //   this.addFarmPlots(map);
+  // }
+
+  // private addResourceNodes(
+  //   map: Tile[][],
+  //   type: TileType,
+  //   count: number,
+  //   locationCheck: (pos: { x: number; y: number }) => boolean
+  // ): void {
+  //   let placed = 0;
+  //   let attempts = 0;
+  //   const maxAttempts = count * 10;
+
+  //   while (placed < count && attempts < maxAttempts) {
+  //     const x = Math.floor(Math.random() * MAP_WIDTH);
+  //     const y = Math.floor(Math.random() * MAP_HEIGHT);
+
+  //     if (map[y][x].type === TileType.GRASS && locationCheck({ x, y })) {
+  //       map[y][x] = {
+  //         type,
+  //         walkable: false,
+  //         interactable: true,
+  //         resources: {
+  //           type: this.getResourceTypeForTile(type),
+  //           quantity: Math.floor(Math.random() * 3) + 1,
+  //           respawnTime: 180
+  //         }
+  //       };
+  //       placed++;
+  //     }
+  //     attempts++;
+  //   }
+  // }
+
+  // private getResourceTypeForTile(tileType: TileType): "BERRY" | "MUSHROOM" | "ORE" | "FISH" | "HERB" {
+  //   switch (tileType) {
+  //     case TileType.BERRY_BUSH: return "BERRY";
+  //     case TileType.MUSHROOM: return "MUSHROOM";
+  //     case TileType.MINE_ENTRANCE: return "ORE";
+  //     case TileType.FISHING_SPOT: return "FISH";
+  //     default: return "HERB";
+  //   }
+  // }
+
+  // private isNearType(map: Tile[][], x: number, y: number, type: TileType): boolean {
+  //   const radius = 2;
+  //   for (let dy = -radius; dy <= radius; dy++) {
+  //     for (let dx = -radius; dx <= radius; dx++) {
+  //       const checkX = x + dx;
+  //       const checkY = y + dy;
+  //       if (
+  //         this.isInBounds(checkX, checkY) &&
+  //         map[checkY][checkX].type === type
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // }
+
+  // private addFarmPlots(map: Tile[][]): void {
+  //   // Add farm plots near the starting house
+  //   const housePos = { x: 10, y: 10 };
+  //   const farmRadius = 5;
+
+  //   for (let y = -farmRadius; y <= farmRadius; y++) {
+  //     for (let x = -farmRadius; x <= farmRadius; x++) {
+  //       const plotX = housePos.x + x + 5; // Offset from house
+  //       const plotY = housePos.y + y + 5;
+
+  //       if (this.isInBounds(plotX, plotY) && map[plotY][plotX].type === TileType.GRASS) {
+  //         map[plotY][plotX] = {
+  //           type: TileType.FARM_PLOT,
+  //           walkable: true,
+  //           interactable: true
+  //         };
+  //       }
+  //     }
+  //   }
+  // }
+
+  private addBridges(map: Tile[][]): void {
+    // Find water bodies and add bridges where paths cross them
+    for (let y = 0; y < MAP_HEIGHT; y++) {
+      for (let x = 0; x < MAP_WIDTH; x++) {
+        if (map[y][x].type === TileType.WATER) {
+          // Check if there are paths on both sides
+          if (this.shouldAddBridge(map, x, y)) {
+            map[y][x] = {
+              type: TileType.BRIDGE,
+              walkable: true,
+              interactable: false,
+            };
+          }
+        }
+      }
     }
   }
 
+  private shouldAddBridge(map: Tile[][], x: number, y: number): boolean {
+    // Check for paths on opposite sides
+    const hasHorizontalPaths = this.isPathNearby(map, x - 1, y) && this.isPathNearby(map, x + 1, y);
+    const hasVerticalPaths = this.isPathNearby(map, x, y - 1) && this.isPathNearby(map, x, y + 1);
+
+    return hasHorizontalPaths || hasVerticalPaths;
+  }
+
+  private isPathNearby(map: Tile[][], x: number, y: number): boolean {
+    if (!this.isInBounds(x, y)) return false;
+    return map[y][x].type === TileType.PATH;
+  }
+
+  private generateWaterBodies(map: Tile[][]): void {
+    // Create lakes and rivers
+    const lakes = [
+      { centerX: 40, centerY: 40, radius: 8 },
+      { centerX: 70, centerY: 20, radius: 5 },
+      { centerX: 20, centerY: 70, radius: 6 },
+    ];
+
+    // Generate lakes
+    lakes.forEach(lake => {
+      for (let y = -lake.radius; y <= lake.radius; y++) {
+        for (let x = -lake.radius; x <= lake.radius; x++) {
+          const currentX = lake.centerX + x;
+          const currentY = lake.centerY + y;
+          if (this.isInBounds(currentX, currentY)) {
+            const distance = Math.sqrt(x * x + y * y);
+            if (distance <= lake.radius) {
+              // Deep water in the center, regular water near edges
+              const tileType = distance < lake.radius - 2 ? TileType.DEEP_WATER : TileType.WATER;
+              map[currentY][currentX] = { type: tileType, walkable: false, interactable: true };
+              // Add sand around the lake
+              if (distance >= lake.radius - 0.5 && distance <= lake.radius + 1) {
+                this.addSandAround(map, currentX, currentY);
+              }
+            }
+          }
+        }
+      }
+    });
+
+    this.generateRiver(map, 0, 30, "horizontal");
+    this.generateRiver(map, 60, MAP_HEIGHT - 1, "vertical");
+  }
+
+  private generateRiver(map: Tile[][], start: number, end: number, direction: "horizontal" | "vertical"): void {
+    const riverWidth = 3;
+    let x = direction === "horizontal" ? start : 40;
+    let y = direction === "horizontal" ? 40 : start;
+    while (direction === "horizontal" ? x < MAP_WIDTH : y < end) {
+      const offset = Math.sin(x * 0.1) * 5;
+      for (let w = -riverWidth; w <= riverWidth; w++) {
+        const currentX = direction === "horizontal" ? x : x + w;
+        const currentY = direction === "horizontal" ? y + w + Math.floor(offset) : y;
+        if (this.isInBounds(currentX, currentY)) {
+          map[currentY][currentX] = { type: TileType.WATER, walkable: false, interactable: true };
+          this.addSandAround(map, currentX, currentY);
+        }
+      }
+      if (direction === "horizontal") {
+        x++;
+      } else {
+        y++;
+      }
+    }
+  }
+
+  private generateMountains(map: Tile[][]): void {
+    const mountainRanges = [
+      { startX: 80, startY: 10, length: 20, direction: "vertical" },
+      { startX: 10, startY: 80, length: 15, direction: "horizontal" },
+    ];
+
+    mountainRanges.forEach(range => {
+      let x = range.startX;
+      let y = range.startY;
+      for (let i = 0; i < range.length; i++) {
+        const mountainWidth = 4 + Math.floor(Math.random() * 3);
+        for (let w = -mountainWidth; w <= mountainWidth; w++) {
+          for (let h = -mountainWidth; h <= mountainWidth; h++) {
+            const currentX = x + w;
+            const currentY = y + h;
+            if (this.isInBounds(currentX, currentY)) {
+              const distance = Math.sqrt(w * w + h * h);
+              if (distance <= mountainWidth) {
+                const isMountainPeak = distance < mountainWidth - 2;
+                map[currentY][currentX] = {
+                  type: isMountainPeak ? TileType.MOUNTAIN : TileType.STONE,
+                  walkable: !isMountainPeak,
+                  interactable: true,
+                };
+              }
+            }
+          }
+        }
+        if (range.direction === "vertical") {
+          y++;
+        } else {
+          x++;
+        }
+      }
+    });
+  }
+
+  private generateForests(map: Tile[][]): void {
+    const forestCenters = [
+      { x: 30, y: 20 },
+      { x: 60, y: 70 },
+      { x: 15, y: 50 },
+    ];
+
+    forestCenters.forEach(center => {
+      const forestRadius = 10;
+      for (let y = -forestRadius; y <= forestRadius; y++) {
+        for (let x = -forestRadius; x <= forestRadius; x++) {
+          const currentX = center.x + x;
+          const currentY = center.y + y;
+          if (this.isInBounds(currentX, currentY) && map[currentY][currentX].type === TileType.GRASS) {
+            const distance = Math.sqrt(x * x + y * y);
+            if (distance <= forestRadius) {
+              const treeChance = 1 - distance / forestRadius;
+              if (Math.random() < treeChance * 0.7) {
+                map[currentY][currentX] = {
+                  type: TileType.TREE,
+                  walkable: false,
+                  interactable: true,
+                  variant: Math.floor(Math.random() * 3), // Different tree variants
+                };
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private addSpecialLocations(map: Tile[][]): void {
+    const locations = [
+      { x: 10, y: 10, type: TileType.HOUSE, size: 3 },
+      { x: 85, y: 10, type: TileType.SHOP, size: 4 },
+      // { x: 80, y: 45, type: TileType.CAVE, size: 2 },
+    ];
+
+    locations.forEach(loc => {
+      for (let y = -loc.size; y <= loc.size; y++) {
+        for (let x = -loc.size; x <= loc.size; x++) {
+          const currentX = loc.x + x;
+          const currentY = loc.y + y;
+          if (this.isInBounds(currentX, currentY)) {
+            map[currentY][currentX] = {
+              type: loc.type,
+              walkable: true,
+              interactable: true,
+            };
+          }
+        }
+      }
+    });
+  }
+
+  private generatePaths(map: Tile[][]): void {
+    const pathPoints = [
+      { x: 10, y: 10 }, // House
+      { x: 85, y: 10 }, // Shop
+      { x: 40, y: 40 }, // Lake
+      { x: 80, y: 45 }, // Cave
+      { x: 30, y: 20 }, // Forest
+    ];
+
+    // Connect all points with natural-looking paths
+    for (let i = 0; i < pathPoints.length - 1; i++) {
+      this.createNaturalPath(map, pathPoints[i], pathPoints[i + 1]);
+    }
+  }
+
+  private createNaturalPath(map: Tile[][], start: Position, end: Position): void {
+    let x = start.x;
+    let y = start.y;
+    const pathWidth = 2;
+
+    while (x !== end.x || y !== end.y) {
+      // Random path variation
+      const shouldVaryPath = Math.random() < 0.2;
+      if (shouldVaryPath) {
+        if (Math.random() < 0.5) {
+          x += x < end.x ? 1 : -1;
+        } else {
+          y += y < end.y ? 1 : -1;
+        }
+      } else {
+        // Direct path
+        if (Math.abs(x - end.x) > Math.abs(y - end.y)) {
+          x += x < end.x ? 1 : -1;
+        } else {
+          y += y < end.y ? 1 : -1;
+        }
+      }
+
+      // Create wider path with variation
+      for (let w = -pathWidth; w <= pathWidth; w++) {
+        for (let h = -pathWidth; h <= pathWidth; h++) {
+          const pathX = x + w;
+          const pathY = y + h;
+          if (this.isInBounds(pathX, pathY)) {
+            const distance = Math.sqrt(w * w + h * h);
+            if (distance <= pathWidth) {
+              map[pathY][pathX] = {
+                type: TileType.PATH,
+                walkable: true,
+                interactable: false,
+              };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private addSandAround(map: Tile[][], x: number, y: number): void {
+    const directions = [
+      { x: -1, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: -1 },
+      { x: 0, y: 1 },
+      { x: -1, y: -1 },
+      { x: -1, y: 1 },
+      { x: 1, y: -1 },
+      { x: 1, y: 1 },
+    ];
+
+    directions.forEach(dir => {
+      const newX = x + dir.x;
+      const newY = y + dir.y;
+      if (this.isInBounds(newX, newY) && map[newY][newX].type === TileType.GRASS) {
+        map[newY][newX] = { type: TileType.SAND, walkable: true, interactable: true };
+      }
+    });
+  }
+
+  private isInBounds(x: number, y: number): boolean {
+    return x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT;
+  }
+
+  private loadSprites(): void {
+    const spriteNames = [
+      "Grass",
+      "water",
+      "tree",
+      "House",
+      "path",
+      "soil",
+      "crop",
+      "mountain",
+      "flower",
+      "shop",
+      "fountain",
+      "npc",
+      "bridge",
+      "sand",
+      "swamp",
+      "rock",
+      "mushroom",
+      "mine",
+      "fishing_spot",
+      "berry_bush",
+      "cactus",
+      "ice",
+      "hot_spring",
+      "bench",
+      "cave",
+    ];
+    // Load basic sprites
+    spriteNames.forEach(name => {
+      const img = new Image();
+      img.src = `/assets/tiles/${name}.png`;
+      this.sprites[name] = img;
+    });
+
+    // Load player directional sprites
+    const directions = ["up", "down", "left", "right"];
+    directions.forEach(direction => {
+      const img = new Image();
+      img.src = `/assets/player/${direction}.png`;
+      this.sprites[`player_${direction}`] = img;
+    });
+  }
+
   public movePlayer(direction: Direction) {
-    const { position, speed } = this.state.player;
+    const { position, speed, character } = this.state.player;
     const newPos = { ...position };
-    const delta = 1; // For smooth movement
+    const delta = 1;
+    // Apply agility bonus to speed
+    const agilityBonus = character.stats.agility * 0.01;
+    const adjustedSpeed = speed * (1 + agilityBonus);
 
     switch (direction) {
       case Direction.UP:
-        newPos.y = Math.max(0, position.y - speed * delta);
+        newPos.y = Math.max(0, position.y - adjustedSpeed * delta);
         break;
       case Direction.DOWN:
-        newPos.y = Math.min(MAP_HEIGHT - 1, position.y + speed * delta);
+        newPos.y = Math.min(MAP_HEIGHT - 1, position.y + adjustedSpeed * delta);
         break;
       case Direction.LEFT:
-        newPos.x = Math.max(0, position.x - speed * delta);
+        newPos.x = Math.max(0, position.x - adjustedSpeed * delta);
         break;
       case Direction.RIGHT:
-        newPos.x = Math.min(MAP_WIDTH - 1, position.x + speed * delta);
+        newPos.x = Math.min(MAP_WIDTH - 1, position.x + adjustedSpeed * delta);
         break;
     }
 
@@ -200,6 +619,9 @@ export class GameEngine {
       this.state.player.position = newPos;
       this.state.player.direction = direction;
       this.updateCamera();
+      // Decrease energy based on stamina
+      const energyCost = 0.1 / (1 + character.stats.stamina * 0.05);
+      this.state.player.energy = Math.max(0, this.state.player.energy - energyCost);
     }
   }
 
@@ -398,7 +820,7 @@ export class GameEngine {
     });
   }
 
-  public render() {
+  public render(): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Draw world
@@ -416,6 +838,26 @@ export class GameEngine {
     // Draw dialogue if active
     if (this.activeDialogue) {
       this.drawDialogue();
+    }
+
+    // Draw player with directional sprite
+    const direction = this.state.player.direction.toLowerCase();
+    const playerSprite = this.sprites[`player_${direction}`];
+    if (playerSprite) {
+      const bounce = Math.sin(this.playerAnimation.bounce) * 2;
+      this.ctx.drawImage(
+        playerSprite,
+        0, // No frame offset for now, using full sprite
+        0,
+        TILE_SIZE,
+        TILE_SIZE,
+        this.state.player.position.x * TILE_SIZE,
+        this.state.player.position.y * TILE_SIZE - bounce,
+        TILE_SIZE,
+        TILE_SIZE,
+      );
+    } else {
+      console.warn(`Player sprite for direction ${direction} not loaded`);
     }
   }
 
@@ -746,14 +1188,27 @@ export class GameEngine {
     const screenX = (position.x - this.camera.x) * TILE_SIZE;
     const screenY = (position.y - this.camera.y) * TILE_SIZE + this.playerAnimation.bounce;
 
+    // Make player 1.5x larger than regular tiles
+    const playerSize = TILE_SIZE * 1.5;
+    const offsetX = (playerSize - TILE_SIZE) / 2;
+    const offsetY = playerSize - TILE_SIZE;
+
     // Add shadow under player
     this.ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
     this.ctx.beginPath();
-    this.ctx.ellipse(screenX + TILE_SIZE / 2, screenY + TILE_SIZE - 2, TILE_SIZE / 3, TILE_SIZE / 6, 0, 0, Math.PI * 2);
+    this.ctx.ellipse(
+      screenX + TILE_SIZE / 2,
+      screenY + TILE_SIZE - 2,
+      TILE_SIZE / 2.5,
+      TILE_SIZE / 5,
+      0,
+      0,
+      Math.PI * 2,
+    );
     this.ctx.fill();
 
     // Get the correct sprite based on direction
-    const spriteKey = `player${direction}`;
+    const spriteKey = `player_${direction.toLowerCase()}`;
     const playerSprite = this.sprites[spriteKey];
 
     if (playerSprite && playerSprite.complete && playerSprite.naturalWidth !== 0) {
@@ -765,7 +1220,8 @@ export class GameEngine {
         const walkingRotation = Math.sin(time * 5) * 0.05;
         this.ctx.rotate(walkingRotation);
 
-        this.ctx.drawImage(playerSprite, -TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
+        // Draw the player sprite larger than the tile size
+        this.ctx.drawImage(playerSprite, -playerSize / 2, -playerSize / 2 - offsetY / 2, playerSize, playerSize);
         this.ctx.restore();
       } catch (error) {
         console.warn("Failed to draw player sprite:", error);
@@ -777,17 +1233,22 @@ export class GameEngine {
   }
 
   private drawPlayerFallback(screenX: number, screenY: number) {
+    // Make fallback character 1.5x larger than regular tiles
+    const playerSize = TILE_SIZE * 1.5;
+    const offsetX = (playerSize - TILE_SIZE) / 2;
+    const offsetY = playerSize - TILE_SIZE;
+
     // Fallback character if sprite not loaded
     this.ctx.fillStyle = "#4A90E2";
     this.ctx.beginPath();
-    this.ctx.arc(screenX + TILE_SIZE / 2, screenY + TILE_SIZE / 2, TILE_SIZE / 2, 0, Math.PI * 2);
+    this.ctx.arc(screenX + TILE_SIZE / 2, screenY + TILE_SIZE / 2 - offsetY / 2, playerSize / 2, 0, Math.PI * 2);
     this.ctx.fill();
 
     // Add eyes to make it look like a character
     this.ctx.fillStyle = "white";
     this.ctx.beginPath();
-    this.ctx.arc(screenX + TILE_SIZE / 2 - 5, screenY + TILE_SIZE / 2 - 5, 3, 0, Math.PI * 2);
-    this.ctx.arc(screenX + TILE_SIZE / 2 + 5, screenY + TILE_SIZE / 2 - 5, 3, 0, Math.PI * 2);
+    this.ctx.arc(screenX + TILE_SIZE / 2 - 7, screenY + TILE_SIZE / 2 - offsetY / 2 - 7, 4, 0, Math.PI * 2);
+    this.ctx.arc(screenX + TILE_SIZE / 2 + 7, screenY + TILE_SIZE / 2 - offsetY / 2 - 7, 4, 0, Math.PI * 2);
     this.ctx.fill();
   }
 
@@ -835,5 +1296,31 @@ export class GameEngine {
 
   public getState(): GameState {
     return this.state;
+  }
+
+  public gainExperience(amount: number, skillType?: keyof Character["skills"]) {
+    const { character } = this.state.player;
+    character.experience += amount;
+
+    // Level up if enough experience
+    if (character.experience >= character.level * 100) {
+      character.level++;
+      character.experience = 0;
+
+      // Increase stats on level up
+      character.stats.strength += 1;
+      character.stats.agility += 1;
+      character.stats.stamina += 1;
+      character.stats.intelligence += 1;
+
+      this.showNotification(`Level Up! Now level ${character.level}`, "#FFD700");
+    }
+
+    // Increase skill if specified
+    if (skillType) {
+      const skillName = String(skillType);
+      character.skills[skillType] += amount * 0.1;
+      this.showNotification(`${skillName} skill increased!`, "#4CAF50");
+    }
   }
 }

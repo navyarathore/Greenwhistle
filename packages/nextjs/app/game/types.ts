@@ -14,6 +14,10 @@ export enum TileType {
   READY_CROP = "READY_CROP",
   HOUSE = "HOUSE",
   SHOP = "SHOP",
+  BRIDGE = "BRIDGE",
+  DEEP_WATER = "DEEP_WATER",
+  MOUNTAIN = "MOUNTAIN",
+  CHARACTER = "CHARACTER",
 }
 
 export enum Direction {
@@ -38,6 +42,23 @@ export interface Tile {
   variant?: number; // For visual variation of the same tile type
 }
 
+export interface Character {
+  level: number;
+  experience: number;
+  stats: {
+    strength: number;
+    agility: number;
+    stamina: number;
+    intelligence: number;
+  };
+  skills: {
+    farming: number;
+    mining: number;
+    fishing: number;
+    crafting: number;
+  };
+}
+
 export interface Player {
   position: Position;
   direction: Direction;
@@ -45,6 +66,7 @@ export interface Player {
   inventory: InventoryItem[];
   selectedItem: number;
   energy: number;
+  character: Character;
   animation?: {
     frame: number;
     frameCount: number;
