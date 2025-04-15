@@ -1,23 +1,23 @@
 export enum TileType {
-  GRASS = "GRASS",
-  DIRT = "DIRT",
-  TILLED_SOIL = "TILLED_SOIL",
-  WATERED_SOIL = "WATERED_SOIL",
-  PATH = "PATH",
-  TREE = "TREE",
-  WATER = "WATER",
-  FLOWER = "FLOWER",
-  STONE = "STONE",
-  FENCE = "FENCE",
-  SAND = "SAND",
-  GROWING_CROP = "GROWING_CROP",
-  READY_CROP = "READY_CROP",
-  HOUSE = "HOUSE",
-  SHOP = "SHOP",
-  BRIDGE = "BRIDGE",
-  DEEP_WATER = "DEEP_WATER",
-  MOUNTAIN = "MOUNTAIN",
-  CHARACTER = "CHARACTER",
+  GRASS = "grass",
+  LONG_GRASS = "long_grass",
+  DIRT = "dirt",
+  SOIL = "soil",
+  TILLED_SOIL = "tilled_soil",
+  PATH = "path",
+  TREE = "tree",
+  WATER = "water",
+  DEEP_WATER = "deep_water",
+  FLOWER = "flower",
+  STONE = "stone",
+  HOUSE = "house",
+  BRIDGE = "bridge",
+  GROUND = "ground",
+  CROP = "crop",
+  GROWING_CROP = "growing_crop",
+  READY_CROP = "ready_crop",
+  WATERED_SOIL = "watered_soil",
+  SAND = "sand",
 }
 
 export enum Direction {
@@ -39,7 +39,8 @@ export interface Tile {
   npcId?: string;
   growthStage?: number;
   waterLevel?: number;
-  variant?: number; // For visual variation of the same tile type
+  variant?: number; // For visual variation of the same tile type, or to indicate special tiles like house parts
+  size?: number; // For tiles that represent larger structures like houses
 }
 
 export interface Character {

@@ -3,6 +3,7 @@ import {
   Direction,
   GameState,
   INITIAL_INVENTORY,
+  InventoryItem,
   MAP_HEIGHT,
   MAP_WIDTH,
   NPC,
@@ -17,7 +18,7 @@ export class GameEngine {
   private state: GameState;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private sprites: { [key: string]: HTMLImageElement } = {};
+  private sprites: { [key: string]: HTMLImageElement | HTMLCanvasElement } = {};
   private camera: Position = { x: 0, y: 0 };
   private lastTimestamp = 0;
   private npcs: NPC[] = NPCS;
@@ -25,6 +26,8 @@ export class GameEngine {
   private notifications: { message: string; color: string; opacity: number; y: number }[] = [];
   private playerAnimation = { bounce: 0, speed: 0.1 };
   private particles: { x: number; y: number; color: string; size: number; velocity: Position; opacity: number }[] = [];
+  private showMarketplace = false;
+  private currentNPC: NPC | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -74,216 +77,230 @@ export class GameEngine {
 
   private generateImprovedMap(): Tile[][] {
     const map: Tile[][] = [];
-    // Initialize map with base terrain
+
+    // Initialize map with grass and ground
     for (let y = 0; y < MAP_HEIGHT; y++) {
       map[y] = [];
       for (let x = 0; x < MAP_WIDTH; x++) {
-        map[y][x] = { type: TileType.GRASS, walkable: true, interactable: true };
+        const isGround = Math.random() < 0.3;
+        map[y][x] = {
+          type: isGround ? TileType.GROUND : TileType.GRASS,
+          walkable: true,
+          interactable: false,
+        };
       }
     }
 
-    // Generate biomes in order
-    // this.generateSnowRegion(map);
+    // Generate water bodies
     this.generateWaterBodies(map);
-    this.generateMountains(map);
-    // this.generateSwamps(map);
-    this.generateForests(map);
-    // Add special locations and interactive elements
-    this.addSpecialLocations(map);
-    // this.addInteractiveElements(map);
-    // Generate paths between locations
+
+    // Add paths
     this.generatePaths(map);
-    // Add bridges over water
-    this.addBridges(map);
+
+    // Add trees and flowers
+    this.generateNature(map);
+
+    // Add buildings and structures
+    this.addStructures(map);
 
     return map;
   }
 
-  // private generateSnowRegion(map: Tile[][]): void {
-  //   // Create a snow biome in the northern region
-  //   const snowStartY = 5;
-  //   const snowEndY = 20;
-  //   for (let y = snowStartY; y < snowEndY; y++) {
-  //     for (let x = 0; x < MAP_WIDTH; x++) {
-  //       const snowChance = 1 - (y - snowStartY) / (snowEndY - snowStartY);
-  //       if (Math.random() < snowChance) {
-  //         const isIce = Math.random() < 0.2;
-  //         map[y][x] = {
-  //           type: isIce ? TileType.ICE : TileType.SNOW,
-  //           walkable: true,
-  //           interactable: true
-  //         };
-  //       }
-  //     }
-  //   }
-  // Add hot springs in the snow region
-  //   for (let i = 0; i < 3; i++) {
-  //     const x = Math.floor(Math.random() * MAP_WIDTH);
-  //     const y = snowStartY + Math.floor(Math.random() * (snowEndY - snowStartY));
-  //     this.createHotSpring(map, x, y);
-  //   }
-  // }
+  private generateWaterBodies(map: Tile[][]): void {
+    // Create lakes and rivers
+    const lakes = [
+      { centerX: 40, centerY: 40, radius: 8 },
+      { centerX: 70, centerY: 20, radius: 5 },
+      { centerX: 20, centerY: 70, radius: 6 },
+    ];
 
-  // private createHotSpring(map: Tile[][], centerX: number, centerY: number): void {
-  //   const radius = 2;
-  //   for (let y = -radius; y <= radius; y++) {
-  //     for (let x = -radius; x <= radius; x++) {
-  //       const currentX = centerX + x;
-  //       const currentY = centerY + y;
-  //       if (this.isInBounds(currentX, currentY)) {
-  //         const distance = Math.sqrt(x * x + y * y);
-  //         if (distance <= radius) {
-  //           map[currentY][currentX] = {
-  //             type: TileType.HOT_SPRING,
-  //             walkable: false,
-  //             interactable: true,
-  //             resources: {
-  //               type: "HERB",
-  //               quantity: 1,
-  //               respawnTime: 300,
-  //             },
-  //           };
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+    // Generate lakes with improved sand borders
+    lakes.forEach(lake => {
+      for (let y = -lake.radius - 2; y <= lake.radius + 2; y++) {
+        for (let x = -lake.radius - 2; x <= lake.radius + 2; x++) {
+          const currentX = lake.centerX + x;
+          const currentY = lake.centerY + y;
+          if (this.isInBounds(currentX, currentY)) {
+            const distance = Math.sqrt(x * x + y * y);
+            if (distance <= lake.radius) {
+              // Deep water in the center, regular water near edges
+              const tileType = distance < lake.radius - 2 ? TileType.DEEP_WATER : TileType.WATER;
+              map[currentY][currentX] = { type: tileType, walkable: false, interactable: true };
+            } else if (distance <= lake.radius + 1.5) {
+              // Add sand around the water
+              map[currentY][currentX] = { type: TileType.SAND, walkable: true, interactable: true };
+            }
+          }
+        }
+      }
+    });
 
-  // private generateSwamps(map: Tile[][]): void {
-  //   const swampCenters = [
-  //     { x: 25, y: 60 },
-  //     { x: 75, y: 30 },
-  //   ];
+    // Generate river with sand banks
+    this.generateRiver(map, 0, 30, "horizontal");
+    this.generateRiver(map, 60, MAP_HEIGHT - 1, "vertical");
+  }
 
-  //   swampCenters.forEach(center => {
-  //     const radius = 8;
-  //     for (let y = -radius; y <= radius; y++) {
-  //       for (let x = -radius; x <= radius; x++) {
-  //         const currentX = center.x + x;
-  //         const currentY = center.y + y;
-  //         if (this.isInBounds(currentX, currentY) && map[currentY][currentX].type === TileType.GRASS) {
-  //           const distance = Math.sqrt(x * x + y * y);
-  //           if (distance <= radius) {
-  //             const isSwamp = Math.random() < 0.7;
-  //             if (isSwamp) {
-  //               map[currentY][currentX] = {
-  //                 type: TileType.SWAMP,
-  //                 walkable: true,
-  //                 interactable: true,
-  //                 resources: Math.random() < 0.2 ? {
-  //                   type: "MUSHROOM",
-  //                   quantity: 1,
-  //                   respawnTime: 120
-  //                 } : undefined
-  //               };
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
+  private generateRiver(map: Tile[][], start: number, end: number, direction: "horizontal" | "vertical"): void {
+    const riverWidth = 3;
+    const sandWidth = riverWidth + 1;
+    let x = direction === "horizontal" ? start : 40;
+    let y = direction === "horizontal" ? 40 : start;
 
-  // private addInteractiveElements(map: Tile[][]): void {
-  //   // Add berry bushes in forest edges
-  //   this.addResourceNodes(map, TileType.BERRY_BUSH, 20, tile =>
-  //     this.isNearType(map, tile.x, tile.y, TileType.TREE));
+    while (direction === "horizontal" ? x < MAP_WIDTH : y < end) {
+      const offset = Math.sin(x * 0.1) * 5;
 
-  //   // Add mushrooms in forest and swamp
-  //   this.addResourceNodes(map, TileType.MUSHROOM, 15, tile =>
-  //     this.isNearType(map, tile.x, tile.y, TileType.TREE) ||
-  //     this.isNearType(map, tile.x, tile.y, TileType.SWAMP));
+      // First add sand (wider than the river)
+      for (let w = -sandWidth; w <= sandWidth; w++) {
+        for (let h = -sandWidth; h <= sandWidth; h++) {
+          const currentX = direction === "horizontal" ? x : x + w;
+          const currentY = direction === "horizontal" ? y + w + Math.floor(offset) : y;
+          if (this.isInBounds(currentX, currentY)) {
+            map[currentY][currentX] = { type: TileType.SAND, walkable: true, interactable: true };
+          }
+        }
+      }
 
-  //   // Add fishing spots near water
-  //   this.addResourceNodes(map, TileType.FISHING_SPOT, 10, tile =>
-  //     this.isNearType(map, tile.x, tile.y, TileType.WATER));
+      // Then add water (narrower than sand)
+      for (let w = -riverWidth; w <= riverWidth; w++) {
+        const currentX = direction === "horizontal" ? x : x + w;
+        const currentY = direction === "horizontal" ? y + w + Math.floor(offset) : y;
+        if (this.isInBounds(currentX, currentY)) {
+          map[currentY][currentX] = { type: TileType.WATER, walkable: false, interactable: true };
+        }
+      }
 
-  //   // Add mine entrances near mountains
-  //   this.addResourceNodes(map, TileType.MINE_ENTRANCE, 5, tile =>
-  //     this.isNearType(map, tile.x, tile.y, TileType.MOUNTAIN));
+      if (direction === "horizontal") {
+        x++;
+      } else {
+        y++;
+      }
+    }
+  }
 
-  //   // Add farm plots near the starting house
-  //   this.addFarmPlots(map);
-  // }
+  private generateNature(map: Tile[][]): void {
+    for (let y = 0; y < MAP_HEIGHT; y++) {
+      for (let x = 0; x < MAP_WIDTH; x++) {
+        if (map[y][x].type === TileType.GRASS) {
+          // Add random trees
+          if (Math.random() < 0.05) {
+            map[y][x] = { type: TileType.TREE, walkable: false, interactable: true };
+          }
+          // Add random flowers
+          else if (Math.random() < 0.03) {
+            map[y][x] = { type: TileType.FLOWER, walkable: true, interactable: true };
+          }
+          // Add random long grass
+          else if (Math.random() < 0.1) {
+            map[y][x] = { type: TileType.LONG_GRASS, walkable: true, interactable: true };
+          }
+        }
+      }
+    }
+  }
 
-  // private addResourceNodes(
-  //   map: Tile[][],
-  //   type: TileType,
-  //   count: number,
-  //   locationCheck: (pos: { x: number; y: number }) => boolean
-  // ): void {
-  //   let placed = 0;
-  //   let attempts = 0;
-  //   const maxAttempts = count * 10;
+  private addStructures(map: Tile[][]): void {
+    // Add player"s house
+    this.addBuilding(map, 10, 10, TileType.HOUSE, 6);
+    // Add farmer"s house
+    this.addBuilding(map, 20, 20, TileType.HOUSE, 6);
+    // Update farmer NPC position
+    const farmer = this.npcs.find(npc => npc.id === "farmer");
+    if (farmer) {
+      farmer.position = { x: 22, y: 24 }; // Position in front of farmer"s house
+      farmer.schedule = [
+        { time: 6, position: { x: 22, y: 24 } },
+        { time: 12, position: { x: 30, y: 30 } }, // Farm field
+        { time: 20, position: { x: 22, y: 24 } },
+      ];
+    }
 
-  //   while (placed < count && attempts < maxAttempts) {
-  //     const x = Math.floor(Math.random() * MAP_WIDTH);
-  //     const y = Math.floor(Math.random() * MAP_HEIGHT);
+    // Add merchant"s house and shop
+    this.addBuilding(map, 40, 10, TileType.HOUSE, 6);
+    // Update merchant NPC position
+    const merchant = this.npcs.find(npc => npc.id === "merchant");
+    if (merchant) {
+      merchant.position = { x: 42, y: 14 }; // Position in front of merchant"s house
+      merchant.schedule = [
+        { time: 8, position: { x: 42, y: 14 } },
+        { time: 12, position: { x: 45, y: 14 } }, // Shop area
+        { time: 18, position: { x: 42, y: 14 } },
+      ];
+    }
 
-  //     if (map[y][x].type === TileType.GRASS && locationCheck({ x, y })) {
-  //       map[y][x] = {
-  //         type,
-  //         walkable: false,
-  //         interactable: true,
-  //         resources: {
-  //           type: this.getResourceTypeForTile(type),
-  //           quantity: Math.floor(Math.random() * 3) + 1,
-  //           respawnTime: 180
-  //         }
-  //       };
-  //       placed++;
-  //     }
-  //     attempts++;
-  //   }
-  // }
+    // Add some stone formations
+    for (let i = 0; i < 5; i++) {
+      const x = Math.floor(Math.random() * MAP_WIDTH);
+      const y = Math.floor(Math.random() * MAP_HEIGHT);
+      this.addStoneFormation(map, x, y);
+    }
 
-  // private getResourceTypeForTile(tileType: TileType): "BERRY" | "MUSHROOM" | "ORE" | "FISH" | "HERB" {
-  //   switch (tileType) {
-  //     case TileType.BERRY_BUSH: return "BERRY";
-  //     case TileType.MUSHROOM: return "MUSHROOM";
-  //     case TileType.MINE_ENTRANCE: return "ORE";
-  //     case TileType.FISHING_SPOT: return "FISH";
-  //     default: return "HERB";
-  //   }
-  // }
+    // Create farm fields near farmer"s house
+    this.createFarmFields(map, 30, 30, 5, 5);
+  }
 
-  // private isNearType(map: Tile[][], x: number, y: number, type: TileType): boolean {
-  //   const radius = 2;
-  //   for (let dy = -radius; dy <= radius; dy++) {
-  //     for (let dx = -radius; dx <= radius; dx++) {
-  //       const checkX = x + dx;
-  //       const checkY = y + dy;
-  //       if (
-  //         this.isInBounds(checkX, checkY) &&
-  //         map[checkY][checkX].type === type
-  //       ) {
-  //         return true;
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // }
+  private createFarmFields(map: Tile[][], x: number, y: number, width: number, height: number): void {
+    for (let dy = 0; dy < height; dy++) {
+      for (let dx = 0; dx < width; dx++) {
+        const currentX = x + dx;
+        const currentY = y + dy;
+        if (this.isInBounds(currentX, currentY)) {
+          map[currentY][currentX] = {
+            type: TileType.DIRT,
+            walkable: true,
+            interactable: true,
+          };
+        }
+      }
+    }
+  }
 
-  // private addFarmPlots(map: Tile[][]): void {
-  //   // Add farm plots near the starting house
-  //   const housePos = { x: 10, y: 10 };
-  //   const farmRadius = 5;
+  private addStoneFormation(map: Tile[][], centerX: number, centerY: number): void {
+    const radius = 2;
+    for (let y = -radius; y <= radius; y++) {
+      for (let x = -radius; x <= radius; x++) {
+        const currentX = centerX + x;
+        const currentY = centerY + y;
+        if (this.isInBounds(currentX, currentY)) {
+          const distance = Math.sqrt(x * x + y * y);
+          if (distance <= radius && Math.random() < 0.7) {
+            map[currentY][currentX] = {
+              type: TileType.STONE,
+              walkable: false,
+              interactable: true,
+            };
+          }
+        }
+      }
+    }
+  }
 
-  //   for (let y = -farmRadius; y <= farmRadius; y++) {
-  //     for (let x = -farmRadius; x <= farmRadius; x++) {
-  //       const plotX = housePos.x + x + 5; // Offset from house
-  //       const plotY = housePos.y + y + 5;
+  private addBuilding(map: Tile[][], x: number, y: number, type: TileType, size: number): void {
+    // Create a single large house tile at the center
+    map[y][x] = {
+      type: type,
+      walkable: false,
+      interactable: true,
+      variant: 1, // Use variant to indicate it"s the main house tile
+      size: 6, // Store the house size for rendering
+    };
 
-  //       if (this.isInBounds(plotX, plotY) && map[plotY][plotX].type === TileType.GRASS) {
-  //         map[plotY][plotX] = {
-  //           type: TileType.FARM_PLOT,
-  //           walkable: true,
-  //           interactable: true
-  //         };
-  //       }
-  //     }
-  //   }
-  // }
+    // Mark surrounding tiles as part of the house but invisible
+    for (let dy = -2; dy <= 3; dy++) {
+      for (let dx = -2; dx <= 3; dx++) {
+        if (dx === 0 && dy === 0) continue; // Skip the center tile
+        const currentX = x + dx;
+        const currentY = y + dy;
+        if (this.isInBounds(currentX, currentY)) {
+          map[currentY][currentX] = {
+            type: type,
+            walkable: false,
+            interactable: false,
+            variant: 0, // Use variant 0 to indicate it"s part of the house but shouldn"t be rendered
+          };
+        }
+      }
+    }
+  }
 
   private addBridges(map: Tile[][]): void {
     // Find water bodies and add bridges where paths cross them
@@ -314,155 +331,6 @@ export class GameEngine {
   private isPathNearby(map: Tile[][], x: number, y: number): boolean {
     if (!this.isInBounds(x, y)) return false;
     return map[y][x].type === TileType.PATH;
-  }
-
-  private generateWaterBodies(map: Tile[][]): void {
-    // Create lakes and rivers
-    const lakes = [
-      { centerX: 40, centerY: 40, radius: 8 },
-      { centerX: 70, centerY: 20, radius: 5 },
-      { centerX: 20, centerY: 70, radius: 6 },
-    ];
-
-    // Generate lakes
-    lakes.forEach(lake => {
-      for (let y = -lake.radius; y <= lake.radius; y++) {
-        for (let x = -lake.radius; x <= lake.radius; x++) {
-          const currentX = lake.centerX + x;
-          const currentY = lake.centerY + y;
-          if (this.isInBounds(currentX, currentY)) {
-            const distance = Math.sqrt(x * x + y * y);
-            if (distance <= lake.radius) {
-              // Deep water in the center, regular water near edges
-              const tileType = distance < lake.radius - 2 ? TileType.DEEP_WATER : TileType.WATER;
-              map[currentY][currentX] = { type: tileType, walkable: false, interactable: true };
-              // Add sand around the lake
-              if (distance >= lake.radius - 0.5 && distance <= lake.radius + 1) {
-                this.addSandAround(map, currentX, currentY);
-              }
-            }
-          }
-        }
-      }
-    });
-
-    this.generateRiver(map, 0, 30, "horizontal");
-    this.generateRiver(map, 60, MAP_HEIGHT - 1, "vertical");
-  }
-
-  private generateRiver(map: Tile[][], start: number, end: number, direction: "horizontal" | "vertical"): void {
-    const riverWidth = 3;
-    let x = direction === "horizontal" ? start : 40;
-    let y = direction === "horizontal" ? 40 : start;
-    while (direction === "horizontal" ? x < MAP_WIDTH : y < end) {
-      const offset = Math.sin(x * 0.1) * 5;
-      for (let w = -riverWidth; w <= riverWidth; w++) {
-        const currentX = direction === "horizontal" ? x : x + w;
-        const currentY = direction === "horizontal" ? y + w + Math.floor(offset) : y;
-        if (this.isInBounds(currentX, currentY)) {
-          map[currentY][currentX] = { type: TileType.WATER, walkable: false, interactable: true };
-          this.addSandAround(map, currentX, currentY);
-        }
-      }
-      if (direction === "horizontal") {
-        x++;
-      } else {
-        y++;
-      }
-    }
-  }
-
-  private generateMountains(map: Tile[][]): void {
-    const mountainRanges = [
-      { startX: 80, startY: 10, length: 20, direction: "vertical" },
-      { startX: 10, startY: 80, length: 15, direction: "horizontal" },
-    ];
-
-    mountainRanges.forEach(range => {
-      let x = range.startX;
-      let y = range.startY;
-      for (let i = 0; i < range.length; i++) {
-        const mountainWidth = 4 + Math.floor(Math.random() * 3);
-        for (let w = -mountainWidth; w <= mountainWidth; w++) {
-          for (let h = -mountainWidth; h <= mountainWidth; h++) {
-            const currentX = x + w;
-            const currentY = y + h;
-            if (this.isInBounds(currentX, currentY)) {
-              const distance = Math.sqrt(w * w + h * h);
-              if (distance <= mountainWidth) {
-                const isMountainPeak = distance < mountainWidth - 2;
-                map[currentY][currentX] = {
-                  type: isMountainPeak ? TileType.MOUNTAIN : TileType.STONE,
-                  walkable: !isMountainPeak,
-                  interactable: true,
-                };
-              }
-            }
-          }
-        }
-        if (range.direction === "vertical") {
-          y++;
-        } else {
-          x++;
-        }
-      }
-    });
-  }
-
-  private generateForests(map: Tile[][]): void {
-    const forestCenters = [
-      { x: 30, y: 20 },
-      { x: 60, y: 70 },
-      { x: 15, y: 50 },
-    ];
-
-    forestCenters.forEach(center => {
-      const forestRadius = 10;
-      for (let y = -forestRadius; y <= forestRadius; y++) {
-        for (let x = -forestRadius; x <= forestRadius; x++) {
-          const currentX = center.x + x;
-          const currentY = center.y + y;
-          if (this.isInBounds(currentX, currentY) && map[currentY][currentX].type === TileType.GRASS) {
-            const distance = Math.sqrt(x * x + y * y);
-            if (distance <= forestRadius) {
-              const treeChance = 1 - distance / forestRadius;
-              if (Math.random() < treeChance * 0.7) {
-                map[currentY][currentX] = {
-                  type: TileType.TREE,
-                  walkable: false,
-                  interactable: true,
-                  variant: Math.floor(Math.random() * 3), // Different tree variants
-                };
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  private addSpecialLocations(map: Tile[][]): void {
-    const locations = [
-      { x: 10, y: 10, type: TileType.HOUSE, size: 3 },
-      { x: 85, y: 10, type: TileType.SHOP, size: 4 },
-      // { x: 80, y: 45, type: TileType.CAVE, size: 2 },
-    ];
-
-    locations.forEach(loc => {
-      for (let y = -loc.size; y <= loc.size; y++) {
-        for (let x = -loc.size; x <= loc.size; x++) {
-          const currentX = loc.x + x;
-          const currentY = loc.y + y;
-          if (this.isInBounds(currentX, currentY)) {
-            map[currentY][currentX] = {
-              type: loc.type,
-              walkable: true,
-              interactable: true,
-            };
-          }
-        }
-      }
-    });
   }
 
   private generatePaths(map: Tile[][]): void {
@@ -549,46 +417,147 @@ export class GameEngine {
   }
 
   private loadSprites(): void {
-    const spriteNames = [
-      "Grass",
-      "water",
-      "tree",
-      "House",
-      "path",
+    const requiredSprites = [
+      // Terrain sprites
+      "grass",
+      "long_grass",
+      "dirt",
       "soil",
-      "crop",
-      "mountain",
+      "tilled_soil",
+      "path",
+      "tree",
+      "water",
+      "deep_water",
       "flower",
-      "shop",
-      "fountain",
-      "npc",
+      "stone",
+      "house",
       "bridge",
+      "ground",
       "sand",
-      "swamp",
-      "rock",
-      "mushroom",
-      "mine",
-      "fishing_spot",
-      "berry_bush",
-      "cactus",
-      "ice",
-      "hot_spring",
-      "bench",
-      "cave",
+      "watered_soil",
+      "crop",
+      "growing_crop",
+      "ready_crop",
+      "farmer",
+      "merchant",
+      "hoe",
+      "watering_can",
+      "seeds",
+      "fishing_rod",
+      "axe",
+      "common_fish",
+      "rare_fish",
+      "legendary_fish",
+      "coin",
+      "energy",
+      "inventory_bg",
     ];
-    // Load basic sprites
-    spriteNames.forEach(name => {
+
+    // Create a fallback colored rectangle for missing sprites
+    const fallbackCanvas = document.createElement("canvas");
+    fallbackCanvas.width = TILE_SIZE;
+    fallbackCanvas.height = TILE_SIZE;
+    const fallbackCtx = fallbackCanvas.getContext("2d");
+    if (fallbackCtx) {
+      fallbackCtx.fillStyle = "#FFD700";
+      fallbackCtx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+      fallbackCtx.strokeStyle = "#000000";
+      fallbackCtx.strokeRect(0, 0, TILE_SIZE, TILE_SIZE);
+      fallbackCtx.beginPath();
+      fallbackCtx.moveTo(0, 0);
+      fallbackCtx.lineTo(TILE_SIZE, TILE_SIZE);
+      fallbackCtx.moveTo(TILE_SIZE, 0);
+      fallbackCtx.lineTo(0, TILE_SIZE);
+      fallbackCtx.stroke();
+    }
+
+    // Load basic sprites with proper error handling
+    requiredSprites.forEach(name => {
       const img = new Image();
+      img.onerror = () => {
+        console.warn(`Failed to load sprite: ${name}.png`);
+        // Create a colored rectangle as fallback
+        const fallbackImg = document.createElement("canvas");
+        fallbackImg.width = TILE_SIZE;
+        fallbackImg.height = TILE_SIZE;
+        const ctx = fallbackImg.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = "#FFD700";
+          ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+          ctx.strokeStyle = "#000000";
+          ctx.strokeRect(0, 0, TILE_SIZE, TILE_SIZE);
+          // Add a crosshatch pattern
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(TILE_SIZE, TILE_SIZE);
+          ctx.moveTo(TILE_SIZE, 0);
+          ctx.lineTo(0, TILE_SIZE);
+          ctx.stroke();
+          // Add sprite name
+          ctx.fillStyle = "#000000";
+          ctx.font = "8px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText(name, TILE_SIZE / 2, TILE_SIZE / 2);
+        }
+        this.sprites[name] = fallbackImg;
+      };
+      img.onload = () => {
+        this.sprites[name] = img;
+      };
       img.src = `/assets/tiles/${name}.png`;
-      this.sprites[name] = img;
     });
 
     // Load player directional sprites
     const directions = ["up", "down", "left", "right"];
     directions.forEach(direction => {
       const img = new Image();
+      img.onerror = () => {
+        console.warn(`Failed to load player sprite: ${direction}.png`);
+        // Create a colored rectangle as fallback for player
+        const fallbackImg = document.createElement("canvas");
+        fallbackImg.width = TILE_SIZE;
+        fallbackImg.height = TILE_SIZE;
+        const ctx = fallbackImg.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = "#4A90E2";
+          ctx.beginPath();
+          ctx.arc(TILE_SIZE / 2, TILE_SIZE / 2, TILE_SIZE / 3, 0, Math.PI * 2);
+          ctx.fill();
+          // Add eyes
+          ctx.fillStyle = "white";
+          ctx.beginPath();
+          ctx.arc(TILE_SIZE / 2 - 4, TILE_SIZE / 2 - 2, 2, 0, Math.PI * 2);
+          ctx.arc(TILE_SIZE / 2 + 4, TILE_SIZE / 2 - 2, 2, 0, Math.PI * 2);
+          ctx.fill();
+          // Add direction indicator
+          ctx.strokeStyle = "white";
+          ctx.beginPath();
+          switch (direction) {
+            case "up":
+              ctx.moveTo(TILE_SIZE / 2, TILE_SIZE / 3);
+              ctx.lineTo(TILE_SIZE / 2, TILE_SIZE / 6);
+              break;
+            case "down":
+              ctx.moveTo(TILE_SIZE / 2, (TILE_SIZE * 2) / 3);
+              ctx.lineTo(TILE_SIZE / 2, (TILE_SIZE * 5) / 6);
+              break;
+            case "left":
+              ctx.moveTo(TILE_SIZE / 3, TILE_SIZE / 2);
+              ctx.lineTo(TILE_SIZE / 6, TILE_SIZE / 2);
+              break;
+            case "right":
+              ctx.moveTo((TILE_SIZE * 2) / 3, TILE_SIZE / 2);
+              ctx.lineTo((TILE_SIZE * 5) / 6, TILE_SIZE / 2);
+              break;
+          }
+          ctx.stroke();
+        }
+        this.sprites[`player_${direction}`] = fallbackImg;
+      };
+      img.onload = () => {
+        this.sprites[`player_${direction}`] = img;
+      };
       img.src = `/assets/player/${direction}.png`;
-      this.sprites[`player_${direction}`] = img;
     });
   }
 
@@ -652,49 +621,71 @@ export class GameEngine {
 
   public interact() {
     const { position, selectedItem, inventory } = this.state.player;
-    const tile = this.state.map[Math.floor(position.y)][Math.floor(position.x)];
+    const tileX = Math.floor(position.x);
+    const tileY = Math.floor(position.y);
+    const tile = this.state.map[tileY][tileX];
 
     // Check for NPC interaction
     if (tile.npcId) {
       const npc = this.npcs.find(n => n.id === tile.npcId);
       if (npc) {
-        this.activeDialogue = {
-          npc,
-          dialogueIndex: 0,
-        };
-        this.showNotification(`Talking to ${npc.name}`, "#4A90E2");
+        this.showMarketplace = true;
+        this.currentNPC = npc;
+        this.showNotification(`Trading with ${npc.name}`, "#4A90E2");
         return;
       }
     }
 
-    // Normal tile interaction
-    if (!tile.interactable) return;
-
+    // Get the selected item
     const item = inventory[selectedItem];
+    if (!item) return;
+
+    // Tool interactions
     switch (item.type) {
       case "TOOL":
-        if (item.name === "Hoe" && tile.type === TileType.GRASS) {
-          tile.type = TileType.TILLED_SOIL;
-          this.showNotification("Tilled the soil!");
-          this.addHarvestParticles(Math.floor(position.x), Math.floor(position.y));
-        } else if (item.name === "Watering Can" && tile.type === TileType.TILLED_SOIL) {
-          tile.type = TileType.WATERED_SOIL;
-          tile.waterLevel = 100;
-          this.showNotification("Watered the soil!", "#4A90E2");
-        } else if (item.name === "Fishing Rod" && tile.type === TileType.WATER) {
-          this.tryFishing();
+        switch (item.name) {
+          case "Hoe":
+            if (tile.type === TileType.GRASS || tile.type === TileType.DIRT) {
+              this.state.map[tileY][tileX] = {
+                type: TileType.TILLED_SOIL,
+                walkable: true,
+                interactable: true,
+              };
+              this.showNotification("Tilled the soil!", "#8E44AD");
+              this.addHarvestParticles(tileX, tileY);
+              this.gainExperience(5, "farming");
+            }
+            break;
+          case "Watering Can":
+            if (tile.type === TileType.TILLED_SOIL || tile.type === TileType.GROWING_CROP) {
+              this.state.map[tileY][tileX] = {
+                ...tile,
+                type: tile.type === TileType.TILLED_SOIL ? TileType.WATERED_SOIL : tile.type,
+                waterLevel: 100,
+              };
+              this.showNotification("Watered the soil!", "#4A90E2");
+              this.gainExperience(2, "farming");
+            }
+            break;
+          case "Fishing Rod":
+            if (tile.type === TileType.WATER || tile.type === TileType.DEEP_WATER) {
+              this.tryFishing();
+            }
+            break;
         }
         break;
       case "SEED":
-        if (tile.type === TileType.TILLED_SOIL || tile.type === TileType.WATERED_SOIL) {
-          if (item.quantity > 0) {
-            tile.type = TileType.GROWING_CROP;
-            tile.growthStage = 0;
-            inventory[selectedItem].quantity--;
-            this.showNotification("Planted a seed!", "#8E44AD");
-          } else {
-            this.showNotification("Out of seeds!", "#E74C3C");
-          }
+        if ((tile.type === TileType.TILLED_SOIL || tile.type === TileType.WATERED_SOIL) && item.quantity > 0) {
+          this.state.map[tileY][tileX] = {
+            type: TileType.GROWING_CROP,
+            walkable: true,
+            interactable: true,
+            growthStage: 0,
+            waterLevel: tile.type === TileType.WATERED_SOIL ? 100 : 0,
+          };
+          inventory[selectedItem].quantity--;
+          this.showNotification("Planted a seed!", "#8E44AD");
+          this.gainExperience(3, "farming");
         }
         break;
     }
@@ -928,12 +919,7 @@ export class GameEngine {
       this.ctx.fillRect(x, y, itemWidth, itemHeight);
 
       // Draw item icon
-      if (item.icon) {
-        const icon = this.sprites[item.icon];
-        if (icon) {
-          this.ctx.drawImage(icon, x + 10, y + 10, 40, 40);
-        }
-      }
+      this.drawInventoryItem(item, x + 10, y + 10, 40);
 
       // Draw item name and quantity with better formatting
       this.ctx.fillStyle = "white";
@@ -947,6 +933,49 @@ export class GameEngine {
         this.ctx.fillText(`x${item.quantity}`, x + itemWidth - 15, y + 20);
       }
     });
+  }
+
+  private drawInventoryItem(item: InventoryItem, x: number, y: number, size = 40): void {
+    if (!item.icon) return;
+
+    const sprite = this.sprites[item.icon];
+    if (!sprite) return;
+
+    this.drawSprite(sprite, x, y, size, size);
+  }
+
+  private drawSprite(
+    sprite: HTMLImageElement | HTMLCanvasElement,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ): void {
+    try {
+      if (sprite instanceof HTMLCanvasElement || this.isImageLoaded(sprite)) {
+        this.ctx.drawImage(sprite, x, y, width, height);
+      } else {
+        // Draw fallback for unloaded images
+        this.ctx.fillStyle = "#FFD700";
+        this.ctx.fillRect(x, y, width, height);
+        this.ctx.strokeStyle = "#000000";
+        this.ctx.strokeRect(x, y, width, height);
+      }
+    } catch (error) {
+      console.warn("Failed to draw sprite", error);
+      // Draw fallback
+      this.ctx.fillStyle = "#FFD700";
+      this.ctx.fillRect(x, y, width, height);
+      this.ctx.strokeStyle = "#000000";
+      this.ctx.strokeRect(x, y, width, height);
+    }
+  }
+
+  private isImageLoaded(sprite: HTMLImageElement | HTMLCanvasElement): boolean {
+    if (sprite instanceof HTMLImageElement) {
+      return sprite.complete && sprite.naturalWidth !== 0;
+    }
+    return true; // Canvas elements are always "loaded"
   }
 
   private drawMiniMap() {
@@ -1101,86 +1130,69 @@ export class GameEngine {
     const screenX = (x - this.camera.x) * TILE_SIZE;
     const screenY = (y - this.camera.y) * TILE_SIZE;
 
-    // Draw base tile
-    let sprite: HTMLImageElement | undefined;
-    switch (tile.type) {
-      case TileType.GRASS:
-        sprite = this.sprites.grass;
-        break;
-      case TileType.DIRT:
-        sprite = this.sprites.dirt;
-        break;
-      case TileType.TILLED_SOIL:
-        sprite = this.sprites.tilledSoil;
-        break;
-      case TileType.WATERED_SOIL:
-        sprite = this.sprites.wateredSoil;
-        break;
-      case TileType.PATH:
-        sprite = this.sprites.path;
-        break;
-      case TileType.TREE:
-        sprite = this.sprites.tree;
-        break;
+    // Draw base tile (ground or grass as default)
+    const baseSprite = this.sprites.ground || this.sprites.grass;
+    if (baseSprite) {
+      this.drawSprite(baseSprite, screenX, screenY, TILE_SIZE, TILE_SIZE);
     }
 
-    if (sprite && sprite.complete && sprite.naturalWidth !== 0) {
-      try {
-        this.ctx.drawImage(sprite, screenX, screenY, TILE_SIZE, TILE_SIZE);
-      } catch (error) {
-        console.warn(`Failed to draw sprite for tile type ${tile.type}:`, error);
-        this.drawTileFallback(tile, screenX, screenY);
+    // Special handling for house
+    if (tile.type === TileType.HOUSE && tile.variant === 1) {
+      const houseSprite = this.sprites.house;
+      if (houseSprite) {
+        const houseSize = (tile.size || 6) * TILE_SIZE;
+        this.drawSprite(houseSprite, screenX - TILE_SIZE * 2, screenY - TILE_SIZE * 2, houseSize, houseSize);
+        return;
       }
+    }
+
+    // Skip rendering for house tiles that are part of the larger house but not the main tile
+    if (tile.type === TileType.HOUSE && tile.variant === 0) {
+      return;
+    }
+
+    // Draw other tile specific sprites
+    const sprite = this.sprites[tile.type.toLowerCase()];
+    if (sprite) {
+      this.drawSprite(sprite, screenX, screenY, TILE_SIZE, TILE_SIZE);
     } else {
       this.drawTileFallback(tile, screenX, screenY);
     }
 
     // Draw crops if present
     if (tile.type === TileType.GROWING_CROP && tile.growthStage !== undefined) {
-      const cropSprite = this.sprites[`crop${tile.growthStage + 1}`];
-      if (cropSprite && cropSprite.complete && cropSprite.naturalWidth !== 0) {
-        try {
-          this.ctx.drawImage(cropSprite, screenX, screenY, TILE_SIZE, TILE_SIZE);
-        } catch (error) {
-          console.warn("Failed to draw crop sprite:", error);
-        }
+      const cropSprite = this.sprites.crop;
+      if (cropSprite) {
+        // Scale the crop based on growth stage
+        const scale = 0.5 + tile.growthStage * 0.25;
+        const size = TILE_SIZE * scale;
+        const offset = (TILE_SIZE - size) / 2;
+        this.drawSprite(cropSprite, screenX + offset, screenY + offset, size, size);
       }
     } else if (tile.type === TileType.READY_CROP) {
-      const readyCropSprite = this.sprites.cropReady;
-      if (readyCropSprite && readyCropSprite.complete && readyCropSprite.naturalWidth !== 0) {
-        try {
-          this.ctx.drawImage(readyCropSprite, screenX, screenY, TILE_SIZE, TILE_SIZE);
-        } catch (error) {
-          console.warn("Failed to draw ready crop sprite:", error);
-        }
+      const readyCropSprite = this.sprites.ready_crop;
+      if (readyCropSprite) {
+        this.drawSprite(readyCropSprite, screenX, screenY, TILE_SIZE, TILE_SIZE);
       }
     }
   }
 
   private drawTileFallback(tile: Tile, x: number, y: number) {
-    switch (tile.type) {
-      case TileType.GRASS:
-        this.ctx.fillStyle = "#90EE90";
-        break;
-      case TileType.DIRT:
-        this.ctx.fillStyle = "#8B4513";
-        break;
-      case TileType.TILLED_SOIL:
-        this.ctx.fillStyle = "#654321";
-        break;
-      case TileType.WATERED_SOIL:
-        this.ctx.fillStyle = "#483C32";
-        break;
-      case TileType.PATH:
-        this.ctx.fillStyle = "#C2B280";
-        break;
-      case TileType.TREE:
-        this.ctx.fillStyle = "#355E3B";
-        break;
-      default:
-        this.ctx.fillStyle = "#000000";
-    }
+    // Use yellow color for missing assets
+    this.ctx.fillStyle = "#FFD700";
+
+    // Add a pattern or text to indicate missing asset
     this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+    this.ctx.strokeStyle = "#000000";
+    this.ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+
+    // Add crosshatch pattern
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y);
+    this.ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE);
+    this.ctx.moveTo(x + TILE_SIZE, y);
+    this.ctx.lineTo(x, y + TILE_SIZE);
+    this.ctx.stroke();
   }
 
   private drawPlayer() {
@@ -1211,7 +1223,7 @@ export class GameEngine {
     const spriteKey = `player_${direction.toLowerCase()}`;
     const playerSprite = this.sprites[spriteKey];
 
-    if (playerSprite && playerSprite.complete && playerSprite.naturalWidth !== 0) {
+    if (playerSprite) {
       try {
         this.ctx.save();
         this.ctx.translate(screenX + TILE_SIZE / 2, screenY + TILE_SIZE / 2);
@@ -1321,6 +1333,43 @@ export class GameEngine {
       const skillName = String(skillType);
       character.skills[skillType] += amount * 0.1;
       this.showNotification(`${skillName} skill increased!`, "#4CAF50");
+    }
+  }
+
+  public isMarketplaceOpen(): boolean {
+    return this.showMarketplace;
+  }
+
+  public getCurrentNPC(): NPC | null {
+    return this.currentNPC;
+  }
+
+  public closeMarketplace(): void {
+    this.showMarketplace = false;
+    this.currentNPC = null;
+  }
+
+  public purchaseItem(item: any): void {
+    if (this.state.money >= item.price) {
+      this.state.money -= item.price;
+
+      // Add item to inventory
+      const existingItem = this.state.player.inventory.find(i => i.name === item.name);
+      if (existingItem) {
+        existingItem.quantity += item.quantity || 1;
+      } else {
+        this.state.player.inventory.push({
+          name: item.name,
+          type: item.type,
+          quantity: item.quantity || 1,
+          icon: item.name.toLowerCase(),
+          description: item.description,
+        });
+      }
+
+      this.showNotification(`Purchased ${item.name}!`, "#4CAF50");
+    } else {
+      this.showNotification("Not enough money!", "#E74C3C");
     }
   }
 }
