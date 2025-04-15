@@ -1,28 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ethers } from "ethers";
 import { AnimatePresence, motion } from "framer-motion";
+import BackgroundGradientDemo from "~~/components/background-gradient-demo";
+import { GlobeDemo } from "~~/components/globe-demo";
+import { LayoutGridDemo } from "~~/components/layout-grid-demo";
 
 export default function Home() {
-  const [isConnected, setIsConnected] = useState(false);
-  const [account, setAccount] = useState<string | null>(null);
   const [showRules, setShowRules] = useState(false);
-
-  const connectWallet = async () => {
-    if (typeof window.ethereum !== "undefined") {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_requestAccounts", []);
-        setAccount(accounts[0]);
-        setIsConnected(true);
-      } catch (error) {
-        console.error("Error connecting to wallet:", error);
-      }
-    } else {
-      alert("Please install MetaMask to play Bloomstead!");
-    }
-  };
 
   const gameFeatures = [
     {
@@ -69,93 +54,62 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-100 to-green-300 overflow-x-hidden">
-      <motion.div
-        className="max-w-6xl mx-auto px-4 py-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div
-          className="text-center mb-12"
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          transition={{ type: "spring", stiffness: 100 }}
-        >
-          <motion.h1
-            className="text-6xl font-bold text-green-800 mb-4"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            Bloomstead
-          </motion.h1>
-          <motion.p
-            className="text-xl text-green-700"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            Your magical farming adventure awaits in the blockchain
-          </motion.p>
-        </motion.div>
-
-        {!isConnected ? (
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={connectWallet}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg"
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      <div className="relative h-screen">
+        <div className="flex flex-row items-center justify-between">
+          <div className="w-1/2 pl-20 z-10">
+            <motion.div
+              className="text-left"
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8 }}
             >
-              Connect Wallet to Play
-            </motion.button>
-            <p className="mt-4 text-green-700">Connect with MetaMask using Sepolia network to start playing</p>
-          </motion.div>
-        ) : (
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <p className="text-green-800 mb-4">
-              Connected: {account?.slice(0, 6)}...{account?.slice(-4)}
-            </p>
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="/game"
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors inline-block shadow-lg"
-            >
-              Start Game
-            </motion.a>
-          </motion.div>
-        )}
+              <h1 className="text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 mb-6">
+                GreenWhistel World
+              </h1>
+              <p className="text-2xl text-gray-300 mb-8">A global farming adventure connecting players worldwide</p>
+              <p className="text-lg text-gray-400 mb-8 max-w-xl">
+                Welcome to Bloomstead, a worldwide blockchain farming community. Join farmers from across the globe,
+                trade internationally on our decentralized marketplace, and be part of an interconnected Web3 ecosystem.
+                Using Sepolia testnet, you can safely participate in this global agricultural revolution.
+              </p>
+              <motion.a
+                href="/game"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg text-xl hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/25"
+              >
+                Start Your Adventure
+              </motion.a>
+            </motion.div>
+          </div>
 
+          <div className="w-1/2 h-screen">
+            <GlobeDemo />
+          </div>
+        </div>
+      </div>
+      <LayoutGridDemo />
+      <div className="max-w-7xl mx-auto px-4 py-20">
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.3 }}
         >
           {gameFeatures.map((feature, index) => (
             <motion.div
               key={feature.title}
-              className="bg-white/50 p-6 rounded-lg shadow-lg backdrop-blur-sm"
+              className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm border border-gray-700"
               whileHover={{ scale: 1.02 }}
               initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 * index }}
             >
-              <h3 className="text-xl font-bold text-green-800 mb-2">{feature.title}</h3>
-              <p className="text-green-700 mb-4">{feature.description}</p>
-              <ul className="list-disc list-inside text-green-600 space-y-1">
+              <h3 className="text-xl font-bold text-blue-400 mb-2">{feature.title}</h3>
+              <p className="text-gray-300 mb-4">{feature.description}</p>
+              <ul className="list-disc list-inside text-gray-400 space-y-1">
                 {feature.details.map((detail, i) => (
                   <li key={i}>{detail}</li>
                 ))}
@@ -164,10 +118,15 @@ export default function Home() {
           ))}
         </motion.div>
 
-        <motion.div className="text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
           <motion.button
             onClick={() => setShowRules(!showRules)}
-            className="text-green-700 underline"
+            className="text-blue-400 underline"
             whileHover={{ scale: 1.05 }}
           >
             {showRules ? "Hide Game Controls" : "Show Game Controls"}
@@ -179,28 +138,28 @@ export default function Home() {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="mt-6 bg-white/50 p-6 rounded-lg shadow-lg backdrop-blur-sm"
+                className="mt-6 bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm border border-gray-700"
               >
-                <h3 className="text-xl font-bold text-green-800 mb-4">Game Controls</h3>
+                <h3 className="text-xl font-bold text-blue-400 mb-4">Game Controls</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                   <div>
-                    <h4 className="font-bold text-green-700">Movement</h4>
-                    <ul className="list-disc list-inside text-green-600">
+                    <h4 className="font-bold text-blue-400">Movement</h4>
+                    <ul className="list-disc list-inside text-gray-300">
                       <li>WASD or Arrow keys to move</li>
                       <li>Hold Shift to run</li>
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-bold text-green-700">Actions</h4>
-                    <ul className="list-disc list-inside text-green-600">
+                    <h4 className="font-bold text-blue-400">Actions</h4>
+                    <ul className="list-disc list-inside text-gray-300">
                       <li>E or Space to interact</li>
                       <li>1-5 to select items</li>
                       <li>I to open inventory</li>
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-bold text-green-700">Tools</h4>
-                    <ul className="list-disc list-inside text-green-600">
+                    <h4 className="font-bold text-blue-400">Tools</h4>
+                    <ul className="list-disc list-inside text-gray-300">
                       <li>Hoe: Till soil for planting</li>
                       <li>Watering Can: Water crops</li>
                       <li>Seeds: Plant in tilled soil</li>
@@ -208,8 +167,8 @@ export default function Home() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-bold text-green-700">Tips</h4>
-                    <ul className="list-disc list-inside text-green-600">
+                    <h4 className="font-bold text-blue-400">Tips</h4>
+                    <ul className="list-disc list-inside text-gray-300">
                       <li>Water crops daily for faster growth</li>
                       <li>Check market prices before selling</li>
                       <li>Talk to NPCs for useful tips</li>
@@ -221,7 +180,8 @@ export default function Home() {
             )}
           </AnimatePresence>
         </motion.div>
-      </motion.div>
+        <BackgroundGradientDemo />
+      </div>
     </div>
   );
 }
