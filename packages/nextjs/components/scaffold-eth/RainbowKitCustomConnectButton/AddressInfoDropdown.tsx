@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
 import { NetworkOptions } from "./NetworkOptions";
+import { Avatar, Name } from "@coinbase/onchainkit/identity";
+import { WalletDropdownDisconnect } from "@coinbase/onchainkit/wallet";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { getAddress } from "viem";
 import { Address } from "viem";
 import { useDisconnect } from "wagmi";
 import {
-  ArrowLeftOnRectangleIcon,
   ArrowTopRightOnSquareIcon,
   ArrowsRightLeftIcon,
   CheckCircleIcon,
@@ -13,7 +14,6 @@ import {
   DocumentDuplicateIcon,
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
-import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 import { getTargetNetworks } from "~~/utils/scaffold-eth";
 
@@ -22,16 +22,9 @@ const allowedNetworks = getTargetNetworks();
 type AddressInfoDropdownProps = {
   address: Address;
   blockExplorerAddressLink: string | undefined;
-  displayName: string;
-  ensAvatar?: string;
 };
 
-export const AddressInfoDropdown = ({
-  address,
-  ensAvatar,
-  displayName,
-  blockExplorerAddressLink,
-}: AddressInfoDropdownProps) => {
+export const AddressInfoDropdown = ({ address, blockExplorerAddressLink }: AddressInfoDropdownProps) => {
   const { disconnect } = useDisconnect();
   const checkSumAddress = getAddress(address);
 
@@ -49,10 +42,8 @@ export const AddressInfoDropdown = ({
     <>
       <details ref={dropdownRef} className="dropdown dropdown-end leading-3">
         <summary tabIndex={0} className="btn btn-secondary btn-sm pl-0 pr-2 shadow-md dropdown-toggle gap-0 !h-auto">
-          <BlockieAvatar address={checkSumAddress} size={30} ensImage={ensAvatar} />
-          <span className="ml-2 mr-1">
-            {isENS(displayName) ? displayName : checkSumAddress?.slice(0, 6) + "..." + checkSumAddress?.slice(-4)}
-          </span>
+          <Avatar address={address} className="h-6 w-6" />
+          <Name address={address} className="ml-2 mr-1" />
           <ChevronDownIcon className="h-6 w-4 ml-2 sm:ml-0" />
         </summary>
         <ul
@@ -122,13 +113,7 @@ export const AddressInfoDropdown = ({
             </li>
           ) : null}
           <li className={selectingNetwork ? "hidden" : ""}>
-            <button
-              className="menu-item text-error btn-sm !rounded-xl flex gap-3 py-3"
-              type="button"
-              onClick={() => disconnect()}
-            >
-              <ArrowLeftOnRectangleIcon className="h-6 w-4 ml-2 sm:ml-0" /> <span>Disconnect</span>
-            </button>
+            <WalletDropdownDisconnect className="menu-item text-error btn-sm !rounded-xl flex gap-3 py-3" />
           </li>
         </ul>
       </details>

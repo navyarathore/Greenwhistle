@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { hardhat } from "viem/chains";
 import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
-import { FaucetButton, RainbowKitCustomConnectButton, BaseFaucetsButton, SuperchainFaucetButton } from "~~/components/scaffold-eth";
+import { FaucetButton, OnchainKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
 
 type HeaderMenuLink = {
@@ -74,9 +74,6 @@ export const Header = () => {
     useCallback(() => setIsDrawerOpen(false), []),
   );
 
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === "dark";
-
   return (
     <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-secondary px-0 sm:px-2">
       <div className="navbar-start w-auto lg:w-1/2">
@@ -104,7 +101,7 @@ export const Header = () => {
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
           <div className="flex relative w-10 h-10">
-            <Image alt="Base logo" className="cursor-pointer" fill src={`/base/Base_Symbol_${isDarkMode ? "White" : "Black"}.svg`} />
+            <BaseLogo />
           </div>
           <div className="flex flex-col">
             <span className="font-bold leading-tight">Scaffold-ETH</span>
@@ -116,11 +113,26 @@ export const Header = () => {
         </ul>
       </div>
       <div className="navbar-end flex-grow mr-4">
-        <RainbowKitCustomConnectButton />
+        <OnchainKitCustomConnectButton />
         {isLocalNetwork && <FaucetButton />}
-        <SuperchainFaucetButton />
-        <BaseFaucetsButton />
       </div>
     </div>
+  );
+};
+
+const BaseLogo = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === "dark";
+
+  return isMounted ? (
+    <Image src={`/base/Base_Symbol_${isDarkMode ? "White" : "Black"}.svg`} alt="Base logo" width={10} height={10} />
+  ) : (
+    <div className="w-full h-full rounded-full"></div>
   );
 };
