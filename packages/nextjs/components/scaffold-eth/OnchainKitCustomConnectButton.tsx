@@ -30,30 +30,31 @@ export const OnchainKitCustomConnectButton = () => {
   // Creating similar behavior to RainbowKit component
   if (!isConnected) {
     return (
-      // Not connected state - enhanced connect button
-      <ConnectWallet
-        className="btn btn-primary btn-sm px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 font-medium"
-        disconnectedLabel={
-          <div className="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
-              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
-              <path d="M18 12h.01"></path>
-            </svg>
-            Connect Wallet
-          </div>
-        }
-      />
+      <Wallet>
+        <ConnectWallet
+          className="btn btn-primary btn-sm px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 font-medium"
+          disconnectedLabel={
+            <div className="flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                <path d="M18 12h.01"></path>
+              </svg>
+              Connect Wallet
+            </div>
+          }
+        />
+      </Wallet>
     );
   }
 
