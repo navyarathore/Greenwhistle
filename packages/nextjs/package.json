@@ -35,6 +35,7 @@
     "next": "^15.2.3",
     "next-nprogress-bar": "^2.3.13",
     "next-themes": "^0.3.0",
+    "phaser": "^3.88.2",
     "qrcode.react": "^4.0.1",
     "react": "^19.0.0",
     "react-copy-to-clipboard": "^5.1.0",
