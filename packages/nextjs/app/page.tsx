@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import BackgroundGradientDemo from "~~/components/background-gradient-demo";
 import { GlobeDemo } from "~~/components/globe-demo";
