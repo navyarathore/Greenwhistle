@@ -3,66 +3,71 @@ import { GameObjects, Scene } from "phaser";
 
 export class MainMenu extends Scene {
   background!: GameObjects.Image;
-  logo!: GameObjects.Image;
   title!: GameObjects.Text;
-  logoTween!: Phaser.Tweens.Tween | null;
+  playButton!: GameObjects.Text;
 
   constructor() {
     super("MainMenu");
   }
 
   create() {
+    // Background with parallax effect
     this.background = this.add.sprite(640, 360, "background").play("background");
 
-    this.logo = this.add.image(512, 300, "logo").setDepth(100);
-
+    // Centered title
     this.title = this.add
-      .text(512, 460, "Main Menu", {
+      .text(700, 180, "Green Whistle", {
         fontFamily: "Arial Black",
-        fontSize: 38,
-        color: "#ffffff",
+        fontSize: 72,
+        color: "#48ff00",
         stroke: "#000000",
-        strokeThickness: 8,
+        strokeThickness: 12,
         align: "center",
       })
       .setOrigin(0.5)
-      .setDepth(100);
+      .setDepth(100)
+      .setShadow(5, 5, "rgba(0,0,0,0.5)", 5);
+
+    // Centered play button
+    this.playButton = this.createButton(650, 450, "Play Game", () => this.changeScene());
 
     EventBus.emit("current-scene-ready", this);
   }
 
-  changeScene() {
-    if (this.logoTween) {
-      this.logoTween.stop();
-      this.logoTween = null;
-    }
+  createButton(x: number, y: number, text: string, callback: () => void): GameObjects.Text {
+    const button = this.add
+      .text(x, y, text, {
+        fontFamily: "Arial Black",
+        fontSize: 48,
+        color: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 6,
+        align: "center",
+      })
+      .setOrigin(0.5)
+      .setDepth(100)
+      .setPadding(15)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerover", () => {
+        button.setScale(1.1);
+        button.setColor("#ffff00");
+      })
+      .on("pointerout", () => {
+        button.setScale(1);
+        button.setColor("#ffffff");
+      })
+      .on("pointerdown", () => {
+        button.setScale(0.95);
+      })
+      .on("pointerup", () => {
+        button.setScale(1);
+        callback();
+      });
 
-    this.scene.start("Game");
+    return button;
   }
 
-  moveLogo(reactCallback: ({ x, y }: { x: number; y: number }) => void) {
-    if (this.logoTween) {
-      if (this.logoTween.isPlaying()) {
-        this.logoTween.pause();
-      } else {
-        this.logoTween.play();
-      }
-    } else {
-      this.logoTween = this.tweens.add({
-        targets: this.logo,
-        x: { value: 750, duration: 3000, ease: "Back.easeInOut" },
-        y: { value: 80, duration: 1500, ease: "Sine.easeOut" },
-        yoyo: true,
-        repeat: -1,
-        onUpdate: () => {
-          if (reactCallback) {
-            reactCallback({
-              x: Math.floor(this.logo.x),
-              y: Math.floor(this.logo.y),
-            });
-          }
-        },
-      });
-    }
+  changeScene() {
+    this.scene.start("Game");
   }
 }

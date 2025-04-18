@@ -22,18 +22,18 @@ function App() {
     }
   };
 
-  const moveSprite = () => {
-    if (phaserRef.current) {
-      const scene = phaserRef.current.scene as MainMenu;
+  // const moveSprite = () => {
+  //   if (phaserRef.current) {
+  //     const scene = phaserRef.current.scene as MainMenu;
 
-      if (scene && scene.scene.key === "MainMenu") {
-        // Get the update logo position
-        scene.moveLogo(({ x, y }) => {
-          setSpritePosition({ x, y });
-        });
-      }
-    }
-  };
+  //     if (scene && scene.scene.key === "MainMenu") {
+  //       // Get the update logo position
+  //       scene.moveLogo(({ x, y }) => {
+  //         setSpritePosition({ x, y });
+  //       });
+  //     }
+  //   }
+  // };
 
   const addSprite = () => {
     if (phaserRef.current) {
@@ -84,7 +84,7 @@ function App() {
           <button
             disabled={canMoveSprite}
             className="bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-3 px-6 rounded-lg w-full hover:scale-105 transition-all shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={moveSprite}
+            // onClick={moveSprite}
           >
             Toggle Movement
           </button>
