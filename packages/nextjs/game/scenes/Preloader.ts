@@ -28,11 +28,31 @@ export class Preloader extends Scene {
   preload() {
     this.load.setPath("assets");
 
-    this.load.image("logo", "logo.png");
-    this.load.image("star", "star.png");
+    this.load.tilemapTiledJSON("map", "/maps/map.json");
+    this.load.image("tiles", "/tilesets/map_tileset.png");
+
+    this.load.spritesheet("ori", "/player/player_movement.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
   }
 
   create() {
+    const animations = ["idle", "down", "up", "right", "left"];
+    const numberOfFramesPerCol = 3;
+
+    animations.forEach((anim, index) => {
+      this.anims.create({
+        key: `ori-${anim}`,
+        frames: this.anims.generateFrameNumbers("ori", {
+          start: index * numberOfFramesPerCol,
+          end: (index + 1) * numberOfFramesPerCol - 1,
+        }),
+        frameRate: 20,
+        repeat: -1,
+      });
+    });
+
     //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
     //  For example, you can define global animations here, so we can use them in other scenes.
 
