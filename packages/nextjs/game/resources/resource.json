@@ -1,0 +1,44 @@
+{
+    "items": {
+        "0": {
+            "name": "Empty",
+            "stackable": false
+        },
+        "799": {
+            "name": "Branches",
+            "type": "resources",
+            "stackable": true
+        }
+    },
+    "pickup": [
+        {
+            "layer": "Branches",
+            "id": [
+                799
+            ]
+        },
+        {
+            "layer": "Logs",
+            "id": [
+                391,
+                392,
+                395,
+                396
+            ]
+        },
+        {
+            "layer": "Seed Bush",
+            "id": [
+                797,
+                847
+            ]
+        },
+        {
+            "layer": "Berries",
+            "id": [
+                105,
+                155
+            ]
+        }
+    ]
+}

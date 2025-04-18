@@ -1,9 +1,11 @@
 // src/game/entities/Player.ts
 import { EventBus } from "../EventBus";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
+import ResourceData from "../resources/resource.json";
 import { Game } from "../scenes/Game";
+import InventorySystem, { InventoryItem } from "../systems/InventorySystem";
 import { Direction, GridEngineConfig } from "grid-engine";
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 
 export const SPRITE_ID = "ori";
 
@@ -25,6 +27,8 @@ export default class Player {
   public isHeavyAttack = false;
   private movementEnabled = true;
   private previousInputEnabled?: boolean;
+  private eKey: Phaser.Input.Keyboard.Key;
+  private inventory!: InventorySystem;
 
   constructor(
     private scene: Game,
@@ -45,28 +49,7 @@ export default class Player {
             x: Math.floor(12),
             y: Math.floor(12),
           },
-          walkingAnimationMapping: {
-            left: {
-              leftFoot: 9,
-              standing: 10,
-              rightFoot: 11,
-            },
-            right: {
-              leftFoot: 6,
-              standing: 7,
-              rightFoot: 8,
-            },
-            up: {
-              leftFoot: 3,
-              standing: 4,
-              rightFoot: 5,
-            },
-            down: {
-              leftFoot: 0,
-              standing: 1,
-              rightFoot: 2,
-            },
-          },
+          walkingAnimationMapping: 0,
         },
       ],
     };
@@ -74,6 +57,19 @@ export default class Player {
     this.scene.gridEngine.create(scene.map, gridEngineConfig);
     this.scene.camera.startFollow(this.sprite, true);
     this.scene.camera.setZoom(2);
+
+    // Add E key for item pickup
+    this.eKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+    // Get reference to inventory system through the event bus
+    EventBus.on("inventory-system-ready", (inventorySystem: any) => {
+      this.inventory = inventorySystem;
+    });
+
+    this.configurePickup();
+
+    // Emit event to get inventory system
+    EventBus.emit("player-created", this);
   }
 
   update() {
@@ -86,6 +82,33 @@ export default class Player {
       const cursor = this.cursors[key as MovementDirections];
       if (cursor.isDown) {
         gridEngine.move(SPRITE_ID, Direction[key.toUpperCase() as keyof typeof Direction]);
+      }
+    });
+  }
+
+  private configurePickup() {
+    this.eKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.eKey.on("up", () => {
+      const playerPosition = this.scene.gridEngine.getPosition(SPRITE_ID);
+
+      for (const res of ResourceData.pickup) {
+        const { layer, id } = res;
+        const tile = this.scene.map.getTileAt(playerPosition.x, playerPosition.y, false, layer);
+
+        if (tile && id.includes(tile.index)) {
+          this.scene.map.removeTileAt(playerPosition.x, playerPosition.y, false, true, layer);
+          this.inventory.addItem(
+            {
+              id: tile.index,
+              ...ResourceData.items[tile.index.toString() as keyof typeof ResourceData.items],
+              quantity: 1,
+            } as InventoryItem,
+            "player",
+          );
+
+          EventBus.emit("item-picked-up", tile.properties);
+          break;
+        }
       }
     });
   }

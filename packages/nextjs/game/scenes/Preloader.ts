@@ -28,8 +28,8 @@ export class Preloader extends Scene {
   preload() {
     this.load.setPath("assets");
 
-    this.load.tilemapTiledJSON("map", "/maps/map.json");
-    this.load.image("tiles", "/tilesets/map_tileset.png");
+    this.load.tilemapTiledJSON("map", "/maps/albion.json");
+    this.load.image("tiles", "/tilesets/albion_tileset.png");
 
     this.load.spritesheet("ori", "/player/player_movement.png", {
       frameWidth: 32,

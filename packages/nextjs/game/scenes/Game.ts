@@ -1,4 +1,5 @@
 import { EventBus } from "../EventBus";
+import { SystemManager } from "../SystemManager";
 import Player from "../entities/Player";
 import GridEngine, { GridEngineConfig } from "grid-engine";
 import { Scene } from "phaser";
@@ -9,6 +10,7 @@ export class Game extends Scene {
   player!: Player;
   cursor!: Phaser.Types.Input.Keyboard.CursorKeys;
   gridEngine!: GridEngine;
+  sysManager!: SystemManager;
 
   constructor() {
     super("Game");
@@ -31,14 +33,18 @@ export class Game extends Scene {
       }
     }
 
+    this.sysManager = new SystemManager(this);
+
     this.cursor = this.input.keyboard.createCursorKeys();
     this.player = new Player(this, this.cursor);
 
     EventBus.emit("current-scene-ready", this);
   }
 
-  update(): void {
+  update(time: number, delta: number): void {
     this.player.update();
+
+    this.sysManager.update(time, delta);
   }
 
   changeScene() {
