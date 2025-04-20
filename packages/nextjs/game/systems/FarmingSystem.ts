@@ -92,16 +92,16 @@ export class FarmingSystem {
     const toolItemId = toolType === "axe" ? "axe" : "pickaxe";
 
     // Check if the tool exists in inventory
-    if (!this.inventorySystem.hasItem(toolItemId)) {
-      EventBus.emit("show-message", `You don't have a ${toolType}!`);
-      return { success: false };
-    }
+    // if (!this.inventorySystem.hasItem(toolItemId)) {
+    //   EventBus.emit("show-message", `You don't have a ${toolType}!`);
+    //   return { success: false };
+    // }
 
-    // Use the tool (this will reduce durability)
-    if (!this.inventorySystem.useItem(toolItemId)) {
-      EventBus.emit("show-message", `Your ${toolType} is broken! Craft a new one.`);
-      return { success: false };
-    }
+    // // Use the tool (this will reduce durability)
+    // if (!this.inventorySystem.useItem(toolItemId)) {
+    //   EventBus.emit("show-message", `Your ${toolType} is broken! Craft a new one.`);
+    //   return { success: false };
+    // }
 
     // Harvest the resource
     resource.resourceAmount--;
@@ -183,35 +183,5 @@ export class FarmingSystem {
         EventBus.emit("resource-respawned", resource.id);
       }
     });
-  }
-
-  repairTool(toolType: string, materials: { type: string; quantity: number }[]): boolean {
-    // Check if player has required materials
-    const hasAllMaterials = materials.every(material => {
-      return this.inventorySystem.hasEnoughItems(material.type, material.quantity);
-    });
-
-    if (!hasAllMaterials) {
-      return false;
-    }
-
-    // Consume materials
-    materials.forEach(material => {
-      this.inventorySystem.removeItem(material.type, material.quantity);
-    });
-
-    // Get the tool from inventory
-    const toolItemId = toolType === "axe" ? "axe" : "pickaxe";
-    const toolItem = this.inventorySystem.getItem(toolItemId);
-
-    if (toolItem && toolItem.durability !== undefined && toolItem.maxDurability !== undefined) {
-      // Repair tool by setting durability to max
-      toolItem.durability = toolItem.maxDurability;
-
-      EventBus.emit("show-message", `Repaired ${toolType}!`);
-      return true;
-    }
-
-    return false;
   }
 }

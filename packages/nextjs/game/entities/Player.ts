@@ -1,4 +1,3 @@
-// src/game/entities/Player.ts
 import { EventBus } from "../EventBus";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
 import ResourceData from "../resources/resource.json";
@@ -31,14 +30,14 @@ export default class Player {
   private inventory!: InventorySystem;
 
   constructor(
-    private scene: Game,
+    private game: Game,
     private cursors: MovementCursor,
     x: number = SCREEN_WIDTH / 2,
     y: number = SCREEN_HEIGHT / 2,
   ) {
-    this.sprite = scene.add.sprite(x, y, SPRITE_ID, 0);
-    this.scene.camera.startFollow(this.sprite, true);
-    this.scene.camera.setFollowOffset(-this.sprite.width, -this.sprite.height);
+    this.sprite = game.add.sprite(x, y, SPRITE_ID, 0);
+    this.game.camera.startFollow(this.sprite, true);
+    this.game.camera.setFollowOffset(-this.sprite.width, -this.sprite.height);
 
     const gridEngineConfig: GridEngineConfig = {
       characters: [
@@ -54,12 +53,12 @@ export default class Player {
       ],
     };
 
-    this.scene.gridEngine.create(scene.map, gridEngineConfig);
-    this.scene.camera.startFollow(this.sprite, true);
-    this.scene.camera.setZoom(2);
+    this.game.gridEngine.create(game.map, gridEngineConfig);
+    this.game.camera.startFollow(this.sprite, true);
+    this.game.camera.setZoom(2);
 
     // Add E key for item pickup
-    this.eKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.eKey = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
     // Get reference to inventory system through the event bus
     EventBus.on("inventory-system-ready", (inventorySystem: any) => {
@@ -73,7 +72,7 @@ export default class Player {
   }
 
   update() {
-    const gridEngine = this.scene.gridEngine;
+    const gridEngine = this.game.gridEngine;
     if (!this.movementEnabled) {
       return;
     }
@@ -87,24 +86,17 @@ export default class Player {
   }
 
   private configurePickup() {
-    this.eKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.eKey = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     this.eKey.on("up", () => {
-      const playerPosition = this.scene.gridEngine.getPosition(SPRITE_ID);
+      const playerPosition = this.game.gridEngine.getPosition(SPRITE_ID);
 
       for (const res of ResourceData.pickup) {
         const { layer, id } = res;
-        const tile = this.scene.map.getTileAt(playerPosition.x, playerPosition.y, false, layer);
+        const tile = this.game.map.getTileAt(playerPosition.x, playerPosition.y, false, layer);
 
         if (tile && id.includes(tile.index)) {
-          this.scene.map.removeTileAt(playerPosition.x, playerPosition.y, false, true, layer);
-          this.inventory.addItem(
-            {
-              id: tile.index,
-              ...ResourceData.items[tile.index.toString() as keyof typeof ResourceData.items],
-              quantity: 1,
-            } as InventoryItem,
-            "player",
-          );
+          this.game.map.removeTileAt(playerPosition.x, playerPosition.y, false, true, layer);
+          this.inventory.addItem(this.game.sysManager.getItemManager().getItem(tile.index)!, 1);
 
           EventBus.emit("item-picked-up", tile.properties);
           break;
@@ -114,7 +106,7 @@ export default class Player {
   }
 
   setPosition(x: number, y: number) {
-    this.scene.gridEngine.setPosition(SPRITE_ID, { x, y });
+    this.game.gridEngine.setPosition(SPRITE_ID, { x, y });
   }
 
   selectTool(tool: string) {
@@ -126,17 +118,17 @@ export default class Player {
   disableMovement(): void {
     this.movementEnabled = false;
 
-    this.scene.gridEngine.stopMovement(SPRITE_ID);
+    this.game.gridEngine.stopMovement(SPRITE_ID);
 
-    this.previousInputEnabled = this.scene.input.enabled;
-    this.scene.input.enabled = false;
+    this.previousInputEnabled = this.game.input.enabled;
+    this.game.input.enabled = false;
   }
 
   enableMovement(): void {
     this.movementEnabled = true;
 
     if (this.previousInputEnabled !== undefined) {
-      this.scene.input.enabled = this.previousInputEnabled;
+      this.game.input.enabled = this.previousInputEnabled;
     }
   }
 }

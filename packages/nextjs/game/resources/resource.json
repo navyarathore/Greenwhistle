@@ -1,44 +1,31 @@
 {
-    "items": {
-        "0": {
-            "name": "Empty",
-            "stackable": false
-        },
-        "799": {
-            "name": "Branches",
-            "type": "resources",
-            "stackable": true
-        }
+  "items": {
+    "0": {
+      "name": "Empty",
+      "stackable": false
     },
-    "pickup": [
-        {
-            "layer": "Branches",
-            "id": [
-                799
-            ]
-        },
-        {
-            "layer": "Logs",
-            "id": [
-                392,
-                393,
-                396,
-                397
-            ]
-        },
-        {
-            "layer": "Seed Bush",
-            "id": [
-                798,
-                848
-            ]
-        },
-        {
-            "layer": "Berries",
-            "id": [
-                106,
-                156
-            ]
-        }
-    ]
+    "799": {
+      "name": "Branches",
+      "type": "resources",
+      "stackable": true
+    }
+  },
+  "pickup": [
+    {
+      "layer": "Branches",
+      "id": [799]
+    },
+    {
+      "layer": "Logs",
+      "id": [392, 393, 396, 397]
+    },
+    {
+      "layer": "Seed Bush",
+      "id": [798, 848]
+    },
+    {
+      "layer": "Berries",
+      "id": [106, 156]
+    }
+  ]
 }

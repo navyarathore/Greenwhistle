@@ -1,5 +1,6 @@
 // src/game/SystemManager.ts
 import { EventBus } from "./EventBus";
+import { ItemManager } from "./resources/ItemManager";
 import { Game } from "./scenes/Game";
 import { FarmingSystem } from "./systems/FarmingSystem";
 import InventorySystem from "./systems/InventorySystem";
@@ -10,14 +11,18 @@ import InventorySystem from "./systems/InventorySystem";
 export class SystemManager {
   private farmingSystem: FarmingSystem;
   private inventorySystem: InventorySystem;
+  private itemManager: ItemManager;
 
   constructor(private scene: Game) {
     // Initialize systems in the correct order
     this.inventorySystem = new InventorySystem(scene);
     this.farmingSystem = new FarmingSystem(scene, this.inventorySystem);
+    this.itemManager = new ItemManager();
+  }
 
-    // Listen for global game events
+  load() {
     this.setupEventListeners();
+    this.itemManager.loadItems();
   }
 
   /**
@@ -84,6 +89,10 @@ export class SystemManager {
    */
   public getFarmingSystem(): FarmingSystem {
     return this.farmingSystem;
+  }
+
+  public getItemManager(): ItemManager {
+    return this.itemManager;
   }
 
   /**
