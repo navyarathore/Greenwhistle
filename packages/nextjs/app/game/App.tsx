@@ -5,7 +5,8 @@ import { MainMenu } from "../../game/scenes/MainMenu";
 import { InventoryGrid } from "~~/components/game/InventoryGrid";
 import { EventBus } from "~~/game/EventBus";
 import { IRefPhaserGame, PhaserGame } from "~~/game/PhaserGame";
-import InventorySystem, { InventoryItem } from "~~/game/systems/InventorySystem";
+import InventoryManager from "~~/game/managers/InventoryManager";
+import { Item } from "~~/game/resources/Item";
 
 function App() {
   // The sprite can only be moved in the MainMenu Scene
@@ -13,15 +14,15 @@ function App() {
 
   //  References to the PhaserGame component (game and scene are exposed)
   const phaserRef = useRef<IRefPhaserGame | null>(null);
-  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<Item[]>([]);
 
   useEffect(() => {
-    const handleInventoryUpdate = (items: InventoryItem[]) => {
+    const handleInventoryUpdate = (items: Item[]) => {
       setInventoryItems(items);
       console.log("Inventory updated:", items);
     };
 
-    const handleInventoryReady = (system: InventorySystem) => {
+    const handleInventoryReady = (system: InventoryManager) => {
       setInventoryItems(system.getItems());
       console.log("Inventory updated:", system.getItems());
     };

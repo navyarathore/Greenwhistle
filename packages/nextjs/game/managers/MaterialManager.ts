@@ -1,5 +1,5 @@
-import { Item, ItemType } from "./Item";
-import Resources from "./resource.json";
+import { Material, MaterialCategory } from "../resources/Item";
+import Resources from "../resources/resource.json";
 
 const ITEMS_PER_ROW = 50;
 
@@ -7,7 +7,7 @@ const ITEMS_PER_ROW = 50;
  * ItemManager class responsible for loading, managing, and providing access to game items
  */
 export class ItemManager {
-  private items: Map<number, Item> = new Map();
+  private items: Map<number, Material> = new Map();
 
   /**
    * Load items from the resource.json file
@@ -17,11 +17,13 @@ export class ItemManager {
       Object.entries(Resources.items).forEach(([_id, itemData]: [string, any]) => {
         const id = Number(_id);
         const zeroBasedIdx = id - 1;
-        const item: Item = {
+        const item: Material = {
           ...itemData,
           id: id,
           name: itemData.name,
-          type: itemData.type ? ItemType[itemData.type.toUpperCase() as keyof typeof ItemType] : ItemType.OTHER,
+          type: itemData.type
+            ? MaterialCategory[itemData.type.toUpperCase() as keyof typeof MaterialCategory]
+            : MaterialCategory.OTHER,
           stackable: itemData.stackable !== undefined ? itemData.stackable : true,
           maxStackSize: itemData.maxStackSize || 99,
           icon: itemData.icon || {
@@ -49,21 +51,21 @@ export class ItemManager {
   /**
    * Get all items
    */
-  public getAllItems(): Item[] {
+  public getAllMaterials(): Material[] {
     return Array.from(this.items.values());
   }
 
   /**
    * Get an item by ID
    */
-  public getItem(id: number): Item | undefined {
+  public getMaterial(id: number): Material | undefined {
     return this.items.get(id);
   }
 
   /**
    * Get items by type
    */
-  public getItemsByType(type: ItemType): Item[] {
-    return this.getAllItems().filter(item => item.type === type);
+  public getItemsByCategory(type: MaterialCategory): Material[] {
+    return this.getAllMaterials().filter(item => item.type === type);
   }
 }

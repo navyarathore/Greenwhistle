@@ -1,6 +1,6 @@
 // src/game/systems/FarmingSystem.ts
 import { EventBus } from "../EventBus";
-import InventorySystem from "./InventorySystem";
+import InventoryManager from "./InventoryManager";
 import Phaser from "phaser";
 
 interface ResourceConfig {
@@ -15,11 +15,11 @@ export class FarmingSystem {
   private resources: Map<string, any> = new Map();
   private currentDay = 1;
   private toolDurability: Map<string, number> = new Map();
-  private inventorySystem: InventorySystem;
+  private inventorySystem: InventoryManager;
 
   constructor(
     private scene: any,
-    inventorySystem: InventorySystem,
+    inventorySystem: InventoryManager,
   ) {
     // Initialize inventory system
     this.inventorySystem = inventorySystem;

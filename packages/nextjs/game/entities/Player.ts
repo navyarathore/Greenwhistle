@@ -1,5 +1,6 @@
 import { EventBus } from "../EventBus";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
+import { Item } from "../resources/Item";
 import ResourceData from "../resources/resource.json";
 import { Game } from "../scenes/Game";
 import { Direction, GridEngineConfig } from "grid-engine";
@@ -90,7 +91,7 @@ export default class Player {
           this.game.map.removeTileAt(playerPosition.x, playerPosition.y, false, true, layer);
           this.game.sysManager
             .getInventorySystem()
-            .addItem(this.game.sysManager.getItemManager().getItem(tile.index)!, 1);
+            .addItem(new Item(this.game.sysManager.getItemManager().getMaterial(tile.index)!, 1));
 
           EventBus.emit("item-picked-up", tile.properties);
           break;

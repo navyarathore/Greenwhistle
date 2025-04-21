@@ -1,10 +1,10 @@
 // A React component to display the inventory grid using the InventorySystem types
 import React from "react";
 import { TileRange } from "~~/components/TileSetComponent";
-import { InventoryItem } from "~~/game/systems/InventorySystem";
+import { Item } from "~~/game/resources/Item";
 
 interface InventoryGridProps {
-  items: InventoryItem[];
+  items: Item[];
   maxSlots?: number;
   tilesetUrl?: string;
 }
@@ -14,14 +14,14 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
   maxSlots = 16,
   tilesetUrl = "/assets/tilesets/albion_tileset.png",
 }) => {
-  const renderItemIcon = (item: InventoryItem) => {
+  const renderItemIcon = (item: Item) => {
     return (
       <TileRange
         tilesetUrl={tilesetUrl}
-        startX={item.item.icon.start.x}
-        startY={item.item.icon.start.y}
-        endX={item.item.icon.end.x}
-        endY={item.item.icon.end.y}
+        startX={item.type.icon.start.x}
+        startY={item.type.icon.start.y}
+        endX={item.type.icon.end.x}
+        endY={item.type.icon.end.y}
         className="mb-1"
       />
     );
@@ -35,11 +35,11 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
         {items.map(invItem => (
           <div
-            key={invItem.item.id}
+            key={invItem.id}
             className="inventory-slot bg-gray-900/80 rounded p-2 flex flex-col items-center justify-center border border-gray-700 hover:border-purple-500 cursor-pointer transition-all hover:scale-105"
           >
             {renderItemIcon(invItem)}
-            <div className="item-name text-white text-sm">{invItem.item.name}</div>
+            <div className="item-name text-white text-sm">{invItem.name}</div>
             <div className="item-quantity text-blue-300 text-xs">x{invItem.quantity}</div>
           </div>
         ))}

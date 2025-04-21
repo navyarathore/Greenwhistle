@@ -1,21 +1,21 @@
 // src/game/SystemManager.ts
 import { EventBus } from "./EventBus";
-import { ItemManager } from "./resources/ItemManager";
+import { FarmingSystem } from "./managers/FarmingSystem";
+import InventoryManager from "./managers/InventoryManager";
+import { ItemManager } from "./managers/MaterialManager";
 import { Game } from "./scenes/Game";
-import { FarmingSystem } from "./systems/FarmingSystem";
-import InventorySystem from "./systems/InventorySystem";
 
 /**
  * SystemManager class to initialize and manage all game systems
  */
 export class SystemManager {
   private farmingSystem: FarmingSystem;
-  private inventorySystem: InventorySystem;
+  private inventorySystem: InventoryManager;
   private itemManager: ItemManager;
 
   constructor(private scene: Game) {
     // Initialize systems in the correct order
-    this.inventorySystem = new InventorySystem(scene);
+    this.inventorySystem = new InventoryManager(scene);
     this.farmingSystem = new FarmingSystem(scene, this.inventorySystem);
     this.itemManager = new ItemManager();
   }
@@ -68,19 +68,13 @@ export class SystemManager {
    * Handle inventory updates
    */
   private handleInventoryUpdate(): void {
-    // Refresh UI elements related to inventory
-    const playerInventory = this.inventorySystem.getInventory("player");
-    if (playerInventory) {
-      // You can emit an event with the updated inventory data
-      // that your UI components can listen for
-      EventBus.emit("update-inventory-ui", Array.from(playerInventory.items.values()));
-    }
+    EventBus.emit("update-inventory-ui", this.inventorySystem.getItems());
   }
 
   /**
    * Get the inventory system
    */
-  public getInventorySystem(): InventorySystem {
+  public getInventorySystem(): InventoryManager {
     return this.inventorySystem;
   }
 
