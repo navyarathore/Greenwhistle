@@ -18,6 +18,7 @@ export class ItemManager {
         const id = Number(_id);
         const zeroBasedIdx = id - 1;
         const item: Item = {
+          ...itemData,
           id: id,
           name: itemData.name,
           type: itemData.type ? ItemType[itemData.type.toUpperCase() as keyof typeof ItemType] : ItemType.OTHER,
@@ -34,11 +35,6 @@ export class ItemManager {
             },
           },
           description: itemData.description,
-          ...Object.entries(itemData)
-            .filter(
-              ([key]) => !["id", "name", "type", "stackable", "maxStackSize", "icon", "description"].includes(key),
-            )
-            .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {}),
         };
 
         this.items.set(id, item);

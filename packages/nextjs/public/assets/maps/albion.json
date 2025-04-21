@@ -606,6 +606,12 @@
          "id":26,
          "name":"Logs",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -667,6 +673,12 @@
          "id":27,
          "name":"Seed Bush",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -728,6 +740,12 @@
          "id":18,
          "name":"Rocks",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -789,6 +807,12 @@
          "id":25,
          "name":"Berries",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -911,6 +935,12 @@
          "id":19,
          "name":"Iron Ore",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -972,6 +1002,12 @@
          "id":20,
          "name":"Dimond Ore",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1094,6 +1130,12 @@
          "id":11,
          "name":"Well",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1338,6 +1380,12 @@
          "id":37,
          "name":"Oak Leaves",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1399,6 +1447,12 @@
          "id":39,
          "name":"Spruce Leaves",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1460,6 +1514,12 @@
          "id":41,
          "name":"Fruit Leaves",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1521,6 +1581,12 @@
          "id":28,
          "name":"Sign",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1582,6 +1648,12 @@
          "id":7,
          "name":"Abandoned House",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1643,6 +1715,12 @@
          "id":30,
          "name":"Trade Center Fan",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1704,6 +1782,12 @@
          "id":29,
          "name":"Trade Center",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"ge_alwaysTop",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":50,
@@ -1981,147 +2065,12 @@
          "tileheight":16,
          "tiles":[
                 {
-                 "id":105,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
-                        }]
-                }, 
-                {
-                 "id":155,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
-                        }]
-                }, 
-                {
                  "id":167,
                  "properties":[
                         {
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
-                        }]
-                }, 
-                {
-                 "id":391,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
-                        }]
-                }, 
-                {
-                 "id":392,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
-                        }]
-                }, 
-                {
-                 "id":395,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
-                        }]
-                }, 
-                {
-                 "id":396,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
-                        }]
-                }, 
-                {
-                 "id":595,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":596,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":597,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":598,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
                         }]
                 }, 
                 {
@@ -2131,11 +2080,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
                         }]
                 }, 
                 {
@@ -2145,11 +2089,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
                         }]
                 }, 
                 {
@@ -2159,11 +2098,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
                         }]
                 }, 
                 {
@@ -2173,67 +2107,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":695,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":696,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":697,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":698,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
                         }]
                 }, 
                 {
@@ -2243,11 +2116,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
                         }]
                 }, 
                 {
@@ -2257,11 +2125,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
                         }]
                 }, 
                 {
@@ -2271,11 +2134,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
                         }]
                 }, 
                 {
@@ -2285,74 +2143,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":797,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":818,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":847,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":2
-                        }]
-                }, 
-                {
-                 "id":867,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":868,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":869,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":916,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
                         }]
                 }, 
                 {
@@ -2383,24 +2173,6 @@
                         }]
                 }, 
                 {
-                 "id":920,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":966,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
                  "id":967,
                  "properties":[
                         {
@@ -2425,24 +2197,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }]
-                }, 
-                {
-                 "id":970,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1016,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
                         }]
                 }, 
                 {
@@ -2473,24 +2227,6 @@
                         }]
                 }, 
                 {
-                 "id":1020,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1066,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
                  "id":1067,
                  "properties":[
                         {
@@ -2517,25 +2253,6 @@
                          "value":true
                         }]
                 }, 
-                {
-                 "id":1070,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1116,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                },
-            
                 {
                  "id":1117,
                  "properties":[
@@ -2564,161 +2281,12 @@
                         }]
                 }, 
                 {
-                 "id":1120,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1146,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":3
-                        }]
-                }, 
-                {
-                 "id":1147,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":3
-                        }]
-                }, 
-                {
-                 "id":1162,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":1163,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":1166,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1167,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1196,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":3
-                        }]
-                }, 
-                {
-                 "id":1197,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":3
-                        }]
-                }, 
-                {
-                 "id":1211,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1212,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":1213,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":1214,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1215,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1216,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1217,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
                  "id":1246,
                  "properties":[
                         {
                          "name":"ge_collide_down",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":3
                         }]
                 }, 
                 {
@@ -2728,155 +2296,6 @@
                          "name":"ge_collide_down",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":3
-                        }]
-                }, 
-                {
-                 "id":1261,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1262,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":1263,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":1264,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1265,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1266,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1267,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1268,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1311,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1312,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":1313,
-                 "properties":[
-                        {
-                         "name":"ge_collide",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":1314,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1316,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1317,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1318,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1361,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
                         }]
                 }, 
                 {
@@ -2898,80 +2317,12 @@
                         }]
                 }, 
                 {
-                 "id":1364,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1366,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1367,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1369,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1370,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1371,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1372,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
                  "id":1391,
                  "properties":[
                         {
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
                         }]
                 }, 
                 {
@@ -2984,15 +2335,6 @@
                         }]
                 }, 
                 {
-                 "id":1411,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
                  "id":1412,
                  "properties":[
                         {
@@ -3000,8 +2342,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":1413,
                  "properties":[
@@ -3009,78 +2350,6 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }]
-                }, 
-                {
-                 "id":1414,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1415,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1416,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1419,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1420,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1421,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1422,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1461,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
                         }]
                 }, 
                 {
@@ -3102,73 +2371,10 @@
                         }]
                 }, 
                 {
-                 "id":1464,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":10
-                        }]
-                }, 
-                {
-                 "id":1465,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1466,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1469,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1470,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1471,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1472,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
                  "id":1515,
                  "properties":[
                         {
-                         "name":"ge_collide_down",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -3177,7 +2383,7 @@
                  "id":1516,
                  "properties":[
                         {
-                         "name":"ge_collide_down",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -3186,7 +2392,7 @@
                  "id":1520,
                  "properties":[
                         {
-                         "name":"ge_collide_down",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -3195,7 +2401,7 @@
                  "id":1521,
                  "properties":[
                         {
-                         "name":"ge_collide_down",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -3207,72 +2413,13 @@
                          "name":"ge_collide",
                          "type":"bool",
                          "value":true
-                        }, 
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":1
-                        }]
-                }, 
-                {
-                 "id":1616,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1617,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1666,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1667,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1716,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
-                        }]
-                }, 
-                {
-                 "id":1717,
-                 "properties":[
-                        {
-                         "name":"ge_heightShift",
-                         "type":"int",
-                         "value":5
                         }]
                 }, 
                 {
                  "id":1766,
                  "properties":[
                         {
-                         "name":"ge_collide_down",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -3281,7 +2428,7 @@
                  "id":1767,
                  "properties":[
                         {
-                         "name":"ge_collide_down",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -3366,7 +2513,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":2130,
                  "properties":[
@@ -3456,8 +2604,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":2230,
                  "properties":[

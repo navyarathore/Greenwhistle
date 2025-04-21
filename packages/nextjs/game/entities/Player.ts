@@ -34,6 +34,7 @@ export default class Player {
     y: number = SCREEN_HEIGHT / 2,
   ) {
     this.sprite = game.add.sprite(x, y, SPRITE_ID, 0);
+    this.sprite.scale = 2.5;
     this.game.camera.startFollow(this.sprite, true);
     this.game.camera.setFollowOffset(-this.sprite.width, -this.sprite.height);
 
@@ -52,8 +53,6 @@ export default class Player {
     };
 
     this.game.gridEngine.create(game.map, gridEngineConfig);
-    this.game.camera.startFollow(this.sprite, true);
-    this.game.camera.setZoom(2);
 
     // Add E key for item pickup
     this.eKey = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
