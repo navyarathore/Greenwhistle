@@ -1,7 +1,7 @@
 import { EventBus } from "../EventBus";
 import { SystemManager } from "../SystemManager";
 import Player from "../entities/Player";
-import GridEngine, { GridEngineConfig } from "grid-engine";
+import GridEngine from "grid-engine";
 import { Scene } from "phaser";
 
 export class Game extends Scene {
@@ -34,6 +34,7 @@ export class Game extends Scene {
     }
 
     this.sysManager = new SystemManager(this);
+    this.sysManager.load();
 
     this.cursor = this.input.keyboard.createCursorKeys();
     this.player = new Player(this, this.cursor);

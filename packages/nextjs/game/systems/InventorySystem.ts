@@ -106,6 +106,24 @@ export default class InventorySystem {
 
       // Update the quantity
       existingInventoryItem.quantity += quantity;
+
+      // Emit events
+      EventBus.emit("item-added", {
+        itemId: item.id,
+        inventoryId,
+        item: {
+          ...existingInventoryItem,
+          quantity: quantity,
+        },
+      });
+
+      // Emit a generic inventory update event
+      EventBus.emit("inventory-updated", {
+        inventoryId,
+        action: "add",
+        items: this.getItems(inventoryId),
+      });
+
       return true;
     }
 
@@ -118,11 +136,18 @@ export default class InventorySystem {
 
       inventory.items.set(item.id, inventoryItem);
 
-      // Emit an event
+      // Emit events
       EventBus.emit("item-added", {
         itemId: item.id,
         inventoryId,
         item: inventoryItem,
+      });
+
+      // Emit a generic inventory update event
+      EventBus.emit("inventory-updated", {
+        inventoryId,
+        action: "add",
+        items: this.getItems(inventoryId),
       });
 
       return true;
@@ -150,6 +175,13 @@ export default class InventorySystem {
         quantity,
       });
 
+      // Emit a generic inventory update event
+      EventBus.emit("inventory-updated", {
+        inventoryId,
+        action: "remove",
+        items: this.getItems(inventoryId),
+      });
+
       return true;
     } else if (inventoryItem.quantity === quantity) {
       // Remove the item entirely
@@ -160,6 +192,13 @@ export default class InventorySystem {
         itemId,
         inventoryId,
         quantity,
+      });
+
+      // Emit a generic inventory update event
+      EventBus.emit("inventory-updated", {
+        inventoryId,
+        action: "remove",
+        items: this.getItems(inventoryId),
       });
 
       return true;
@@ -194,6 +233,19 @@ export default class InventorySystem {
         targetInventoryId,
       });
 
+      // Emit inventory update events for both source and target inventories
+      EventBus.emit("inventory-updated", {
+        inventoryId: sourceInventoryId,
+        action: "transfer-out",
+        items: this.getItems(sourceInventoryId),
+      });
+
+      EventBus.emit("inventory-updated", {
+        inventoryId: targetInventoryId,
+        action: "transfer-in",
+        items: this.getItems(targetInventoryId),
+      });
+
       return true;
     }
 
@@ -223,6 +275,13 @@ export default class InventorySystem {
         itemId,
         inventoryId,
         quantity: inventoryItem.quantity,
+      });
+
+      // Emit a generic inventory update event
+      EventBus.emit("inventory-updated", {
+        inventoryId,
+        action: "use",
+        items: this.getItems(inventoryId),
       });
 
       return true;

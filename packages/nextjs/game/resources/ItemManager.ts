@@ -1,6 +1,8 @@
 import { Item, ItemType } from "./Item";
 import Resources from "./resource.json";
 
+const ITEMS_PER_ROW = 50;
+
 /**
  * ItemManager class responsible for loading, managing, and providing access to game items
  */
@@ -12,14 +14,25 @@ export class ItemManager {
    */
   public loadItems() {
     try {
-      Object.entries(Resources.items).forEach(([id, itemData]: [string, any]) => {
+      Object.entries(Resources.items).forEach(([_id, itemData]: [string, any]) => {
+        const id = Number(_id);
+        const zeroBasedIdx = id - 1;
         const item: Item = {
-          id: Number(id),
+          id: id,
           name: itemData.name,
-          type: ItemType[itemData.type.toUpperCase() as keyof typeof ItemType],
+          type: itemData.type ? ItemType[itemData.type.toUpperCase() as keyof typeof ItemType] : ItemType.OTHER,
           stackable: itemData.stackable !== undefined ? itemData.stackable : true,
           maxStackSize: itemData.maxStackSize || 99,
-          icon: itemData.icon,
+          icon: itemData.icon || {
+            start: {
+              x: zeroBasedIdx % ITEMS_PER_ROW,
+              y: Math.floor(zeroBasedIdx / ITEMS_PER_ROW),
+            },
+            end: {
+              x: zeroBasedIdx % ITEMS_PER_ROW,
+              y: Math.floor(zeroBasedIdx / ITEMS_PER_ROW),
+            },
+          },
           description: itemData.description,
           ...Object.entries(itemData)
             .filter(
@@ -28,7 +41,7 @@ export class ItemManager {
             .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {}),
         };
 
-        this.items.set(Number(id), item);
+        this.items.set(id, item);
       });
 
       console.log(`Loaded ${this.items.size} items from resource.json`);

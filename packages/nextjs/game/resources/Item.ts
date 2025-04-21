@@ -11,11 +11,22 @@ export const ItemType = {
 
 export type ItemType = (typeof ItemType)[keyof typeof ItemType];
 
+export interface ItemIcon {
+  start: {
+    x: number;
+    y: number;
+  };
+  end: {
+    x: number;
+    y: number;
+  };
+}
+
 export interface Item {
   id: number;
   name: string;
   type: ItemType;
-  icon?: string;
+  icon: ItemIcon;
   description?: string;
   stackable: boolean;
   maxStackSize: number;

@@ -2,7 +2,6 @@ import { EventBus } from "../EventBus";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
 import ResourceData from "../resources/resource.json";
 import { Game } from "../scenes/Game";
-import InventorySystem, { InventoryItem } from "../systems/InventorySystem";
 import { Direction, GridEngineConfig } from "grid-engine";
 import * as Phaser from "phaser";
 
@@ -27,7 +26,6 @@ export default class Player {
   private movementEnabled = true;
   private previousInputEnabled?: boolean;
   private eKey: Phaser.Input.Keyboard.Key;
-  private inventory!: InventorySystem;
 
   constructor(
     private game: Game,
@@ -60,11 +58,6 @@ export default class Player {
     // Add E key for item pickup
     this.eKey = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    // Get reference to inventory system through the event bus
-    EventBus.on("inventory-system-ready", (inventorySystem: any) => {
-      this.inventory = inventorySystem;
-    });
-
     this.configurePickup();
 
     // Emit event to get inventory system
@@ -96,7 +89,9 @@ export default class Player {
 
         if (tile && id.includes(tile.index)) {
           this.game.map.removeTileAt(playerPosition.x, playerPosition.y, false, true, layer);
-          this.inventory.addItem(this.game.sysManager.getItemManager().getItem(tile.index)!, 1);
+          this.game.sysManager
+            .getInventorySystem()
+            .addItem(this.game.sysManager.getItemManager().getItem(tile.index)!, 1);
 
           EventBus.emit("item-picked-up", tile.properties);
           break;
