@@ -1,3 +1,4 @@
+import { EventBus } from "../EventBus";
 import { Item } from "../resources/Item";
 
 interface Recipe {
@@ -6,7 +7,7 @@ interface Recipe {
   result: Item;
 }
 
-export class CraftingSystem {
+export class CraftingManager {
   private recipes: Map<string, Recipe> = new Map();
 
   constructor(initialRecipes: Recipe[] = []) {
@@ -31,20 +32,19 @@ export class CraftingSystem {
     if (!recipe) return false;
 
     // Check if player has all required ingredients
-    return recipe.ingredients.every(ingredient => {
-      const playerItems = playerInventory.filter(item => item.id === ingredient.id);
-      const totalQuantity = playerItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
-      return totalQuantity >= ingredient.quantity;
-    });
+    return recipe.ingredients.every(
+      ingredient =>
+        playerInventory
+          .filter(item => item.type.id === ingredient.type.id)
+          .reduce((total, item) => total + item.quantity, 0) >= ingredient.quantity,
+    );
   }
 
-  // Craft item immediately
   public craftItem(
     recipeId: string,
-    playerId: string,
     playerInventory: Item[],
-    consumeIngredients: (playerId: string, items: Item[]) => boolean,
-    addItemToInventory: (playerId: string, item: Item) => void,
+    consumeIngredients: (items: Item[]) => boolean,
+    addItemToInventory: (item: Item) => void,
   ): boolean {
     const recipe = this.recipes.get(recipeId);
 
@@ -52,11 +52,13 @@ export class CraftingSystem {
     if (!this.canCraft(recipeId, playerInventory)) return false;
 
     // Consume ingredients
-    const success = consumeIngredients(playerId, recipe.ingredients);
+    const success = consumeIngredients(recipe.ingredients);
     if (!success) return false;
 
     // Add crafted item to inventory immediately
-    addItemToInventory(playerId, recipe.result);
+    addItemToInventory(recipe.result);
+
+    EventBus.emit("craft-item", recipe.result);
 
     return true;
   }
