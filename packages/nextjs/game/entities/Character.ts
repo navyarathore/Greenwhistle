@@ -28,7 +28,6 @@ export default class Character extends Phaser.Physics.Arcade.Sprite implements C
   constructor(config: CharacterConfig) {
     super(config.scene, config.position.x, config.position.y, config.assetKey, config.frame || 0);
     config.scene.add.existing(this);
-    config.scene.physics.add.existing(this);
 
     const gridEngineConfig: GridEngineConfig = {
       characters: [

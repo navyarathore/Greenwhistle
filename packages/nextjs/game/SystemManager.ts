@@ -83,6 +83,6 @@ export class SystemManager {
    * Update method called every frame
    */
   public update(time: number, delta: number): void {
-    // Add any per-frame system updates here
+    this.controlsManager.update();
   }
 }
