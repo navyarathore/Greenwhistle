@@ -55,7 +55,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-amber-100 overflow-x-hidden">
-      {/* Decorative top pixel pattern (matches header) */}
       <div className="w-full h-4 bg-amber-900 shadow-md flex">
         {Array.from({ length: 20 }).map((_, i) => (
           <div key={i} className="flex-1 border-r-2 border-amber-700"></div>
@@ -64,9 +63,21 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="relative min-h-screen bg-gradient-to-b from-amber-100 to-amber-200">
-        <div className="absolute inset-0 bg-[url('/textures/old-paper.png')] opacity-10"></div>
+        <div className="absolute mb-40  pb-40 h-screen inset-0 bg-[url('https://i.ibb.co/CRWH571/Green-Whistle.png')]"></div>
         <div className="flex flex-col lg:flex-row items-center justify-between">
-          <div className="w-full lg:w-1/2 p-8 lg:pl-20 z-10">
+          <div className="w-full lg:w-1/2 p-8 lg:pr-20 z-10">
+            <motion.a
+              href="/game"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="bg-amber-800 text-amber-100 mt-44 ml-44 font-bold py-4 px-8 rounded-lg text-xl hover:bg-amber-700 
+            transition-all shadow-lg border-2 border-amber-900 inline-block transform hover:scale-105"
+            >
+              Start Your Adventure
+            </motion.a>
+          </div>
+          {/* <div className="w-full lg:w-1/2 p-8 lg:pl-20 z-10">
             <motion.div
               className="text-left"
               initial={{ y: -50, opacity: 0 }}
@@ -93,14 +104,14 @@ export default function Home() {
                 Start Your Adventure
               </motion.a>
             </motion.div>
-          </div>
+          </div> */}
 
-          <div className="w-full lg:w-1/2 h-[50vh] lg:h-screen relative">
+          {/* <div className="w-full lg:w-1/2 h-[50vh] lg:h-screen relative">
             <div className="absolute inset-0 transform scale-90 border-8 border-amber-900 rounded-lg overflow-hidden m-4">
               <GlobeDemo />
               <div className="absolute inset-0 bg-amber-900 opacity-10 pointer-events-none"></div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <LayoutGridDemo />
