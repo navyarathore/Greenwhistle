@@ -57,29 +57,7 @@ function App() {
         <div className="game-container bg-gray-800 rounded-lg overflow-hidden shadow-xl">
           <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
         </div>
-        <div className="controls bg-gray-800/50 p-4 rounded-lg backdrop-blur-sm border border-gray-700">
-          <div className="mb-4">
-            <button
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-lg w-full hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/25"
-              onClick={changeScene}
-            >
-              Change Scene
-            </button>
-          </div>
-          <div className="mb-4">
-            <button
-              disabled={canMoveSprite}
-              className="bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-3 px-6 rounded-lg w-full hover:scale-105 transition-all shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-              // onClick={moveSprite}
-            >
-              Toggle Movement
-            </button>
-          </div>
-        </div>
       </div>
-
-      {/* Inventory Section */}
-      <InventoryGrid items={inventoryItems} maxSlots={PLAYER_INVENTORY_SIZE} />
     </div>
   );
 }

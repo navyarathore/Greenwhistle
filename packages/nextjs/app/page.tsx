@@ -95,12 +95,12 @@ export default function Home() {
 
         {/* Game Logo with Parallax Effect */}
         <Image
-          src="/whitetext.png"
+          src="/name4.png"
           alt="Green Whistle Logo"
-          width={350}
-          height={100}
+          width={550}
+          height={200}
           priority
-          className="absolute left-1/2 top-[20%] w-[350px] max-w-[80vw] z-10 pointer-events-none select-none"
+          className="absolute left-1/2 top-[10%] w-[500px] max-w-[80vw] z-10 pointer-events-none select-none"
           style={{
             transform: `translate(-50%, ${scrollY * 0.15}px)`,
             transition: "transform 0.1s linear",

@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { hardhat } from "viem/chains";
-import { Bars3Icon, BugAntIcon, TrophyIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, BugAntIcon, MoonIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, OnchainKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
 
@@ -30,6 +29,11 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "Game",
     href: "/game",
     icon: <TrophyIcon className="h-4 w-4" />,
+  },
+  {
+    label: "MarketPlace",
+    href: "/marketplace",
+    icon: <MoonIcon className="h-4 w-4" />,
   },
 ];
 
