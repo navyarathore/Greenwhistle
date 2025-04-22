@@ -1,80 +1,104 @@
 import React from "react";
 import Link from "next/link";
-import { hardhat } from "viem/chains";
-import { CurrencyDollarIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import AnimatedTooltipPreview from "./animated-tooltip-demo";
 import { HeartIcon } from "@heroicons/react/24/outline";
-import { SwitchTheme } from "~~/components/SwitchTheme";
 import { BuidlGuidlLogo } from "~~/components/assets/BuidlGuidlLogo";
-import { Faucet } from "~~/components/scaffold-eth";
-import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
-import { useGlobalState } from "~~/services/store/store";
 
-/**
- * Site footer
- */
 export const Footer = () => {
-  const nativeCurrencyPrice = useGlobalState(state => state.nativeCurrency.price);
-  const { targetNetwork } = useTargetNetwork();
-  const isLocalNetwork = targetNetwork.id === hardhat.id;
-
   return (
-    <div className="min-h-0 py-5 px-1 mb-11 lg:mb-0">
-      <div>
-        <div className="fixed flex justify-between items-center w-full z-10 p-4 bottom-0 left-0 pointer-events-none">
-          <div className="flex flex-col md:flex-row gap-2 pointer-events-auto">
-            {nativeCurrencyPrice > 0 && (
-              <div>
-                <div className="btn btn-primary btn-sm font-normal gap-1 cursor-auto">
-                  <CurrencyDollarIcon className="h-4 w-4" />
-                  <span>{nativeCurrencyPrice.toFixed(2)}</span>
-                </div>
+    <>
+      {/* Decorative top border */}
+      <div className="w-full h-4 bg-amber-900 flex shadow-inner">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div key={i} className="flex-1 border-r border-amber-700"></div>
+        ))}
+      </div>
+
+      {/* Main footer */}
+      <footer className="bg-amber-100 border-t-4 border-amber-900 text-amber-900">
+        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-10">
+          {/* Logo & About */}
+          <div className="flex flex-col gap-4 items-center md:items-start text-center md:text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-amber-800 rounded-full flex items-center justify-center border-2 border-amber-900 shadow">
+                <GameLogo />
               </div>
-            )}
-            {isLocalNetwork && (
-              <>
-                <Faucet />
-                <Link href="/blockexplorer" passHref className="btn btn-primary btn-sm font-normal gap-1">
-                  <MagnifyingGlassIcon className="h-4 w-4" />
-                  <span>Block Explorer</span>
-                </Link>
-              </>
-            )}
+              <div>
+                <h2 className="text-xl font-semibold font-serif">Greenwhistle</h2>
+                <p className="text-xs italic text-amber-700">Game of the year</p>
+              </div>
+            </div>
+            <p className="text-sm">
+              The ultimate blockchain gaming experience. Collect, trade, and conquer in the world of Greenwhistle.
+            </p>
           </div>
-          <SwitchTheme className={`pointer-events-auto ${isLocalNetwork ? "self-end md:self-auto" : ""}`} />
+
+          {/* Quick Links */}
+          <div className="flex flex-col gap-4 items-center">
+            <h3 className="text-lg font-bold font-serif">Quick Links</h3>
+            <ul className="space-y-2 text-sm font-medium">
+              {["/", "/game", "/marketplace"].map((path, i) => {
+                const names = ["Home", "Game", "Marketplace"];
+                return (
+                  <li key={path}>
+                    <Link href={path} className="hover:text-amber-600 transition">
+                      {names[i]}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Community & Social */}
+          <div className="flex flex-col gap-4 items-center md:items-end">
+            <h3 className="text-lg font-bold font-serif">Community</h3>
+            <div className="flex gap-3">
+              <SocialIcon href="https://github.com/scaffold-eth/se-2" label="GitHub">
+                <GitHubIcon />
+              </SocialIcon>
+              <SocialIcon href="https://buidlguidl.com/" label="BuidlGuidl">
+                <BuidlGuidlLogo className="w-4 h-6" />
+              </SocialIcon>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span>Built with</span>
+              <HeartIcon className="w-4 h-4 text-red-500" />
+              <span>XLR8</span>
+            </div>
+          </div>
         </div>
+        <AnimatedTooltipPreview />
+      </footer>
+
+      {/* Copyright */}
+      <div className="bg-amber-900 text-amber-200 text-center text-xs py-3">
+        © 2025 Greenwhistle. All rights reserved.
       </div>
-      <div className="w-full">
-        <ul className="menu menu-horizontal w-full">
-          <div className="flex justify-center items-center gap-2 text-sm w-full">
-            <div className="text-center">
-              <a href="https://github.com/scaffold-eth/se-2" target="_blank" rel="noreferrer" className="link">
-                Fork me
-              </a>
-            </div>
-            <span>·</span>
-            <div className="flex justify-center items-center gap-2">
-              <p className="m-0 text-center">
-                Built with <HeartIcon className="inline-block h-4 w-4" /> at
-              </p>
-              <a
-                className="flex justify-center items-center gap-1"
-                href="https://buidlguidl.com/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <BuidlGuidlLogo className="w-3 h-5 pb-1" />
-                <span className="link">BuidlGuidl</span>
-              </a>
-            </div>
-            <span>·</span>
-            <div className="text-center">
-              <a href="https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA" target="_blank" rel="noreferrer" className="link">
-                Support
-              </a>
-            </div>
-          </div>
-        </ul>
-      </div>
-    </div>
+    </>
   );
 };
+
+const GameLogo = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-amber-200">
+    <path d="..." />
+  </svg>
+);
+
+const SocialIcon = ({ href, children, label }: { href: string; children: React.ReactNode; label: string }) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noreferrer"
+    aria-label={label}
+    className="p-2 border-2 border-amber-900 bg-amber-300 hover:bg-amber-400 rounded-lg transition"
+  >
+    {children}
+  </a>
+);
+
+const GitHubIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+    <path d="..." />
+  </svg>
+);
