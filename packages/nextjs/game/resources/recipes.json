@@ -1,0 +1,16 @@
+{
+  "recipes": [
+    {
+      "ingredients": [
+        {
+          "id": 799,
+          "quantity": 4
+        }
+      ],
+      "result": {
+        "id": 54,
+        "quantity": 1
+      }
+    }
+  ]
+}

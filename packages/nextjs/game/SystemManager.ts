@@ -1,11 +1,11 @@
-// src/game/SystemManager.ts
 import { EventBus } from "./EventBus";
 import { FarmingSystem } from "./managers/FarmingSystem";
 import InventoryManager from "./managers/InventoryManager";
-import { ItemManager } from "./managers/MaterialManager";
+import { MaterialManager } from "./managers/MaterialManager";
 import { Game } from "./scenes/Game";
 import { InputComponent } from "~~/game/input/InputComponent";
 import ControlsManager from "~~/game/managers/ControlsManager";
+import { CraftingManager } from "~~/game/managers/CraftingManager";
 
 /**
  * SystemManager class to initialize and manage all game systems
@@ -13,14 +13,16 @@ import ControlsManager from "~~/game/managers/ControlsManager";
 export class SystemManager {
   readonly farmingSystem: FarmingSystem;
   readonly inventorySystem: InventoryManager;
-  readonly itemManager: ItemManager;
+  readonly materialManager: MaterialManager;
+  readonly craftingManager: CraftingManager;
   readonly controlsManager: ControlsManager;
 
   constructor(private scene: Game) {
     // Initialize systems in the correct order
     this.inventorySystem = new InventoryManager(scene);
     this.farmingSystem = new FarmingSystem(scene, this.inventorySystem);
-    this.itemManager = new ItemManager();
+    this.materialManager = new MaterialManager();
+    this.craftingManager = new CraftingManager();
 
     const inputComponent = new InputComponent(scene.input.keyboard!);
 
@@ -28,7 +30,8 @@ export class SystemManager {
   }
 
   load(): void {
-    this.itemManager.loadItems();
+    this.materialManager.loadItems();
+    this.craftingManager.loadRecipes(this.materialManager);
     this.controlsManager.setupControls();
     this.setupEventListeners();
   }

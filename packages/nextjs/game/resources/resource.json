@@ -2,23 +2,48 @@
   "items": {
     "1": {
       "name": "Empty",
-      "stackable": false
+      "stackable": false,
+      "tileset": "tiles-sprite"
     },
     "799": {
       "name": "Branches",
-      "type": "resources"
+      "type": "resources",
+      "tileset": "tiles-sprite"
     },
     "86": {
       "name": "Wheat seed",
-      "type": "seed"
+      "type": "seed",
+      "tileset": "tiles-sprite"
     },
     "161": {
       "name": "Blueberry",
-      "type": "consumable"
+      "type": "consumable",
+      "tileset": "tiles-sprite"
     },
     "111": {
       "name": "Strawberry",
-      "type": "consumable"
+      "type": "consumable",
+      "tileset": "tiles-sprite"
+    },
+    "54": {
+      "name": "Axe",
+      "type": "tool",
+      "tileset": "tiles-tools"
+    },
+    "95": {
+      "name": "Pickaxe",
+      "type": "tool",
+      "tileset": "tiles-tools"
+    },
+    "135": {
+      "name": "Shovel",
+      "type": "tool",
+      "tileset": "tiles-tools"
+    },
+    "175": {
+      "name": "Hoe",
+      "type": "tool",
+      "tileset": "tiles-tools"
     }
   },
   "combined_blocks": [

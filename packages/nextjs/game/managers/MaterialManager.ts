@@ -7,7 +7,7 @@ const DEFAULT_MAX_STACK = 8;
 /**
  * ItemManager class responsible for loading, managing, and providing access to game items
  */
-export class ItemManager {
+export class MaterialManager {
   private items: Map<number, Material> = new Map();
 
   /**
@@ -27,6 +27,7 @@ export class ItemManager {
             : MaterialCategory.OTHER,
           stackable: itemData.stackable !== undefined ? itemData.stackable : true,
           maxStackSize: itemData.maxStackSize || DEFAULT_MAX_STACK,
+          tileset: itemData.tileset,
           icon: itemData.icon || {
             start: {
               x: zeroBasedIdx % ITEMS_PER_ROW,

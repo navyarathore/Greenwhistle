@@ -27,6 +27,7 @@ export interface Material {
   name: string;
   type: MaterialCategory;
   icon: MaterialIcon;
+  tileset: string;
   description?: string;
   stackable: boolean;
   maxStackSize: number;

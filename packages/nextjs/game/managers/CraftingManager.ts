@@ -1,5 +1,7 @@
 import { EventBus } from "../EventBus";
 import { Item } from "../resources/Item";
+import Recipes from "../resources/recipes.json";
+import { MaterialManager } from "~~/game/managers/MaterialManager";
 
 interface Recipe {
   id: string;
@@ -11,8 +13,26 @@ export class CraftingManager {
   private recipes: Map<string, Recipe> = new Map();
 
   constructor(initialRecipes: Recipe[] = []) {
-    // Register initial recipes
     initialRecipes.forEach(recipe => this.registerRecipe(recipe));
+  }
+
+  loadRecipes(materialManager: MaterialManager): void {
+    const convertItem = (item: { id: number; quantity: number }): Item => {
+      return new Item(materialManager.getMaterial(item.id)!, item.quantity);
+    };
+
+    try {
+      Recipes.recipes.forEach((recipe, index) => {
+        this.registerRecipe({
+          id: String(index),
+          ingredients: recipe.ingredients.map(item => convertItem(item)),
+          result: convertItem(recipe.result),
+        });
+      });
+      console.log(`Loaded ${this.recipes.size} recipes from recipes.json.`);
+    } catch (error) {
+      console.error("Error loading recipes", error);
+    }
   }
 
   // Register a new crafting recipe

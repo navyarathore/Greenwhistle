@@ -20,7 +20,10 @@ export default class ControlsManager {
         this.game.scene.stop("InventoryMenu");
         this.game.player.enableMovement();
       } else {
-        this.game.scene.launch("InventoryMenu", { inventoryManager: this.game.sysManager.inventorySystem });
+        this.game.scene.launch("InventoryMenu", {
+          inventoryManager: this.game.sysManager.inventorySystem,
+          craftingManager: this.game.sysManager.craftingManager,
+        });
         this.game.player.disableMovement();
       }
     });
@@ -59,10 +62,12 @@ export default class ControlsManager {
           const toAdd: Item[] = [];
           if (method === "random") {
             const randomResult = Phaser.Math.RND.pick(result);
-            toAdd.push(new Item(this.game.sysManager.itemManager.getMaterial(randomResult.id)!, randomResult.amount));
+            toAdd.push(
+              new Item(this.game.sysManager.materialManager.getMaterial(randomResult.id)!, randomResult.amount),
+            );
           } else if (method === "direct") {
             toAdd.push(
-              ...result.map(res => new Item(this.game.sysManager.itemManager.getMaterial(res.id)!, res.amount)),
+              ...result.map(res => new Item(this.game.sysManager.materialManager.getMaterial(res.id)!, res.amount)),
             );
           }
 

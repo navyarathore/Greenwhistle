@@ -35,6 +35,10 @@ export class Preloader extends Scene {
       frameWidth: 16,
       frameHeight: 16,
     });
+    this.load.spritesheet("tiles-tools", "/tilesets/tools_tileset.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
 
     this.load.spritesheet(SPRITE_ID, "/player/player_movement.png", {
       frameWidth: 32,
