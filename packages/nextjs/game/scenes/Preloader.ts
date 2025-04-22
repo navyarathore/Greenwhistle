@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { SPRITE_ID } from "~~/game/entities/Player";
 
 export class Preloader extends Scene {
   constructor() {
@@ -35,12 +36,12 @@ export class Preloader extends Scene {
       frameHeight: 16,
     });
 
-    this.load.spritesheet("ori", "/player/player_movement.png", {
+    this.load.spritesheet(SPRITE_ID, "/player/player_movement.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
 
-    this.load.image("crafting", "/ui/crafting.png");
+    this.load.image("inventory", "/ui/inventory.png");
   }
 
   create() {
@@ -50,7 +51,7 @@ export class Preloader extends Scene {
     animations.forEach((anim, index) => {
       this.anims.create({
         key: `ori-${anim}`,
-        frames: this.anims.generateFrameNumbers("ori", {
+        frames: this.anims.generateFrameNumbers(SPRITE_ID, {
           start: index * numberOfFramesPerCol,
           end: (index + 1) * numberOfFramesPerCol - 1,
         }),

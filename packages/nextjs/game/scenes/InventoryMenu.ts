@@ -21,7 +21,7 @@ export class InventoryMenu extends Phaser.Scene {
   }
 
   create() {
-    this.inventoryMenu = this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "crafting");
+    this.inventoryMenu = this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "inventory");
     this.inventoryMenu.setScale(SCALE);
 
     const items = this.inventoryManager.getItems();
@@ -31,7 +31,7 @@ export class InventoryMenu extends Phaser.Scene {
         SCREEN_WIDTH / 2 - FIRST_CELL_OFFSET_X * SCALE + (i % COLUMN_COUNT) * CELL_HORIZONTAL_OFFSET * SCALE;
       const offsetY =
         SCREEN_HEIGHT / 2 + FIRST_CELL_OFFSET_Y * SCALE + Math.floor(i / COLUMN_COUNT) * CELL_VERTICAL_OFFSET * SCALE;
-      const img = this.add.image(offsetX, offsetY, "tiles-sprite", item.id - 1);
+      const img = this.add.image(offsetX, offsetY, item.type.tileset, item.id - 1);
       img.setScale(2);
 
       this.add.text(offsetX + 3, offsetY + 3, `x${item.quantity}`, {
@@ -39,6 +39,11 @@ export class InventoryMenu extends Phaser.Scene {
         fontStyle: "bold",
       });
     }
+
+    this.add.text(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "Ori", {
+      fontSize: 32,
+      fontStyle: "bold",
+    });
 
     // Add event listeners for crafting actions
     this.input.on("pointerdown", (pointer: any) => {
