@@ -1,13 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import BackgroundGradientDemo from "~~/components/background-gradient-demo";
-import { GlobeDemo } from "~~/components/globe-demo";
 import { LayoutGridDemo } from "~~/components/layout-grid-demo";
+
+// import PixelCard from "~~/components/PixcelCard";
 
 export default function Home() {
   const [showRules, setShowRules] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
+  // Handle scroll for parallax effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const gameFeatures = [
     {
@@ -20,6 +32,7 @@ export default function Home() {
         "Water daily for faster growth",
         "Harvest crops when fully grown",
       ],
+      variant: "blue",
     },
     {
       title: "🏪 Marketplace",
@@ -30,6 +43,7 @@ export default function Home() {
         "Trade with other players",
         "Daily market price changes",
       ],
+      variant: "yellow",
     },
     {
       title: "🎣 Fishing",
@@ -40,6 +54,7 @@ export default function Home() {
         "Sell fish at the market",
         "Special rare catches",
       ],
+      variant: "default",
     },
     {
       title: "👥 NPCs",
@@ -50,72 +65,67 @@ export default function Home() {
         "Learn farming techniques",
         "Build relationships",
       ],
+      variant: "pink",
     },
   ];
 
   return (
     <div className="min-h-screen bg-amber-100 overflow-x-hidden">
+      {/* Pixel-art border at top */}
       <div className="w-full h-4 bg-amber-900 shadow-md flex">
         {Array.from({ length: 20 }).map((_, i) => (
           <div key={i} className="flex-1 border-r-2 border-amber-700"></div>
         ))}
       </div>
 
-      {/* Hero Section */}
-      <div className="relative min-h-screen bg-gradient-to-b from-amber-100 to-amber-200">
-        <div className="absolute mb-40  pb-40 h-screen inset-0 bg-[url('https://i.ibb.co/CRWH571/Green-Whistle.png')]"></div>
-        <div className="flex flex-col lg:flex-row items-center justify-between">
-          <div className="w-full lg:w-1/2 p-8 lg:pr-20 z-10">
-            <motion.a
-              href="/game"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="bg-amber-800 text-amber-100 mt-44 ml-44 font-bold py-4 px-8 rounded-lg text-xl hover:bg-amber-700 
-            transition-all shadow-lg border-2 border-amber-900 inline-block transform hover:scale-105"
-            >
-              Start Your Adventure
-            </motion.a>
-          </div>
-          {/* <div className="w-full lg:w-1/2 p-8 lg:pl-20 z-10">
-            <motion.div
-              className="text-left"
-              initial={{ y: -50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-            >
-              <h1 className="text-5xl md:text-7xl font-bold font-serif mb-6 text-amber-900">GreenWhistle World</h1>
-              <p className="text-xl md:text-2xl text-amber-800 mb-8 font-serif">
-                A global farming adventure connecting players worldwide
-              </p>
-              <p className="text-lg text-amber-700 mb-8 max-w-xl border-l-4 border-amber-700 pl-4">
-                Welcome to Bloomstead, a worldwide blockchain farming community. Join farmers from across the globe,
-                trade internationally on our decentralized marketplace, and be part of an interconnected Web3 ecosystem.
-                Using Sepolia testnet, you can safely participate in this global agricultural revolution.
-              </p>
-              <motion.a
-                href="/game"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="bg-amber-800 text-amber-100 font-bold py-4 px-8 rounded-lg text-xl hover:bg-amber-700 
-                transition-all shadow-lg border-2 border-amber-900 inline-block transform hover:scale-105"
-              >
-                Start Your Adventure
-              </motion.a>
-            </motion.div>
-          </div> */}
+      {/* Hero Section with Parallax */}
+      <div className="relative h-screen">
+        {/* Parallax Background */}
+        <div
+          className="absolute inset-0 h-full w-full"
+          style={{
+            backgroundImage: "url('https://i.ibb.co/CRWH571/Green-Whistle.png')",
+            backgroundPosition: "center bottom",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            transform: `translateY(${scrollY * 0.3}px) scale(1.1)`,
+            transformOrigin: "center bottom",
+          }}
+        />
 
-          {/* <div className="w-full lg:w-1/2 h-[50vh] lg:h-screen relative">
-            <div className="absolute inset-0 transform scale-90 border-8 border-amber-900 rounded-lg overflow-hidden m-4">
-              <GlobeDemo />
-              <div className="absolute inset-0 bg-amber-900 opacity-10 pointer-events-none"></div>
-            </div>
-          </div> */}
+        {/* Game Logo with Parallax Effect */}
+        <Image
+          src="/whitetext.png"
+          alt="Green Whistle Logo"
+          width={350}
+          height={100}
+          priority
+          className="absolute left-1/2 top-[20%] w-[350px] max-w-[80vw] z-10 pointer-events-none select-none"
+          style={{
+            transform: `translate(-50%, ${scrollY * 0.15}px)`,
+            transition: "transform 0.1s linear",
+          }}
+        />
+
+        {/* Start Adventure Button */}
+        <div className="relative z-20 h-full flex flex-col items-center justify-end pb-16">
+          <motion.a
+            href="/game"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-amber-800 text-amber-100 font-bold py-4 px-8 rounded-lg text-xl hover:bg-amber-700 
+              transition-all shadow-lg border-2 border-amber-900 inline-block transform hover:scale-105"
+          >
+            Start Your Adventure
+          </motion.a>
         </div>
       </div>
+
+      {/* Layout Grid Demo Section */}
       <LayoutGridDemo />
-      {/* Decorative divider */}
+
+      {/* Decorative pixel divider */}
       <div className="w-full h-6 bg-amber-900 flex items-center justify-center">
         <div className="flex space-x-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -124,26 +134,42 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Feature cards */}
+      {/* Welcome Section */}
       <div className="bg-amber-200 py-16 px-4">
+        <div className="max-w-7xl mx-auto mb-12">
+          <h2 className="text-4xl font-bold text-amber-900 text-center mb-8 font-serif">Welcome to Green Whistle</h2>
+          <p className="text-lg text-amber-800 mb-6 text-center max-w-3xl mx-auto">
+            Dive into a vibrant world of farming, trading, and adventure. Grow your crops, catch fish, and trade with
+            friends in this immersive pixelated universe.
+          </p>
+        </div>
+
+        {/* Game Features Section */}
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-amber-900 text-center mb-12 font-serif">Game Features</h2>
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
+
+          {/* Game Features in Pixel Cards - 4 in a row */}
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {gameFeatures.map((feature, index) => (
+              <PixelCard key={index} className="h-full">
+                <div className="text-center text-white p-2">
+                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                </div>
+              </PixelCard>
+            ))}
+          </div> */}
+
+          {/* Game Features Details (outside PixelCards) */}
+          <div className="grid grid-cols-1 rounded-xl sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {gameFeatures.map((feature, index) => (
               <motion.div
-                key={feature.title}
-                className="bg-amber-100 p-6 rounded-lg border-4 border-amber-800 shadow-lg"
-                whileHover={{ scale: 1.02 }}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                animate={{ opacity: 1, x: 0 }}
+                key={index}
+                className="bg-amber-100 p-6 rounded-3xl border-4 border-amber-800 shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 * index }}
               >
-                <h3 className="text-2xl font-bold text-amber-900 mb-3 font-serif">{feature.title}</h3>
+                <h3 className="text-xl font-bold text-amber-900 mb-3">{feature.title}</h3>
                 <p className="text-amber-800 mb-4">{feature.description}</p>
                 <ul className="list-disc list-inside text-amber-700 space-y-2">
                   {feature.details.map((detail, i) => (
@@ -154,9 +180,9 @@ export default function Home() {
                 </ul>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
 
-          {/* Game Controls */}
+          {/* Game Controls Section */}
           <motion.div
             className="text-center mt-12"
             initial={{ opacity: 0 }}
@@ -177,42 +203,44 @@ export default function Home() {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="mt-6 bg-amber-100 p-6 rounded-lg backdrop-blur-sm border-4 border-amber-800 shadow-lg"
+                  className="mt-6"
                 >
-                  <h3 className="text-2xl font-bold text-amber-900 mb-4 font-serif">Game Controls</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-                    <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
-                      <h4 className="font-bold text-amber-900 text-lg mb-2">Movement</h4>
-                      <ul className="list-disc list-inside text-amber-800 space-y-1">
-                        <li>WASD or Arrow keys to move</li>
-                        <li>Hold Shift to run</li>
-                      </ul>
-                    </div>
-                    <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
-                      <h4 className="font-bold text-amber-900 text-lg mb-2">Actions</h4>
-                      <ul className="list-disc list-inside text-amber-800 space-y-1">
-                        <li>E or Space to interact</li>
-                        <li>1-5 to select items</li>
-                        <li>I to open inventory</li>
-                      </ul>
-                    </div>
-                    <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
-                      <h4 className="font-bold text-amber-900 text-lg mb-2">Tools</h4>
-                      <ul className="list-disc list-inside text-amber-800 space-y-1">
-                        <li>Hoe: Till soil for planting</li>
-                        <li>Watering Can: Water crops</li>
-                        <li>Seeds: Plant in tilled soil</li>
-                        <li>Fishing Rod: Fish in water</li>
-                      </ul>
-                    </div>
-                    <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
-                      <h4 className="font-bold text-amber-900 text-lg mb-2">Tips</h4>
-                      <ul className="list-disc list-inside text-amber-800 space-y-1">
-                        <li>Water crops daily for faster growth</li>
-                        <li>Check market prices before selling</li>
-                        <li>Talk to NPCs for useful tips</li>
-                        <li>Use the mini-map for navigation</li>
-                      </ul>
+                  <div className="bg-amber-100 p-6 rounded-lg border-4 border-amber-800 shadow-lg">
+                    <h3 className="text-2xl font-bold text-amber-900 mb-4 font-serif">Game Controls</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                      <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
+                        <h4 className="font-bold text-amber-900 text-lg mb-2">Movement</h4>
+                        <ul className="list-disc list-inside text-amber-800 space-y-1">
+                          <li>WASD or Arrow keys to move</li>
+                          <li>Hold Shift to run</li>
+                        </ul>
+                      </div>
+                      <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
+                        <h4 className="font-bold text-amber-900 text-lg mb-2">Actions</h4>
+                        <ul className="list-disc list-inside text-amber-800 space-y-1">
+                          <li>E or Space to interact</li>
+                          <li>1-5 to select items</li>
+                          <li>I to open inventory</li>
+                        </ul>
+                      </div>
+                      <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
+                        <h4 className="font-bold text-amber-900 text-lg mb-2">Tools</h4>
+                        <ul className="list-disc list-inside text-amber-800 space-y-1">
+                          <li>Hoe: Till soil for planting</li>
+                          <li>Watering Can: Water crops</li>
+                          <li>Seeds: Plant in tilled soil</li>
+                          <li>Fishing Rod: Fish in water</li>
+                        </ul>
+                      </div>
+                      <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
+                        <h4 className="font-bold text-amber-900 text-lg mb-2">Tips</h4>
+                        <ul className="list-disc list-inside text-amber-800 space-y-1">
+                          <li>Water crops daily for faster growth</li>
+                          <li>Check market prices before selling</li>
+                          <li>Talk to NPCs for useful tips</li>
+                          <li>Use the mini-map for navigation</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -222,7 +250,25 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Decorative bottom pixel pattern (matches header) */}
+      {/* Call to Action Section */}
+      <div className="bg-amber-800 py-12 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-amber-100 mb-6 font-serif">Ready to Start Farming?</h2>
+          <p className="text-amber-200 mb-8">
+            Join the Green Whistle community and start your farming adventure today!
+          </p>
+          <motion.a
+            href="/game"
+            className="bg-amber-100 text-amber-800 font-bold py-3 px-8 rounded-lg text-xl hover:bg-amber-200
+              transition-all shadow-lg border-2 border-amber-900 inline-block"
+            whileHover={{ scale: 1.05 }}
+          >
+            Play Now
+          </motion.a>
+        </div>
+      </div>
+
+      {/* Decorative bottom pixel pattern */}
       <div className="w-full h-4 bg-amber-900 shadow-md flex">
         {Array.from({ length: 20 }).map((_, i) => (
           <div key={i} className="flex-1 border-r-2 border-amber-700"></div>

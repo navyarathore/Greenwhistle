@@ -4339,6 +4339,7 @@ __metadata:
     react-copy-to-clipboard: ^5.1.0
     react-dom: ^19.0.0
     react-hot-toast: ^2.4.0
+    react-scroll-parallax: ^3.4.5
     tailwind-merge: ^3.2.0
     tailwindcss: ^3.4.11
     three: ^0.175.0
@@ -7886,6 +7887,13 @@ __metadata:
   version: 1.1.4
   resolution: "bech32@npm:1.1.4"
   checksum: 0e98db619191548390d6f09ff68b0253ba7ae6a55db93dfdbb070ba234c1fd3308c0606fbcc95fad50437227b10011e2698b89f0181f6e7f845c499bd14d0f4b
+  languageName: node
+  linkType: hard
+
+"bezier-easing@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "bezier-easing@npm:2.1.0"
+  checksum: ec22666b5385979b3e7a63eaf2631395b1be5beb3aed4f14cc70ae9eb09032082584f7e3eec045e4c122466987ed7e159f5b39f82b8a9870cd55e75b0d55a7d5
   languageName: node
   linkType: hard
 
@@ -15620,6 +15628,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parallax-controller@npm:^1.7.1":
+  version: 1.7.1
+  resolution: "parallax-controller@npm:1.7.1"
+  dependencies:
+    bezier-easing: ^2.1.0
+  checksum: 3079bda3cf24ec368735b6cdcc6bae9a828b81d68a69907c1fae1744ae7d89f678f7b015d7a87d36dbfb02a050f5d0968eb47c2ce0d67c7193da720a0527abce
+  languageName: node
+  linkType: hard
+
 "parent-module@npm:^1.0.0":
   version: 1.0.1
   resolution: "parent-module@npm:1.0.1"
@@ -16515,6 +16532,18 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 310e6e6d2f28226a1751dc5084a2dce49167f0b69e3d78d6510f329f423ee313d4f6477f5e1adccb68baef40a7af75541e980a8c398cb82ea0d3573e514e8124
+  languageName: node
+  linkType: hard
+
+"react-scroll-parallax@npm:^3.4.5":
+  version: 3.4.5
+  resolution: "react-scroll-parallax@npm:3.4.5"
+  dependencies:
+    parallax-controller: ^1.7.1
+  peerDependencies:
+    react: ^16.8.0-0 || >=17.0.1 || ^18.0.0
+    react-dom: ^16.8.0-0 || >=17.0.1 || ^18.0.0
+  checksum: 8a749430849566cae9bd7aa5536cd3e2ef2574b04a6d12c37dd53e095695d0858814f2d4b176307bca7f4e30eddcfea807fc4428c6302a1013c302c7f5a929cf
   languageName: node
   linkType: hard
 

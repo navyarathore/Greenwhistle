@@ -5,12 +5,22 @@ export class InputComponent {
   readonly inventoryKey: Phaser.Input.Keyboard.Key;
   readonly actionKey: Phaser.Input.Keyboard.Key;
   readonly enterKey: Phaser.Input.Keyboard.Key;
+  // WASD keys
+  readonly wKey: Phaser.Input.Keyboard.Key;
+  readonly aKey: Phaser.Input.Keyboard.Key;
+  readonly sKey: Phaser.Input.Keyboard.Key;
+  readonly dKey: Phaser.Input.Keyboard.Key;
 
   constructor(keyboardPlugin: Phaser.Input.Keyboard.KeyboardPlugin) {
     this.cursorKeys = keyboardPlugin.createCursorKeys();
     this.inventoryKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     this.actionKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.F);
     this.enterKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    // Add WASD keys
+    this.wKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    this.aKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    this.sKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    this.dKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
     // F = B, Inventory
     // E = A, Talk, Run, Lift, Push/Pull
@@ -19,27 +29,27 @@ export class InputComponent {
   }
 
   get isUpDown(): boolean {
-    return this.cursorKeys.up.isDown;
+    return this.cursorKeys.up.isDown || this.wKey.isDown;
   }
 
   get isUpJustDown(): boolean {
-    return Phaser.Input.Keyboard.JustDown(this.cursorKeys.up);
+    return Phaser.Input.Keyboard.JustDown(this.cursorKeys.up) || Phaser.Input.Keyboard.JustDown(this.wKey);
   }
 
   get isDownDown(): boolean {
-    return this.cursorKeys.down.isDown;
+    return this.cursorKeys.down.isDown || this.sKey.isDown;
   }
 
   get isDownJustDown(): boolean {
-    return Phaser.Input.Keyboard.JustDown(this.cursorKeys.down);
+    return Phaser.Input.Keyboard.JustDown(this.cursorKeys.down) || Phaser.Input.Keyboard.JustDown(this.sKey);
   }
 
   get isLeftDown(): boolean {
-    return this.cursorKeys.left.isDown;
+    return this.cursorKeys.left.isDown || this.aKey.isDown;
   }
 
   get isRightDown(): boolean {
-    return this.cursorKeys.right.isDown;
+    return this.cursorKeys.right.isDown || this.dKey.isDown;
   }
 
   get isActionKeyJustDown(): boolean {

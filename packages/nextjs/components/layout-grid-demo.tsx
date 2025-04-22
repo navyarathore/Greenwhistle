@@ -72,18 +72,18 @@ const cards = [
     id: 2,
     content: <SkeletonTwo />,
     className: "col-span-1",
-    thumbnail: "https://i.ibb.co/5WNt6j9R/green2.png",
+    thumbnail: "/town.png",
   },
   {
     id: 3,
     content: <SkeletonThree />,
     className: "col-span-1",
-    thumbnail: "https://i.ibb.co/CRWH571/Green-Whistle.png",
+    thumbnail: "/green2.png",
   },
   {
     id: 4,
     content: <SkeletonFour />,
     className: "md:col-span-2",
-    thumbnail: "https://i.ibb.co/5WNt6j9R/green2.png",
+    thumbnail: "/shop.png",
   },
 ];
