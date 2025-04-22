@@ -67,15 +67,13 @@ export const OnchainKitCustomConnectButton = () => {
   return (
     <Wallet>
       {/* Display balance and network same as original */}
-      <div className="flex items-center gap-1">
-        <div className="flex flex-col items-center mr-1">
-          <EthBalance address={address} className="min-h-0 h-auto" />
-          <span className="text-xs" style={{ color: networkColor }}>
-            {chain.name}
-          </span>
+      <div className="flex text-black items-center gap-1">
+        <div className="flex flex-col items-center mr-1 text-black">
+          <EthBalance address={address} className="min-h-0 text-black h-auto" />
+          <span className="text-xs text-black">{chain.name}</span>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex text-white items-center gap-1">
           <AddressInfoDropdown address={address as Address} blockExplorerAddressLink={blockExplorerAddressLink} />
         </div>
 
