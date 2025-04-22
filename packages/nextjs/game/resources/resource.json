@@ -1,31 +1,81 @@
 {
   "items": {
-    "0": {
+    "1": {
       "name": "Empty",
       "stackable": false
     },
     "799": {
       "name": "Branches",
-      "type": "resources",
-      "stackable": true
+      "type": "resources"
+    },
+    "86": {
+      "name": "Wheat seed",
+      "type": "seed"
+    },
+    "161": {
+      "name": "Blueberry",
+      "type": "consumable"
+    },
+    "111": {
+      "name": "Strawberry",
+      "type": "consumable"
     }
   },
   "pickup": [
     {
       "layer": "Branches",
-      "id": [799]
+      "id": [799],
+      "method": "direct",
+      "result": [
+        {
+          "id": 799,
+          "amount": 1
+        }
+      ]
     },
     {
       "layer": "Logs",
-      "id": [392, 393, 396, 397]
+      "id": [392, 393, 396, 397],
+      "method": "direct",
+        "result": [
+          {
+            "id": 799,
+            "amount": 5
+          }
+        ]
     },
     {
       "layer": "Seed Bush",
-      "id": [798, 848]
+      "id": [798, 848],
+      "method": "random",
+      "result": [
+        {
+          "id": 86,
+          "amount": 1
+        }
+      ]
     },
     {
       "layer": "Berries",
-      "id": [106, 156]
+      "id": [106],
+      "method": "direct",
+      "result": [
+        {
+          "id": 111,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "layer": "Berries",
+      "id": [156],
+      "method": "direct",
+      "result": [
+        {
+          "id": 161,
+          "amount": 1
+        }
+      ]
     }
   ]
 }

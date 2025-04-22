@@ -5,7 +5,7 @@ import { MainMenu } from "../../game/scenes/MainMenu";
 import { InventoryGrid } from "~~/components/game/InventoryGrid";
 import { EventBus } from "~~/game/EventBus";
 import { IRefPhaserGame, PhaserGame } from "~~/game/PhaserGame";
-import InventoryManager from "~~/game/managers/InventoryManager";
+import InventoryManager, { PLAYER_INVENTORY_SIZE } from "~~/game/managers/InventoryManager";
 import { Item } from "~~/game/resources/Item";
 
 function App() {
@@ -79,7 +79,7 @@ function App() {
       </div>
 
       {/* Inventory Section */}
-      <InventoryGrid items={inventoryItems} maxSlots={30} />
+      <InventoryGrid items={inventoryItems} maxSlots={PLAYER_INVENTORY_SIZE} />
     </div>
   );
 }

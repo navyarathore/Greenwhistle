@@ -30,11 +30,17 @@ export class Preloader extends Scene {
 
     this.load.tilemapTiledJSON("map", "/maps/albion.json");
     this.load.image("tiles", "/tilesets/albion_tileset.png");
+    this.load.spritesheet("tiles-sprite", "/tilesets/albion_tileset.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
 
     this.load.spritesheet("ori", "/player/player_movement.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
+
+    this.load.image("crafting", "/ui/crafting.png");
   }
 
   create() {

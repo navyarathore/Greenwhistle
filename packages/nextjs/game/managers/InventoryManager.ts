@@ -13,12 +13,14 @@ export interface Inventory {
   slots: InventorySlot[];
 }
 
+export const PLAYER_INVENTORY = "player";
+export const PLAYER_INVENTORY_SIZE = 27;
+
 export default class InventoryManager {
   private inventories: Map<string, Inventory> = new Map();
-  private playerInventory = "player";
 
   constructor(private game: Game) {
-    this.createInventory(this.playerInventory, "Player Inventory", 30);
+    this.createInventory(PLAYER_INVENTORY, "Player Inventory", PLAYER_INVENTORY_SIZE);
 
     // Listen for inventory-related events
     EventBus.on("item-harvested", this.handleItemHarvested.bind(this));
@@ -49,12 +51,12 @@ export default class InventoryManager {
   }
 
   // Get an inventory by ID
-  getInventory(id: string = this.playerInventory): Inventory | undefined {
+  getInventory(id: string = PLAYER_INVENTORY): Inventory | undefined {
     return this.inventories.get(id);
   }
 
   // Get all items in an inventory
-  getItems(inventoryId: string = this.playerInventory): Item[] {
+  getItems(inventoryId: string = PLAYER_INVENTORY): Item[] {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return [];
 
@@ -62,7 +64,7 @@ export default class InventoryManager {
   }
 
   // Find the slot index of an item by its ID
-  findItemSlot(itemId: number, inventoryId: string = this.playerInventory): number {
+  findItemSlot(itemId: number, inventoryId: string = PLAYER_INVENTORY): number {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return -1;
 
@@ -70,12 +72,12 @@ export default class InventoryManager {
   }
 
   // Check if an inventory has an item
-  hasItem(itemId: number, inventoryId: string = this.playerInventory): boolean {
+  hasItem(itemId: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     return this.findItemSlot(itemId, inventoryId) !== -1;
   }
 
   // Get an item from an inventory
-  getItem(itemId: number, inventoryId: string = this.playerInventory): Item | undefined {
+  getItem(itemId: number, inventoryId: string = PLAYER_INVENTORY): Item | undefined {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return undefined;
 
@@ -84,7 +86,7 @@ export default class InventoryManager {
   }
 
   // Find the first empty slot in an inventory
-  findEmptySlot(inventoryId: string = this.playerInventory): number {
+  findEmptySlot(inventoryId: string = PLAYER_INVENTORY): number {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return -1;
 
@@ -92,12 +94,12 @@ export default class InventoryManager {
   }
 
   // Check if an inventory has enough space
-  hasSpace(inventoryId: string = this.playerInventory): boolean {
+  hasSpace(inventoryId: string = PLAYER_INVENTORY): boolean {
     return this.findEmptySlot(inventoryId) !== -1;
   }
 
   // Check if an item can be added to a specific slot
-  canAddItemToSlot(newItem: Item, slotIndex: number, inventoryId: string = this.playerInventory): boolean {
+  canAddItemToSlot(newItem: Item, slotIndex: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory || slotIndex < 0 || slotIndex >= inventory.maxSlots) return false;
 
@@ -115,7 +117,7 @@ export default class InventoryManager {
   }
 
   // Check if an item can be added to any slot in the inventory
-  canAddItem(item: Item, inventoryId: string = this.playerInventory): boolean {
+  canAddItem(item: Item, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return false;
 
@@ -130,7 +132,7 @@ export default class InventoryManager {
   }
 
   // Add an item to a specific slot
-  addItemToSlot(newItem: Item, slotIndex: number, inventoryId: string = this.playerInventory): boolean {
+  addItemToSlot(newItem: Item, slotIndex: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory || !this.canAddItemToSlot(newItem, slotIndex, inventoryId)) return false;
 
@@ -164,7 +166,7 @@ export default class InventoryManager {
   }
 
   // Add an item to the first available slot or stack it with existing items
-  addItem(item: Item, inventoryId: string = this.playerInventory): boolean {
+  addItem(item: Item, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return false;
 
@@ -185,8 +187,22 @@ export default class InventoryManager {
     return false;
   }
 
+  addItems(items: Item[], inventoryId: string = PLAYER_INVENTORY): boolean {
+    let allAdded = true;
+
+    for (const item of items) {
+      const added = this.addItem(item, inventoryId);
+      if (!added) {
+        allAdded = false;
+        break;
+      }
+    }
+
+    return allAdded;
+  }
+
   // Remove a quantity of an item from a specific slot
-  removeItemFromSlot(slotIndex: number, quantity: number, inventoryId: string = this.playerInventory): boolean {
+  removeItemFromSlot(slotIndex: number, quantity: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory || slotIndex < 0 || slotIndex >= inventory.maxSlots) return false;
 
@@ -226,7 +242,7 @@ export default class InventoryManager {
   }
 
   // Remove an item from an inventory
-  removeItem(item: Item, inventoryId: string = this.playerInventory): boolean {
+  removeItem(item: Item, inventoryId: string = PLAYER_INVENTORY): boolean {
     const slotIndex = this.findItemSlot(item.id, inventoryId);
     if (slotIndex === -1) return false;
 
@@ -292,7 +308,7 @@ export default class InventoryManager {
     fromSlotIndex: number,
     toSlotIndex: number,
     quantity: number,
-    inventoryId: string = this.playerInventory,
+    inventoryId: string = PLAYER_INVENTORY,
   ): boolean {
     const inventory = this.getInventory(inventoryId);
     if (
@@ -402,7 +418,7 @@ export default class InventoryManager {
   }
 
   // Use an item (reduce quantity) in a specific slot
-  useItemInSlot(slotIndex: number, inventoryId: string = this.playerInventory): boolean {
+  useItemInSlot(slotIndex: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory || slotIndex < 0 || slotIndex >= inventory.maxSlots) return false;
 
@@ -442,7 +458,7 @@ export default class InventoryManager {
   }
 
   // Use an item by its ID
-  useItem(itemId: number, inventoryId: string = this.playerInventory): boolean {
+  useItem(itemId: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const slotIndex = this.findItemSlot(itemId, inventoryId);
     if (slotIndex === -1) return false;
 
@@ -450,7 +466,7 @@ export default class InventoryManager {
   }
 
   // Check if an inventory has enough of a specific item
-  hasEnoughItems(itemId: number, quantity: number, inventoryId: string = this.playerInventory): boolean {
+  hasEnoughItems(itemId: number, quantity: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return false;
 
@@ -467,7 +483,7 @@ export default class InventoryManager {
   }
 
   // Get the total quantity of an item in an inventory
-  getItemQuantity(itemId: number, inventoryId: string = this.playerInventory): number {
+  getItemQuantity(itemId: number, inventoryId: string = PLAYER_INVENTORY): number {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return 0;
 
@@ -493,7 +509,7 @@ export default class InventoryManager {
   }
 
   // Get all items of a specific type
-  getItemsByType(category: MaterialCategory, inventoryId: string = this.playerInventory): Item[] {
+  getItemsByType(category: MaterialCategory, inventoryId: string = PLAYER_INVENTORY): Item[] {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return [];
 
@@ -509,7 +525,7 @@ export default class InventoryManager {
     // TODO get item from item manager
     // Add the item to the player's inventory
     // const item = this.game.itemManager.getItemById(data.resourceId);
-    // if (item && this.addItem(item, this.playerInventory)) {
+    // if (item && this.addItem(item, PLAYER_INVENTORY)) {
     //   EventBus.emit("show-message", `Added ${data.quantity} ${item.name} to inventory`);
     // } else {
     //   EventBus.emit("show-message", `Inventory full! Could not add item`);

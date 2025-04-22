@@ -2,6 +2,7 @@ import { Material, MaterialCategory } from "../resources/Item";
 import Resources from "../resources/resource.json";
 
 const ITEMS_PER_ROW = 50;
+const DEFAULT_MAX_STACK = 8;
 
 /**
  * ItemManager class responsible for loading, managing, and providing access to game items
@@ -25,7 +26,7 @@ export class ItemManager {
             ? MaterialCategory[itemData.type.toUpperCase() as keyof typeof MaterialCategory]
             : MaterialCategory.OTHER,
           stackable: itemData.stackable !== undefined ? itemData.stackable : true,
-          maxStackSize: itemData.maxStackSize || 99,
+          maxStackSize: itemData.maxStackSize || DEFAULT_MAX_STACK,
           icon: itemData.icon || {
             start: {
               x: zeroBasedIdx % ITEMS_PER_ROW,

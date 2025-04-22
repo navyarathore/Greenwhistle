@@ -40,6 +40,17 @@ export class Game extends Scene {
     this.cursor = this.input.keyboard.createCursorKeys();
     this.player = new Player(this, this.cursor);
 
+    const eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    eKey.on("up", () => {
+      if (this.scene.isActive("InventoryMenu")) {
+        this.scene.stop("InventoryMenu");
+        this.player.enableMovement();
+      } else {
+        this.scene.launch("InventoryMenu", { inventoryManager: this.sysManager.getInventorySystem() });
+        this.player.disableMovement();
+      }
+    });
+
     EventBus.emit("current-scene-ready", this);
   }
 
