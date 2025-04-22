@@ -56,11 +56,11 @@ export default class InventoryManager {
   }
 
   // Get all items in an inventory
-  getItems(inventoryId: string = PLAYER_INVENTORY): Item[] {
+  getItems(inventoryId: string = PLAYER_INVENTORY): Array<Item | null> {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return [];
 
-    return inventory.slots.filter(slot => slot.item !== null).map(slot => slot.item as Item);
+    return inventory.slots.map(slot => slot.item);
   }
 
   // Find the slot index of an item by its ID

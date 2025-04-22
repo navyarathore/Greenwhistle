@@ -1,54 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { MainMenu } from "../../game/scenes/MainMenu";
-import { InventoryGrid } from "~~/components/game/InventoryGrid";
-import { EventBus } from "~~/game/EventBus";
+import { useRef } from "react";
 import { IRefPhaserGame, PhaserGame } from "~~/game/PhaserGame";
-import InventoryManager, { PLAYER_INVENTORY_SIZE } from "~~/game/managers/InventoryManager";
-import { Item } from "~~/game/resources/Item";
 
 function App() {
-  // The sprite can only be moved in the MainMenu Scene
-  const [canMoveSprite, setCanMoveSprite] = useState(true);
-
   //  References to the PhaserGame component (game and scene are exposed)
   const phaserRef = useRef<IRefPhaserGame | null>(null);
-  const [inventoryItems, setInventoryItems] = useState<Item[]>([]);
-
-  useEffect(() => {
-    const handleInventoryUpdate = (items: Item[]) => {
-      setInventoryItems(items);
-      console.log("Inventory updated:", items);
-    };
-
-    const handleInventoryReady = (system: InventoryManager) => {
-      setInventoryItems(system.getItems());
-      console.log("Inventory updated:", system.getItems());
-    };
-
-    EventBus.on("update-inventory-ui", handleInventoryUpdate);
-    EventBus.on("inventory-system-ready", handleInventoryReady);
-
-    return () => {
-      EventBus.off("update-inventory-ui", handleInventoryUpdate);
-      EventBus.off("inventory-system-ready", handleInventoryReady);
-    };
-  });
-
-  const changeScene = () => {
-    if (phaserRef.current) {
-      const scene = phaserRef.current.scene as MainMenu;
-
-      if (scene) {
-        scene.changeScene();
-      }
-    }
-  };
 
   // Event emitted from the PhaserGame component
   const currentScene = (scene: Phaser.Scene) => {
-    setCanMoveSprite(scene.scene.key !== "MainMenu");
+    // Callback on scene change
   };
 
   return (
