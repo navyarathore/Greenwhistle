@@ -32,7 +32,7 @@ export const mockItems: Item[] = [
     id: "2",
     name: "Dreams & Nightmares Case",
     game: "Counter-Strike 2",
-    imageUrl: "/name2.png",
+    imageUrl: "/town.png",
     quantity: 223451,
     price: {
       amount: 1.91,

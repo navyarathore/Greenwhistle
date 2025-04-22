@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MainMenu } from "../../game/scenes/MainMenu";
-import { InventoryGrid } from "~~/components/game/InventoryGrid";
 import { EventBus } from "~~/game/EventBus";
 import { IRefPhaserGame, PhaserGame } from "~~/game/PhaserGame";
 import InventoryManager, { PLAYER_INVENTORY_SIZE } from "~~/game/managers/InventoryManager";
@@ -54,7 +53,7 @@ function App() {
   return (
     <div id="app" className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row gap-6">
-        <div className="game-container bg-gray-800 rounded-lg overflow-hidden shadow-xl">
+        <div className="game-container bg-amber-700 rounded-lg overflow-hidden shadow-xl">
           <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
         </div>
       </div>
