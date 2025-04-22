@@ -29,7 +29,7 @@ export class Game extends Scene {
 
     if (tileset) {
       for (let i = 0; i < this.map.layers.length; i++) {
-        const layer = this.map.createLayer(i, "tileset", 0, 0);
+        const layer = this.map.createLayer(i, "tileset", 0, 0)!;
         layer.scale = 3;
       }
     }
@@ -37,19 +37,21 @@ export class Game extends Scene {
     this.sysManager = new SystemManager(this);
     this.sysManager.load();
 
-    this.cursor = this.input.keyboard.createCursorKeys();
-    this.player = new Player(this, this.cursor);
-
-    const eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-    eKey.on("up", () => {
-      if (this.scene.isActive("InventoryMenu")) {
-        this.scene.stop("InventoryMenu");
-        this.player.enableMovement();
-      } else {
-        this.scene.launch("InventoryMenu", { inventoryManager: this.sysManager.getInventorySystem() });
-        this.player.disableMovement();
-      }
-    });
+    this.player = new Player(
+      {
+        scene: this,
+        gridEngine: this.gridEngine,
+        gridPosition: {
+          x: 12,
+          y: 12,
+        },
+        controls: this.sysManager.controlsManager.inputComponent,
+      },
+      {
+        maxHealth: 5,
+        health: 5,
+      },
+    );
 
     EventBus.emit("current-scene-ready", this);
   }

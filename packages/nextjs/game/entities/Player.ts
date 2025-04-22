@@ -1,160 +1,79 @@
 import { EventBus } from "../EventBus";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
-import { Item } from "../resources/Item";
-import ResourceData from "../resources/resource.json";
 import { Game } from "../scenes/Game";
-import { Direction, GridEngineConfig } from "grid-engine";
+import GridEngine, { Direction } from "grid-engine";
 import { Position } from "grid-engine";
-import * as Phaser from "phaser";
+import Character from "~~/game/entities/Character";
+import { InputComponent } from "~~/game/input/InputComponent";
+
+export type PlayerConfig = {
+  scene: Game;
+  gridEngine: GridEngine;
+  gridPosition: Position;
+  controls: InputComponent;
+};
+
+export type PlayerData = {
+  health: number;
+  maxHealth: number;
+};
 
 export const SPRITE_ID = "ori";
 
-export type MovementDirections = "up" | "down" | "left" | "right";
-
-export type IsPressed = {
-  isUp: boolean;
-  isDown: boolean;
-};
-
-export type MovementCursor = {
-  [K in MovementDirections]: IsPressed;
-};
-
-export default class Player {
-  public sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-  public currentTool = "axe";
-  public isHeavyAttack = false;
+export default class Player extends Character {
+  private config: PlayerConfig;
+  private playerData: PlayerData;
   private movementEnabled = true;
   private previousInputEnabled?: boolean;
-  private fKey: Phaser.Input.Keyboard.Key;
 
-  constructor(
-    private game: Game,
-    private cursors: MovementCursor,
-    x: number = SCREEN_WIDTH / 2,
-    y: number = SCREEN_HEIGHT / 2,
-  ) {
-    this.sprite = game.add.sprite(x, y, SPRITE_ID, 0);
-    this.sprite.scale = 2.5;
-    this.game.camera.startFollow(this.sprite, true);
-    this.game.camera.setFollowOffset(-this.sprite.width, -this.sprite.height);
+  constructor(config: PlayerConfig, data: PlayerData) {
+    super({
+      scene: config.scene,
+      gridEngine: config.gridEngine,
+      position: {
+        x: SCREEN_WIDTH / 2,
+        y: SCREEN_HEIGHT / 2,
+      },
+      gridPosition: config.gridPosition,
+      assetKey: "ori",
+      frame: 1,
+      walkingAnimationMapping: 0,
+      inputComponent: config.controls,
+      speed: 1,
+      id: "ori",
+      isPlayer: true,
+      maxLife: 5,
+      currentLife: 5,
+    });
+    this.config = config;
+    this.playerData = data;
 
-    const gridEngineConfig: GridEngineConfig = {
-      characters: [
-        {
-          id: SPRITE_ID,
-          sprite: this.sprite,
-          startPosition: {
-            x: Math.floor(12),
-            y: Math.floor(12),
-          },
-          walkingAnimationMapping: 0,
-        },
-      ],
-    };
-
-    this.game.gridEngine.create(game.map, gridEngineConfig);
-
-    this.fKey = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
-
-    this.configureKeys();
+    this.scale = 2.5;
+    config.scene.camera.startFollow(this, true);
+    config.scene.camera.setFollowOffset(-this.width, -this.height);
 
     // Emit event to get inventory system
     EventBus.emit("player-created", this);
   }
 
-  update() {
-    const gridEngine = this.game.gridEngine;
-    if (!this.movementEnabled) {
-      return;
-    }
-
-    Object.keys(this.cursors).forEach(key => {
-      const cursor = this.cursors[key as MovementDirections];
-      if (cursor.isDown) {
-        gridEngine.move(SPRITE_ID, Direction[key.toUpperCase() as keyof typeof Direction]);
-      }
-    });
-  }
-
-  private configureKeys() {
-    this.fKey.on("up", () => {
-      const playerPosition = this.game.gridEngine.getPosition(SPRITE_ID);
-
-      for (const res of ResourceData.pickup) {
-        const { layer, id, method, result } = res;
-        const tile = this.game.map.getTileAt(playerPosition.x, playerPosition.y, false, layer);
-
-        if (tile && id.includes(tile.index)) {
-          const combined = new Set(ResourceData.combined_blocks.filter(block => block.includes(tile.index)).flat());
-          console.log(combined);
-          const toRemove = [
-            [1, 0],
-            [-1, 0],
-            [0, 1],
-            [0, -1],
-          ].reduce<Position[]>(
-            (pos, [deltaX, deltaY]) => {
-              const deltaTile: Phaser.Tilemaps.Tile | null = this.game.map.getTileAt(
-                tile.x + deltaX,
-                tile.y + deltaY,
-                false,
-                layer,
-              );
-              if (deltaTile && combined.has(deltaTile.index)) {
-                return [...pos, { x: deltaTile.x, y: deltaTile.y }];
-              }
-              return pos;
-            },
-            [{ x: tile.x, y: tile.y }],
-          );
-
-          const toAdd: Item[] = [];
-          if (method === "random") {
-            const randomResult = result[Math.floor(Math.random() * result.length)];
-            toAdd.push(
-              new Item(this.game.sysManager.getItemManager().getMaterial(randomResult.id)!, randomResult.amount),
-            );
-          } else if (method === "direct") {
-            toAdd.push(
-              ...result.map(res => new Item(this.game.sysManager.getItemManager().getMaterial(res.id)!, res.amount)),
-            );
-          }
-
-          const added = this.game.sysManager.getInventorySystem().addItems(toAdd);
-          if (!added) return;
-
-          for (const { x, y } of toRemove) {
-            this.game.map.removeTileAt(x, y, false, true, layer);
-          }
-
-          EventBus.emit("item-picked-up", tile.properties);
-          break;
-        }
-      }
-    });
-  }
-
-  selectTool(tool: string) {
-    this.currentTool = tool;
-
-    EventBus.emit("tool-selected", tool);
+  get isMovementEnabled(): boolean {
+    return this.movementEnabled;
   }
 
   disableMovement(): void {
     this.movementEnabled = false;
 
-    this.game.gridEngine.stopMovement(SPRITE_ID);
+    this.config.scene.gridEngine.stopMovement(SPRITE_ID);
 
-    this.previousInputEnabled = this.game.input.enabled;
-    this.game.input.enabled = false;
+    this.previousInputEnabled = this.config.scene.input.enabled;
+    this.config.scene.input.enabled = false;
   }
 
   enableMovement(): void {
     this.movementEnabled = true;
 
     if (this.previousInputEnabled !== undefined) {
-      this.game.input.enabled = this.previousInputEnabled;
+      this.config.scene.input.enabled = this.previousInputEnabled;
     }
   }
 }

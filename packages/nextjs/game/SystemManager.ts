@@ -4,25 +4,33 @@ import { FarmingSystem } from "./managers/FarmingSystem";
 import InventoryManager from "./managers/InventoryManager";
 import { ItemManager } from "./managers/MaterialManager";
 import { Game } from "./scenes/Game";
+import { InputComponent } from "~~/game/input/InputComponent";
+import ControlsManager from "~~/game/managers/ControlsManager";
 
 /**
  * SystemManager class to initialize and manage all game systems
  */
 export class SystemManager {
-  private farmingSystem: FarmingSystem;
-  private inventorySystem: InventoryManager;
-  private itemManager: ItemManager;
+  readonly farmingSystem: FarmingSystem;
+  readonly inventorySystem: InventoryManager;
+  readonly itemManager: ItemManager;
+  readonly controlsManager: ControlsManager;
 
   constructor(private scene: Game) {
     // Initialize systems in the correct order
     this.inventorySystem = new InventoryManager(scene);
     this.farmingSystem = new FarmingSystem(scene, this.inventorySystem);
     this.itemManager = new ItemManager();
+
+    const inputComponent = new InputComponent(scene.input.keyboard!);
+
+    this.controlsManager = new ControlsManager(scene, inputComponent, scene.gridEngine);
   }
 
-  load() {
-    this.setupEventListeners();
+  load(): void {
     this.itemManager.loadItems();
+    this.controlsManager.setupControls();
+    this.setupEventListeners();
   }
 
   /**
@@ -69,24 +77,6 @@ export class SystemManager {
    */
   private handleInventoryUpdate(): void {
     EventBus.emit("update-inventory-ui", this.inventorySystem.getItems());
-  }
-
-  /**
-   * Get the inventory system
-   */
-  public getInventorySystem(): InventoryManager {
-    return this.inventorySystem;
-  }
-
-  /**
-   * Get the farming system
-   */
-  public getFarmingSystem(): FarmingSystem {
-    return this.farmingSystem;
-  }
-
-  public getItemManager(): ItemManager {
-    return this.itemManager;
   }
 
   /**
