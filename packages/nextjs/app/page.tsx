@@ -54,21 +54,41 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      <div className="relative h-screen">
-        <div className="flex flex-row items-center justify-between">
-          <div className="w-1/2 pl-20 z-10">
+    <div className="min-h-screen bg-amber-100 overflow-x-hidden">
+      <div className="w-full h-4 bg-amber-900 shadow-md flex">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div key={i} className="flex-1 border-r-2 border-amber-700"></div>
+        ))}
+      </div>
+
+      {/* Hero Section */}
+      <div className="relative min-h-screen bg-gradient-to-b from-amber-100 to-amber-200">
+        <div className="absolute mb-40  pb-40 h-screen inset-0 bg-[url('https://i.ibb.co/CRWH571/Green-Whistle.png')]"></div>
+        <div className="flex flex-col lg:flex-row items-center justify-between">
+          <div className="w-full lg:w-1/2 p-8 lg:pr-20 z-10">
+            <motion.a
+              href="/game"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="bg-amber-800 text-amber-100 mt-44 ml-44 font-bold py-4 px-8 rounded-lg text-xl hover:bg-amber-700 
+            transition-all shadow-lg border-2 border-amber-900 inline-block transform hover:scale-105"
+            >
+              Start Your Adventure
+            </motion.a>
+          </div>
+          {/* <div className="w-full lg:w-1/2 p-8 lg:pl-20 z-10">
             <motion.div
               className="text-left"
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 mb-6">
-                GreenWhistel World
-              </h1>
-              <p className="text-2xl text-gray-300 mb-8">A global farming adventure connecting players worldwide</p>
-              <p className="text-lg text-gray-400 mb-8 max-w-xl">
+              <h1 className="text-5xl md:text-7xl font-bold font-serif mb-6 text-amber-900">GreenWhistle World</h1>
+              <p className="text-xl md:text-2xl text-amber-800 mb-8 font-serif">
+                A global farming adventure connecting players worldwide
+              </p>
+              <p className="text-lg text-amber-700 mb-8 max-w-xl border-l-4 border-amber-700 pl-4">
                 Welcome to Bloomstead, a worldwide blockchain farming community. Join farmers from across the globe,
                 trade internationally on our decentralized marketplace, and be part of an interconnected Web3 ecosystem.
                 Using Sepolia testnet, you can safely participate in this global agricultural revolution.
@@ -78,109 +98,135 @@ export default function Home() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg text-xl hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/25"
+                className="bg-amber-800 text-amber-100 font-bold py-4 px-8 rounded-lg text-xl hover:bg-amber-700 
+                transition-all shadow-lg border-2 border-amber-900 inline-block transform hover:scale-105"
               >
                 Start Your Adventure
               </motion.a>
             </motion.div>
-          </div>
+          </div> */}
 
-          <div className="w-1/2 h-screen">
-            <GlobeDemo />
-          </div>
+          {/* <div className="w-full lg:w-1/2 h-[50vh] lg:h-screen relative">
+            <div className="absolute inset-0 transform scale-90 border-8 border-amber-900 rounded-lg overflow-hidden m-4">
+              <GlobeDemo />
+              <div className="absolute inset-0 bg-amber-900 opacity-10 pointer-events-none"></div>
+            </div>
+          </div> */}
         </div>
       </div>
       <LayoutGridDemo />
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          {gameFeatures.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm border border-gray-700"
-              whileHover={{ scale: 1.02 }}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 * index }}
-            >
-              <h3 className="text-xl font-bold text-blue-400 mb-2">{feature.title}</h3>
-              <p className="text-gray-300 mb-4">{feature.description}</p>
-              <ul className="list-disc list-inside text-gray-400 space-y-1">
-                {feature.details.map((detail, i) => (
-                  <li key={i}>{detail}</li>
-                ))}
-              </ul>
-            </motion.div>
+      {/* Decorative divider */}
+      <div className="w-full h-6 bg-amber-900 flex items-center justify-center">
+        <div className="flex space-x-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="w-4 h-4 bg-amber-200 rounded-full border-2 border-amber-700"></div>
           ))}
-        </motion.div>
+        </div>
+      </div>
 
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <motion.button
-            onClick={() => setShowRules(!showRules)}
-            className="text-blue-400 underline"
-            whileHover={{ scale: 1.05 }}
+      {/* Feature cards */}
+      <div className="bg-amber-200 py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-bold text-amber-900 text-center mb-12 font-serif">Game Features</h2>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
           >
-            {showRules ? "Hide Game Controls" : "Show Game Controls"}
-          </motion.button>
-
-          <AnimatePresence>
-            {showRules && (
+            {gameFeatures.map((feature, index) => (
               <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="mt-6 bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm border border-gray-700"
+                key={feature.title}
+                className="bg-amber-100 p-6 rounded-lg border-4 border-amber-800 shadow-lg"
+                whileHover={{ scale: 1.02 }}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 * index }}
               >
-                <h3 className="text-xl font-bold text-blue-400 mb-4">Game Controls</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                  <div>
-                    <h4 className="font-bold text-blue-400">Movement</h4>
-                    <ul className="list-disc list-inside text-gray-300">
-                      <li>WASD or Arrow keys to move</li>
-                      <li>Hold Shift to run</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-blue-400">Actions</h4>
-                    <ul className="list-disc list-inside text-gray-300">
-                      <li>E or Space to interact</li>
-                      <li>1-5 to select items</li>
-                      <li>I to open inventory</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-blue-400">Tools</h4>
-                    <ul className="list-disc list-inside text-gray-300">
-                      <li>Hoe: Till soil for planting</li>
-                      <li>Watering Can: Water crops</li>
-                      <li>Seeds: Plant in tilled soil</li>
-                      <li>Fishing Rod: Fish in water</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-blue-400">Tips</h4>
-                    <ul className="list-disc list-inside text-gray-300">
-                      <li>Water crops daily for faster growth</li>
-                      <li>Check market prices before selling</li>
-                      <li>Talk to NPCs for useful tips</li>
-                      <li>Use the mini-map for navigation</li>
-                    </ul>
-                  </div>
-                </div>
+                <h3 className="text-2xl font-bold text-amber-900 mb-3 font-serif">{feature.title}</h3>
+                <p className="text-amber-800 mb-4">{feature.description}</p>
+                <ul className="list-disc list-inside text-amber-700 space-y-2">
+                  {feature.details.map((detail, i) => (
+                    <li key={i} className="pl-2">
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-        <BackgroundGradientDemo />
+            ))}
+          </motion.div>
+
+          {/* Game Controls */}
+          <motion.div
+            className="text-center mt-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <motion.button
+              onClick={() => setShowRules(!showRules)}
+              className="bg-amber-800 text-amber-100 py-3 px-6 rounded-lg border-2 border-amber-900 font-bold"
+              whileHover={{ scale: 1.05 }}
+            >
+              {showRules ? "Hide Game Controls" : "Show Game Controls"}
+            </motion.button>
+
+            <AnimatePresence>
+              {showRules && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="mt-6 bg-amber-100 p-6 rounded-lg backdrop-blur-sm border-4 border-amber-800 shadow-lg"
+                >
+                  <h3 className="text-2xl font-bold text-amber-900 mb-4 font-serif">Game Controls</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                    <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
+                      <h4 className="font-bold text-amber-900 text-lg mb-2">Movement</h4>
+                      <ul className="list-disc list-inside text-amber-800 space-y-1">
+                        <li>WASD or Arrow keys to move</li>
+                        <li>Hold Shift to run</li>
+                      </ul>
+                    </div>
+                    <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
+                      <h4 className="font-bold text-amber-900 text-lg mb-2">Actions</h4>
+                      <ul className="list-disc list-inside text-amber-800 space-y-1">
+                        <li>E or Space to interact</li>
+                        <li>1-5 to select items</li>
+                        <li>I to open inventory</li>
+                      </ul>
+                    </div>
+                    <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
+                      <h4 className="font-bold text-amber-900 text-lg mb-2">Tools</h4>
+                      <ul className="list-disc list-inside text-amber-800 space-y-1">
+                        <li>Hoe: Till soil for planting</li>
+                        <li>Watering Can: Water crops</li>
+                        <li>Seeds: Plant in tilled soil</li>
+                        <li>Fishing Rod: Fish in water</li>
+                      </ul>
+                    </div>
+                    <div className="bg-amber-50 p-4 rounded-lg border-2 border-amber-700">
+                      <h4 className="font-bold text-amber-900 text-lg mb-2">Tips</h4>
+                      <ul className="list-disc list-inside text-amber-800 space-y-1">
+                        <li>Water crops daily for faster growth</li>
+                        <li>Check market prices before selling</li>
+                        <li>Talk to NPCs for useful tips</li>
+                        <li>Use the mini-map for navigation</li>
+                      </ul>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Decorative bottom pixel pattern (matches header) */}
+      <div className="w-full h-4 bg-amber-900 shadow-md flex">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div key={i} className="flex-1 border-r-2 border-amber-700"></div>
+        ))}
       </div>
     </div>
   );
