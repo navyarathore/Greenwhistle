@@ -21,6 +21,11 @@
       "type": "consumable"
     }
   },
+  "combined_blocks": [
+    [392, 393],
+    [396, 397],
+    [798, 848]
+  ],
   "pickup": [
     {
       "layer": "Branches",

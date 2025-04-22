@@ -71,6 +71,19 @@ export default class InventoryManager {
     return inventory.slots.findIndex(slot => slot.item && slot.item.id === itemId);
   }
 
+  // Find all slot indices containing a specific item
+  findAllItemSlots(itemId: number, inventoryId: string = PLAYER_INVENTORY): number[] {
+    const inventory = this.getInventory(inventoryId);
+    if (!inventory) return [];
+
+    return inventory.slots.reduce<number[]>((indices, slot, index) => {
+      if (slot.item && slot.item.id === itemId) {
+        indices.push(index);
+      }
+      return indices;
+    }, []);
+  }
+
   // Check if an inventory has an item
   hasItem(itemId: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     return this.findItemSlot(itemId, inventoryId) !== -1;
@@ -91,6 +104,19 @@ export default class InventoryManager {
     if (!inventory) return -1;
 
     return inventory.slots.findIndex(slot => slot.item === null);
+  }
+
+  // Find all empty slots in an inventory
+  findAllEmptySlots(inventoryId: string = PLAYER_INVENTORY): number[] {
+    const inventory = this.getInventory(inventoryId);
+    if (!inventory) return [];
+
+    return inventory.slots.reduce<number[]>((indices, slot, index) => {
+      if (slot.item === null) {
+        indices.push(index);
+      }
+      return indices;
+    }, []);
   }
 
   // Check if an inventory has enough space
@@ -170,21 +196,75 @@ export default class InventoryManager {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return false;
 
-    // Try to find an existing slot with the same item if stackable
-    if (item.isStackable) {
-      const existingSlotIndex = this.findItemSlot(item.id, inventoryId);
-      if (existingSlotIndex !== -1 && this.canAddItemToSlot(item, existingSlotIndex, inventoryId)) {
-        return this.addItemToSlot(item, existingSlotIndex, inventoryId);
+    // Make a clone of the item to avoid modifying the original
+    const itemToAdd = item.clone();
+    let remainingQuantity = itemToAdd.quantity;
+
+    // Try to fill existing slots with the same item if stackable
+    if (itemToAdd.isStackable) {
+      // Get all slots containing this item
+      const existingSlotIndices = this.findAllItemSlots(itemToAdd.id, inventoryId);
+
+      // Try to fill each existing slot first
+      for (const slotIndex of existingSlotIndices) {
+        const slot = inventory.slots[slotIndex];
+
+        if (slot.item) {
+          // Calculate how much we can add to this slot
+          const spaceInSlot = (itemToAdd.maxStackSize || Infinity) - slot.item.quantity;
+
+          if (spaceInSlot > 0) {
+            // Determine how much to add to this slot
+            const quantityToAdd = Math.min(remainingQuantity, spaceInSlot);
+
+            // Create a temporary item with just the amount we're adding to this slot
+            const tempItem = itemToAdd.clone();
+            tempItem.quantity = quantityToAdd;
+
+            // Add to the slot
+            if (this.addItemToSlot(tempItem, slotIndex, inventoryId)) {
+              remainingQuantity -= quantityToAdd;
+
+              // If we've added everything, we're done
+              if (remainingQuantity <= 0) {
+                return true;
+              }
+            }
+          }
+        }
       }
     }
 
-    // Find an empty slot
-    const emptySlotIndex = this.findEmptySlot(inventoryId);
-    if (emptySlotIndex !== -1) {
-      return this.addItemToSlot(item, emptySlotIndex, inventoryId);
+    // If we still have remaining quantity, find empty slots
+    if (remainingQuantity > 0) {
+      // Get all empty slots
+      const emptySlotIndices = this.findAllEmptySlots(inventoryId);
+
+      for (const slotIndex of emptySlotIndices) {
+        // Create a temporary item for what we're adding to this slot
+        const tempItem = itemToAdd.clone();
+
+        if (itemToAdd.isStackable && itemToAdd.maxStackSize) {
+          // Add maximum stack size or remaining quantity, whichever is smaller
+          tempItem.quantity = Math.min(remainingQuantity, itemToAdd.maxStackSize);
+        } else {
+          tempItem.quantity = remainingQuantity;
+        }
+
+        // Add to the slot
+        if (this.addItemToSlot(tempItem, slotIndex, inventoryId)) {
+          remainingQuantity -= tempItem.quantity;
+
+          // If we've added everything, we're done
+          if (remainingQuantity <= 0) {
+            return true;
+          }
+        }
+      }
     }
 
-    return false;
+    // Return true if we added all items, false if we couldn't add everything
+    return remainingQuantity <= 0;
   }
 
   addItems(items: Item[], inventoryId: string = PLAYER_INVENTORY): boolean {

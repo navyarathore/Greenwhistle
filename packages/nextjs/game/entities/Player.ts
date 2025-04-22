@@ -4,6 +4,7 @@ import { Item } from "../resources/Item";
 import ResourceData from "../resources/resource.json";
 import { Game } from "../scenes/Game";
 import { Direction, GridEngineConfig } from "grid-engine";
+import { Position } from "grid-engine";
 import * as Phaser from "phaser";
 
 export const SPRITE_ID = "ori";
@@ -85,6 +86,29 @@ export default class Player {
         const tile = this.game.map.getTileAt(playerPosition.x, playerPosition.y, false, layer);
 
         if (tile && id.includes(tile.index)) {
+          const combined = new Set(ResourceData.combined_blocks.filter(block => block.includes(tile.index)).flat());
+          console.log(combined);
+          const toRemove = [
+            [1, 0],
+            [-1, 0],
+            [0, 1],
+            [0, -1],
+          ].reduce<Position[]>(
+            (pos, [deltaX, deltaY]) => {
+              const deltaTile: Phaser.Tilemaps.Tile | null = this.game.map.getTileAt(
+                tile.x + deltaX,
+                tile.y + deltaY,
+                false,
+                layer,
+              );
+              if (deltaTile && combined.has(deltaTile.index)) {
+                return [...pos, { x: deltaTile.x, y: deltaTile.y }];
+              }
+              return pos;
+            },
+            [{ x: tile.x, y: tile.y }],
+          );
+
           const toAdd: Item[] = [];
           if (method === "random") {
             const randomResult = result[Math.floor(Math.random() * result.length)];
@@ -96,18 +120,19 @@ export default class Player {
               ...result.map(res => new Item(this.game.sysManager.getItemManager().getMaterial(res.id)!, res.amount)),
             );
           }
-          this.game.map.removeTileAt(playerPosition.x, playerPosition.y, false, true, layer);
-          this.game.sysManager.getInventorySystem().addItems(toAdd);
+
+          const added = this.game.sysManager.getInventorySystem().addItems(toAdd);
+          if (!added) return;
+
+          for (const { x, y } of toRemove) {
+            this.game.map.removeTileAt(x, y, false, true, layer);
+          }
 
           EventBus.emit("item-picked-up", tile.properties);
           break;
         }
       }
     });
-  }
-
-  setPosition(x: number, y: number) {
-    this.game.gridEngine.setPosition(SPRITE_ID, { x, y });
   }
 
   selectTool(tool: string) {
