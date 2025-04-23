@@ -4327,6 +4327,7 @@ __metadata:
     framer-motion: ^12.7.3
     grid-engine: ^2.48.0
     kubo-rpc-client: ^5.0.2
+    lucide-react: ^0.503.0
     motion: ^12.7.3
     next: ^15.2.3
     next-nprogress-bar: ^2.3.13
@@ -14015,6 +14016,15 @@ __metadata:
   version: 0.3.3
   resolution: "lru_map@npm:0.3.3"
   checksum: ca9dd43c65ed7a4f117c548028101c5b6855e10923ea9d1f635af53ad20c5868ff428c364d454a7b57fe391b89c704982275410c3c5099cca5aeee00d76e169a
+  languageName: node
+  linkType: hard
+
+"lucide-react@npm:^0.503.0":
+  version: 0.503.0
+  resolution: "lucide-react@npm:0.503.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: ff55ef2c62d4002fec95e5fbe0b83ff830300639473bd228165061c64c107f0867c9815e479c1e71751d7b2dd2aa9aff4830b9da9e2c5a6361e1331f4de2c9c6
   languageName: node
   linkType: hard
 
