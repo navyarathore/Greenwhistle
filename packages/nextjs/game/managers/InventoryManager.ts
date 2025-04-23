@@ -71,7 +71,7 @@ export default class InventoryManager {
   }
 
   // Find the slot index of an item by its ID
-  findItemSlot(itemId: number, inventoryId: string = PLAYER_INVENTORY): number {
+  findItemSlot(itemId: string, inventoryId: string = PLAYER_INVENTORY): number {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return -1;
 
@@ -79,7 +79,7 @@ export default class InventoryManager {
   }
 
   // Find all slot indices containing a specific item
-  findAllItemSlots(itemId: number, inventoryId: string = PLAYER_INVENTORY): number[] {
+  findAllItemSlots(itemId: string, inventoryId: string = PLAYER_INVENTORY): number[] {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return [];
 
@@ -92,12 +92,12 @@ export default class InventoryManager {
   }
 
   // Check if an inventory has an item
-  hasItem(itemId: number, inventoryId: string = PLAYER_INVENTORY): boolean {
+  hasItem(itemId: string, inventoryId: string = PLAYER_INVENTORY): boolean {
     return this.findItemSlot(itemId, inventoryId) !== -1;
   }
 
   // Get an item from an inventory
-  getItem(itemId: number, inventoryId: string = PLAYER_INVENTORY): Item | undefined {
+  getItem(itemId: string, inventoryId: string = PLAYER_INVENTORY): Item | undefined {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return undefined;
 
@@ -559,7 +559,7 @@ export default class InventoryManager {
   }
 
   // Use an item by its ID
-  useItem(itemId: number, inventoryId: string = PLAYER_INVENTORY): boolean {
+  useItem(itemId: string, inventoryId: string = PLAYER_INVENTORY): boolean {
     const slotIndex = this.findItemSlot(itemId, inventoryId);
     if (slotIndex === -1) return false;
 
@@ -567,7 +567,7 @@ export default class InventoryManager {
   }
 
   // Check if an inventory has enough of a specific item
-  hasEnoughItems(itemId: number, quantity: number, inventoryId: string = PLAYER_INVENTORY): boolean {
+  hasEnoughItems(itemId: string, quantity: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return false;
 
@@ -584,7 +584,7 @@ export default class InventoryManager {
   }
 
   // Get the total quantity of an item in an inventory
-  getItemQuantity(itemId: number, inventoryId: string = PLAYER_INVENTORY): number {
+  getItemQuantity(itemId: string, inventoryId: string = PLAYER_INVENTORY): number {
     const inventory = this.getInventory(inventoryId);
     if (!inventory) return 0;
 
@@ -599,7 +599,7 @@ export default class InventoryManager {
   }
 
   // Get the total quantity of an item across all inventories
-  getTotalItemQuantity(itemId: number): number {
+  getTotalItemQuantity(itemId: string): number {
     let total = 0;
 
     this.inventories.forEach(inventory => {
@@ -633,7 +633,7 @@ export default class InventoryManager {
     // }
   }
 
-  private handleItemUsed(data: { itemId: number }): void {
+  private handleItemUsed(data: { itemId: string }): void {
     this.useItem(data.itemId);
   }
 

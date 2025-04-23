@@ -1,23 +1,20 @@
 import { Material, MaterialCategory } from "../resources/Item";
 import Resources from "../resources/resource.json";
 
-const ITEMS_PER_ROW = 50;
 const DEFAULT_MAX_STACK = 8;
 
 /**
  * ItemManager class responsible for loading, managing, and providing access to game items
  */
 export class MaterialManager {
-  private items: Map<number, Material> = new Map();
+  private items: Map<string, Material> = new Map();
 
   /**
    * Load items from the resource.json file
    */
   public loadItems() {
     try {
-      Object.entries(Resources.items).forEach(([_id, itemData]: [string, any]) => {
-        const id = Number(_id);
-        const zeroBasedIdx = id - 1;
+      Object.entries(Resources.items).forEach(([id, itemData]: [string, any]) => {
         const item: Material = {
           ...itemData,
           id: id,
@@ -27,16 +24,9 @@ export class MaterialManager {
             : MaterialCategory.OTHER,
           stackable: itemData.stackable !== undefined ? itemData.stackable : true,
           maxStackSize: itemData.maxStackSize || DEFAULT_MAX_STACK,
-          tileset: itemData.tileset,
-          icon: itemData.icon || {
-            start: {
-              x: zeroBasedIdx % ITEMS_PER_ROW,
-              y: Math.floor(zeroBasedIdx / ITEMS_PER_ROW),
-            },
-            end: {
-              x: zeroBasedIdx % ITEMS_PER_ROW,
-              y: Math.floor(zeroBasedIdx / ITEMS_PER_ROW),
-            },
+          icon: {
+            id: itemData.icon.id || id,
+            path: `/assets/icons/${itemData.icon.path}`,
           },
           description: itemData.description,
         };
@@ -60,7 +50,7 @@ export class MaterialManager {
   /**
    * Get an item by ID
    */
-  public getMaterial(id: number): Material | undefined {
+  public getMaterial(id: string): Material | undefined {
     return this.items.get(id);
   }
 

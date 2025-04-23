@@ -4,13 +4,13 @@ import InventoryManager, { PLAYER_INVENTORY_SIZE } from "~~/game/managers/Invent
 
 const FIRST_CELL_OFFSET_X = 150;
 const FIRST_CELL_OFFSET_Y = 58;
-const CELL_HORIZONTAL_OFFSET = 37.5;
+const CELL_HORIZONTAL_OFFSET = 37.6;
 const CELL_VERTICAL_OFFSET = 40;
 
-const CRAFT_CELL_OFFSET_X = 92;
-const CRAFT_CELL_OFFSET_Y = 126;
+const CRAFT_CELL_OFFSET_X = 86;
+const CRAFT_CELL_OFFSET_Y = 118;
 const CRAFT_CELL_HORIZONTAL_OFFSET = 43;
-const CRAFT_CELL_VERTICAL_OFFSET = 53;
+const CRAFT_CELL_VERTICAL_OFFSET = 52;
 
 const SCALE = 1.5;
 const COLUMN_COUNT = 9;
@@ -93,8 +93,7 @@ export class InventoryMenu extends Phaser.Scene {
       }
 
       // Create the item image
-      const img = this.add.image(position.x, position.y, item.type.tileset, item.id - 1);
-      img.setScale(2);
+      const img = this.add.image(position.x, position.y, item.type.icon.id);
       img.setData("slotIndex", i);
       img.setData("itemId", item.id);
       img.setData("quantity", item.quantity);
@@ -140,10 +139,9 @@ export class InventoryMenu extends Phaser.Scene {
         CRAFT_CELL_OFFSET_Y * SCALE +
         Math.floor(i / CRAFT_COLUMN_COUNT) * CRAFT_CELL_VERTICAL_OFFSET * SCALE;
 
-      const img = this.add.image(offsetX, offsetY, recipe.result.type.tileset, recipe.result.id - 1);
-      img.setScale(3);
+      const img = this.add.image(offsetX, offsetY, recipe.result.type.icon.id);
 
-      const rectangle = this.add.rectangle(offsetX + 10, offsetY + 10, 40, 40, 0xffffff, 0.2);
+      const rectangle = this.add.rectangle(offsetX, offsetY, 40, 40, 0xffffff, 0.2);
       rectangle.setVisible(false);
 
       img.setInteractive();
@@ -178,16 +176,11 @@ export class InventoryMenu extends Phaser.Scene {
         box: rectangle,
       });
 
-      this.add.text(offsetX + 10, offsetY + 12, `x${recipe.result.quantity}`, {
+      this.add.text(offsetX + 4, offsetY + 4, `x${recipe.result.quantity}`, {
         fontSize: 16,
         fontStyle: "bold",
       });
     }
-
-    this.add.text(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "Ori", {
-      fontSize: 32,
-      fontStyle: "bold",
-    });
   }
 
   update() {
@@ -203,7 +196,7 @@ export class InventoryMenu extends Phaser.Scene {
     };
 
     // Increase size slightly and bring to top
-    gameObject.setScale(2.3);
+    gameObject.setScale(1.3);
     this.children.bringToTop(gameObject);
 
     // Also bring quantity text to top if it exists
@@ -306,7 +299,7 @@ export class InventoryMenu extends Phaser.Scene {
     // Reset to original position if no valid drop or if move failed
     gameObject.x = this.dragState.originalPosition.x;
     gameObject.y = this.dragState.originalPosition.y;
-    gameObject.setScale(2);
+    gameObject.setScale(1);
 
     // Reset quantity text position
     const itemData = this.inventoryItems.find(item => item?.image === gameObject);
