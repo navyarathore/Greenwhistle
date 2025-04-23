@@ -14,7 +14,7 @@ function App() {
 
   return (
     <div id="app" className="flex flex-col gap-6">
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col ml-[105px] md:flex-row gap-6">
         <div className="game-container bg-amber-700 rounded-lg overflow-hidden shadow-xl">
           <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
         </div>
