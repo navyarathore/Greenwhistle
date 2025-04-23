@@ -63,6 +63,13 @@ export default class InventoryManager {
     return inventory.slots.map(slot => slot.item);
   }
 
+  getItemsNotNull(inventoryId: string = PLAYER_INVENTORY): Item[] {
+    const inventory = this.getInventory(inventoryId);
+    if (!inventory) return [];
+
+    return inventory.slots.filter(slot => slot.item !== null).map(slot => slot.item as Item);
+  }
+
   // Find the slot index of an item by its ID
   findItemSlot(itemId: number, inventoryId: string = PLAYER_INVENTORY): number {
     const inventory = this.getInventory(inventoryId);
@@ -327,6 +334,20 @@ export default class InventoryManager {
     if (slotIndex === -1) return false;
 
     return this.removeItemFromSlot(slotIndex, item.quantity, inventoryId);
+  }
+
+  removeItems(items: Item[], inventoryId: string = PLAYER_INVENTORY): boolean {
+    let allRemoved = true;
+
+    for (const item of items) {
+      const removed = this.removeItem(item, inventoryId);
+      if (!removed) {
+        allRemoved = false;
+        break;
+      }
+    }
+
+    return allRemoved;
   }
 
   // Transfer an item between inventories

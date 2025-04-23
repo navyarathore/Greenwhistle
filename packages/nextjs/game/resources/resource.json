@@ -28,22 +28,26 @@
     "54": {
       "name": "Axe",
       "type": "tool",
-      "tileset": "tiles-tools"
+      "tileset": "tiles-tools",
+      "stackable": false
     },
     "95": {
       "name": "Pickaxe",
       "type": "tool",
-      "tileset": "tiles-tools"
+      "tileset": "tiles-tools",
+      "stackable": false
     },
     "135": {
       "name": "Shovel",
       "type": "tool",
-      "tileset": "tiles-tools"
+      "tileset": "tiles-tools",
+      "stackable": false
     },
     "175": {
       "name": "Hoe",
       "type": "tool",
-      "tileset": "tiles-tools"
+      "tileset": "tiles-tools",
+      "stackable": false
     }
   },
   "combined_blocks": [
