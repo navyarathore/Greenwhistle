@@ -41,23 +41,23 @@ export class MaterialManager {
   }
 
   /**
-   * Get all items
+   * Get all materials
    */
   public getAllMaterials(): Material[] {
     return Array.from(this.items.values());
   }
 
   /**
-   * Get an item by ID
+   * Get an material by ID
    */
   public getMaterial(id: string): Material | undefined {
     return this.items.get(id);
   }
 
   /**
-   * Get items by type
+   * Get materials by type
    */
-  public getItemsByCategory(type: MaterialCategory): Material[] {
+  public getMaterialByCategory(type: MaterialCategory): Material[] {
     return this.getAllMaterials().filter(item => item.type === type);
   }
 }
