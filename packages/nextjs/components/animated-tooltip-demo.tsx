@@ -19,7 +19,7 @@ const people = [
     id: 3,
     name: "Navya Rathore",
     designation: "AI Engineer",
-    image: "/vaibhav.png",
+    image: "/navya.png",
   },
 ];
 
