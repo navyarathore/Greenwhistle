@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FolderOpenDot } from "lucide-react";
 import { hardhat } from "viem/chains";
 import { Bars3Icon, ChevronDownIcon, HomeIcon, ShoppingCartIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, OnchainKitCustomConnectButton } from "~~/components/scaffold-eth";
@@ -30,6 +31,11 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "MarketPlace",
     href: "/marketplace",
     icon: <ShoppingCartIcon className="h-5 w-5" />,
+  },
+  {
+    label: "Recipes",
+    href: "/recipes",
+    icon: <FolderOpenDot className="h-5 w-5" />,
   },
 ];
 

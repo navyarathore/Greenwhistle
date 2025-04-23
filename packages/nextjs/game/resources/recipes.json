@@ -11,6 +11,42 @@
         "id": "axe",
         "quantity": 1
       }
+    },
+    {
+      "ingredients": [
+        {
+          "id": "branches",
+          "quantity": 4
+        }
+      ],
+      "result": {
+        "id": "pickaxe",
+        "quantity": 1
+      }
+    },
+    {
+      "ingredients": [
+        {
+          "id": "branches",
+          "quantity": 4
+        }
+      ],
+      "result": {
+        "id": "shovel",
+        "quantity": 1
+      }
+    },
+    {
+      "ingredients": [
+        {
+          "id": "branches",
+          "quantity": 4
+        }
+      ],
+      "result": {
+        "id": "hoe",
+        "quantity": 1
+      }
     }
   ]
 }

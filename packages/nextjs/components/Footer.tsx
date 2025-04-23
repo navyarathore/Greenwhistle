@@ -36,6 +36,7 @@ export const Footer = () => {
                   { name: "Home", path: "/" },
                   { name: "Game", path: "/game" },
                   { name: "Marketplace", path: "/marketplace" },
+                  { name: "Recipes", path: "/recipes" },
                 ].map(link => (
                   <Link
                     key={link.path}
