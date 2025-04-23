@@ -17,7 +17,7 @@ export class CraftingManager {
   }
 
   loadRecipes(materialManager: MaterialManager): void {
-    const convertItem = (item: { id: number; quantity: number }): Item => {
+    const convertItem = (item: { id: string; quantity: number }): Item => {
       return new Item(materialManager.getMaterial(item.id)!, item.quantity);
     };
 

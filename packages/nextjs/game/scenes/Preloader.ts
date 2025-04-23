@@ -1,6 +1,32 @@
 import { Scene } from "phaser";
 import { SPRITE_ID } from "~~/game/entities/Player";
 
+// Define icon paths for recursive loading
+const ICON_PATHS = {
+  items: {
+    pickup: [
+      "blueberry",
+      "branches",
+      "carrot",
+      "carrot_seed",
+      "diamond_bar",
+      "diamond_ore",
+      "iron_bar",
+      "iron_ore",
+      "rock",
+      "stone_bar",
+      "strawberry",
+      "tomato",
+      "tomato_seed",
+      "wheat",
+      "wheat_seed",
+    ],
+    placeable: ["anvil", "wooden_chest", "workbench"],
+  },
+  placeable: ["bed", "bed_vertical", "cook_vertical", "furnace_vertical", "log"],
+  tools: ["axe", "hoe", "pickaxe", "shovel", "sword"],
+};
+
 export class Preloader extends Scene {
   constructor() {
     super("Preloader");
@@ -31,14 +57,6 @@ export class Preloader extends Scene {
 
     this.load.tilemapTiledJSON("map", "/maps/albion.json");
     this.load.image("tiles", "/tilesets/albion_tileset.png");
-    this.load.spritesheet("tiles-sprite", "/tilesets/albion_tileset.png", {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-    this.load.spritesheet("tiles-tools", "/tilesets/tools_tileset.png", {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
 
     this.load.spritesheet(SPRITE_ID, "/player/player_movement.png", {
       frameWidth: 32,
@@ -46,6 +64,26 @@ export class Preloader extends Scene {
     });
 
     this.load.image("inventory", "/ui/inventory.png");
+
+    this.loadAllIcons();
+  }
+
+  private loadAllIcons() {
+    ICON_PATHS.items.pickup.forEach(icon => {
+      this.load.image(icon, `/icons/items/pickup/${icon}.png`);
+    });
+
+    ICON_PATHS.items.placeable.forEach(icon => {
+      this.load.image(icon, `/icons/items/placeable/${icon}.png`);
+    });
+
+    ICON_PATHS.placeable.forEach(icon => {
+      this.load.image(icon, `/icons/placeable/${icon}.png`);
+    });
+
+    ICON_PATHS.tools.forEach(icon => {
+      this.load.image(icon, `/icons/tools/${icon}.png`);
+    });
   }
 
   create() {

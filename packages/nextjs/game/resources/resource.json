@@ -1,53 +1,64 @@
 {
   "items": {
-    "1": {
-      "name": "Empty",
-      "stackable": false,
-      "tileset": "tiles-sprite"
-    },
-    "799": {
+    "branches": {
       "name": "Branches",
       "type": "resources",
-      "tileset": "tiles-sprite"
+      "icon": {
+        "path": "/items/pickup/branches.png"
+      }
     },
-    "86": {
+    "wheat_seed": {
       "name": "Wheat seed",
       "type": "seed",
-      "tileset": "tiles-sprite"
+      "icon": {
+        "path": "/items/pickup/wheat_seed.png"
+      }
     },
-    "161": {
+    "blueberry": {
       "name": "Blueberry",
       "type": "consumable",
-      "tileset": "tiles-sprite"
+      "icon": {
+        "path": "/items/pickup/blueberry.png"
+      }
     },
-    "111": {
+    "strawberry": {
       "name": "Strawberry",
       "type": "consumable",
-      "tileset": "tiles-sprite"
+      "icon": {
+        "path": "/items/pickup/strawberry.png"
+      }
     },
-    "54": {
+    "axe": {
       "name": "Axe",
       "type": "tool",
-      "tileset": "tiles-tools",
-      "stackable": false
+      "stackable": false,
+      "icon": {
+        "path": "/tools/axe.png"
+      }
     },
-    "95": {
+    "pickaxe": {
       "name": "Pickaxe",
       "type": "tool",
-      "tileset": "tiles-tools",
-      "stackable": false
+      "stackable": false,
+      "icon": {
+        "path": "/tools/pickaxe.png"
+      }
     },
-    "135": {
+    "shovel": {
       "name": "Shovel",
       "type": "tool",
-      "tileset": "tiles-tools",
-      "stackable": false
+      "stackable": false,
+      "icon": {
+        "path": "/tools/shovel.png"
+      }
     },
-    "175": {
+    "hoe": {
       "name": "Hoe",
       "type": "tool",
-      "tileset": "tiles-tools",
-      "stackable": false
+      "stackable": false,
+      "icon": {
+        "path": "/tools/hoe.png"
+      }
     }
   },
   "combined_blocks": [
@@ -62,7 +73,7 @@
       "method": "direct",
       "result": [
         {
-          "id": 799,
+          "id": "branches",
           "amount": 1
         }
       ]
@@ -73,7 +84,7 @@
       "method": "direct",
         "result": [
           {
-            "id": 799,
+            "id": "branches",
             "amount": 5
           }
         ]
@@ -84,7 +95,7 @@
       "method": "random",
       "result": [
         {
-          "id": 86,
+          "id": "wheat_seed",
           "amount": 1
         }
       ]
@@ -95,7 +106,7 @@
       "method": "direct",
       "result": [
         {
-          "id": 111,
+          "id": "strawberry",
           "amount": 1
         }
       ]
@@ -106,7 +117,7 @@
       "method": "direct",
       "result": [
         {
-          "id": 161,
+          "id": "blueberry",
           "amount": 1
         }
       ]

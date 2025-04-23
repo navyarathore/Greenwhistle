@@ -3,12 +3,12 @@
     {
       "ingredients": [
         {
-          "id": 799,
+          "id": "branches",
           "quantity": 4
         }
       ],
       "result": {
-        "id": 54,
+        "id": "axe",
         "quantity": 1
       }
     }

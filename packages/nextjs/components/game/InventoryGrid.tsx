@@ -1,6 +1,6 @@
 // A React component to display the inventory grid using the InventorySystem types
 import React from "react";
-import { TileRange } from "~~/components/TileSetComponent";
+import Image from "next/image";
 import { Item } from "~~/game/resources/Item";
 
 interface InventoryGridProps {
@@ -9,20 +9,16 @@ interface InventoryGridProps {
   tilesetUrl?: string;
 }
 
-export const InventoryGrid: React.FC<InventoryGridProps> = ({
-  items,
-  maxSlots = 16,
-  tilesetUrl = "/assets/tilesets/albion_tileset.png",
-}) => {
+export const InventoryGrid: React.FC<InventoryGridProps> = ({ items, maxSlots = 16 }) => {
   const renderItemIcon = (item: Item) => {
     return (
-      <TileRange
-        tilesetUrl={tilesetUrl}
-        startX={item.type.icon.start.x}
-        startY={item.type.icon.start.y}
-        endX={item.type.icon.end.x}
-        endY={item.type.icon.end.y}
-        className="mb-1"
+      <Image
+        src={item.type.icon.path}
+        alt={item.type.name}
+        width={40}
+        height={40}
+        className="object-contain mb-1"
+        priority
       />
     );
   };

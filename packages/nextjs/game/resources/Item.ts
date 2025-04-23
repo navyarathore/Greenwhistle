@@ -11,23 +11,16 @@ export const MaterialCategory = {
 
 export type MaterialCategory = (typeof MaterialCategory)[keyof typeof MaterialCategory];
 
-export interface MaterialIcon {
-  start: {
-    x: number;
-    y: number;
-  };
-  end: {
-    x: number;
-    y: number;
-  };
-}
+export type MaterialIcon = {
+  id: string;
+  path: string;
+};
 
 export interface Material {
-  id: number;
+  id: string;
   name: string;
   type: MaterialCategory;
   icon: MaterialIcon;
-  tileset: string;
   description?: string;
   stackable: boolean;
   maxStackSize: number;
@@ -43,7 +36,7 @@ export class Item {
     this.quantity = quantity;
   }
 
-  get id(): number {
+  get id(): string {
     return this.type.id;
   }
 
