@@ -23,6 +23,12 @@ const people = [
     image:
       "https://media.licdn.com/dms/image/v2/D4D03AQG-bzrFONmdZw/profile-displayphoto-shrink_400_400/B4DZZXFHy9H4Ag-/0/1745217683675?e=1750896000&v=beta&t=1LiB0ha_rvjRK2ujass-v8fe05qRQY46_44Ab6H3fEM",
   },
+  {
+    id: 4,
+    name: "Harsh Bhai",
+    designation: "Game Developer",
+    image: "",
+  },
 ];
 
 export default function AnimatedTooltipPreview() {

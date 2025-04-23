@@ -12,6 +12,14 @@ export interface Item {
   description?: string;
   category?: string;
   rarity?: string;
+  // Add these new properties
+  type?: string;
+  levelRequired?: number;
+  durability?: {
+    current: number;
+    max: number;
+  };
+  weight?: number;
 }
 export const mockItems: Item[] = [
   {
@@ -22,11 +30,19 @@ export const mockItems: Item[] = [
     quantity: 148972,
     price: {
       amount: 1.03,
-      currency: "USD",
+      currency: "ETH",
     },
     slug: "fever-case",
     description: "A case containing various weapon skins.",
     rarity: "common",
+    // Add the properties
+    type: "Container",
+    levelRequired: 4,
+    durability: {
+      current: 100,
+      max: 100,
+    },
+    weight: 1.5,
   },
   {
     id: "2",
@@ -36,25 +52,40 @@ export const mockItems: Item[] = [
     quantity: 223451,
     price: {
       amount: 1.91,
-      currency: "USD",
+      currency: "ETH",
     },
     slug: "dreams-nightmares-case",
     description: "A special case with rare dream-themed weapon skins.",
     rarity: "uncommon",
+    // Add the properties
+    type: "Container",
+    levelRequired: 2,
+    durability: {
+      current: 100,
+      max: 100,
+    },
+    weight: 1.5,
   },
   {
     id: "3",
     name: "Mann Co. Supply Crate Key",
     game: "Team Fortress 2",
-    imageUrl: "/images/mann-co-key.png",
+    imageUrl: "/backpack.jpeg",
     quantity: 27123,
     price: {
       amount: 2.27,
-      currency: "USD",
+      currency: "ETH",
     },
     slug: "mann-co-key",
     description: "Used to open Mann Co. Supply Crates.",
     rarity: "common",
+    type: "Container",
+    levelRequired: 4,
+    durability: {
+      current: 100,
+      max: 100,
+    },
+    weight: 1.5,
   },
   {
     id: "4",
@@ -64,25 +95,39 @@ export const mockItems: Item[] = [
     quantity: 273961,
     price: {
       amount: 0.61,
-      currency: "USD",
+      currency: "ETH",
     },
     slug: "kilowatt-case",
     description: "An electrifying case of weapon skins.",
     rarity: "common",
+    type: "Container",
+    levelRequired: 4,
+    durability: {
+      current: 100,
+      max: 100,
+    },
+    weight: 1.5,
   },
   {
     id: "5",
     name: "Fracture Case",
     game: "Counter-Strike 2",
-    imageUrl: "/images/fracture-case.png",
+    imageUrl: "/logo.png",
     quantity: 571396,
     price: {
       amount: 0.31,
-      currency: "USD",
+      currency: "ETH",
     },
     slug: "fracture-case",
     description: "Contains fractured design weapon skins.",
     rarity: "common",
+    type: "Container",
+    levelRequired: 4,
+    durability: {
+      current: 100,
+      max: 100,
+    },
+    weight: 1.5,
   },
   {
     id: "6",
@@ -92,11 +137,18 @@ export const mockItems: Item[] = [
     quantity: 233061,
     price: {
       amount: 0.54,
-      currency: "USD",
+      currency: "ETH",
     },
     slug: "revolution-case",
     description: "Revolutionary designs for your weapons.",
     rarity: "uncommon",
+    type: "Container",
+    levelRequired: 4,
+    durability: {
+      current: 100,
+      max: 100,
+    },
+    weight: 1.5,
   },
 ];
 
