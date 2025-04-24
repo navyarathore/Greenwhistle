@@ -38,6 +38,7 @@ export default function Home() {
       details: [
         "Sell crops for Sepolia ETH",
         "Buy new seeds and tools",
+        "NFTs marketplace for unique items",
         "Trade with other players",
         "Daily market price changes",
       ],
@@ -147,8 +148,11 @@ export default function Home() {
       {/* Welcome Section */}
       <div className="bg-amber-200 py-16 px-4">
         <div className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-4xl font-bold text-amber-900 text-center mb-8 font-serif">Welcome to Green Whistle</h2>
-          <p className="text-lg text-amber-800 mb-6 text-center max-w-3xl mx-auto">
+          <h2 className="text-6xl font-bold text-amber-900 text-center mb-8 font-['PixelGame']">
+            {" "}
+            Welcome to Green Whistle{" "}
+          </h2>
+          <p className="text-2xl text-amber-800 mb-6 text-center max-w-3xl font-['PixelGame'] mx-auto">
             Dive into a vibrant world of farming, trading, and adventure. Grow your crops, catch fish, and trade with
             friends in this immersive pixelated universe.
           </p>
@@ -156,7 +160,7 @@ export default function Home() {
 
         {/* Game Features Section */}
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-amber-900 text-center mb-12 font-serif">Game Features</h2>
+          <h2 className="text-4xl font-bold text-amber-900 text-center mb-12 font-['PixelGame']">Game Features</h2>
 
           {/* Game Features Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
