@@ -42,27 +42,51 @@ export default class ControlsManager {
         const tile = getTileRecursivelyAt(playerPosition, this.game.map, layer, false);
 
         if (tile && id.includes(tile.index)) {
-          const combined = new Set(ResourceData.combined_blocks.filter(block => block.includes(tile.index)).flat());
-          const toRemove = [
+          const combined: Map<number, string> = new Map(
+            ResourceData.combined_blocks
+              .filter(block => Object.keys(block).includes(String(tile.index)))
+              .flatMap(block => Object.entries(block))
+              .map(([key, value]) => [parseInt(key), value as string]),
+          );
+          const layers = new Set(combined.values());
+
+          const delta = [
             [1, 0],
             [-1, 0],
             [0, 1],
             [0, -1],
-          ].reduce<Position[]>(
-            (pos, [deltaX, deltaY]) => {
-              const deltaTile: Phaser.Tilemaps.Tile | null = this.game.map.getTileAt(
-                tile.x + deltaX,
-                tile.y + deltaY,
-                false,
-                layer,
-              );
-              if (deltaTile && combined.has(deltaTile.index)) {
-                return [...pos, { x: deltaTile.x, y: deltaTile.y }];
+          ];
+          const checkTiles = (
+            x: number,
+            y: number,
+            layer: string,
+            visited: Set<string>,
+            positions: Array<Position & { layer: string }> = [],
+          ): Array<Position & { layer: string }> => {
+            console.log(`x: ${x}, y: ${y}, layer: ${layer}, Visited: `, visited);
+            const key = `${x}:${y}`;
+            if (visited.has(key)) return positions;
+
+            visited.add(key);
+            positions.push({ x, y, layer });
+
+            for (const [dx, dy] of delta) {
+              const nextX = x + dx;
+              const nextY = y + dy;
+              for (const l of layers) {
+                const nextTile = getTileRecursivelyAt({ x: nextX, y: nextY }, this.game.map, l, false);
+                console.log(nextTile);
+                if (nextTile && combined.get(nextTile.index) === l) {
+                  checkTiles(nextX, nextY, nextTile.layer.name, visited, positions);
+                  break;
+                }
               }
-              return pos;
-            },
-            [{ x: tile.x, y: tile.y }],
-          );
+            }
+
+            return positions;
+          };
+
+          const toRemove = checkTiles(tile.x, tile.y, tile.layer.name, new Set<string>());
 
           const toAdd: Item[] = [];
           if (method === "random") {
@@ -77,7 +101,7 @@ export default class ControlsManager {
           const added = this.sysManager.inventoryManager.addItems(toAdd);
           if (!added) return;
 
-          for (const { x, y } of toRemove) {
+          for (const { x, y, layer } of toRemove) {
             this.game.map.removeTileAt(x, y, false, true, layer);
           }
 

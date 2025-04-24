@@ -153,9 +153,18 @@
     }
   },
   "combined_blocks": [
-    [392, 393],
-    [396, 397],
-    [798, 848]
+    {
+      "392": "Height 1",
+      "393": "Height 1"
+    },
+    {
+      "396": "Height 1",
+      "397": "Height 1"
+    },
+    {
+      "798": "Height 2",
+      "848": "Height 1"
+    }
   ],
   "pickup": [
     {
@@ -182,7 +191,7 @@
     },
     {
       "layer": "Height 1",
-      "id": [798, 848],
+      "id": [848],
       "method": "random",
       "result": [
         {

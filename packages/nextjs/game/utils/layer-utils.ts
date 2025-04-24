@@ -7,6 +7,7 @@ interface LayerMapping {
 }
 
 const layerMapping = new Map<string, LayerMapping>();
+const layerNames: string[] = [];
 
 export const loadLayerMapping = (tilemap: Phaser.Tilemaps.Tilemap) => {
   const layers = tilemap.getTileLayerNames();
@@ -21,7 +22,7 @@ export const loadLayerMapping = (tilemap: Phaser.Tilemaps.Tilemap) => {
       });
     }
   }
-  console.log(layerMapping);
+  layerNames.push(...tilemap.getTileLayerNames());
 };
 
 export interface LayerCallback<T> {
@@ -37,7 +38,7 @@ export const loopLayerRecursively = <T>(
   if (!mapping) {
     throw new Error(`Unable to load layer: ${layer}`);
   }
-  return callback(tilemap.getTileLayerNames().slice(mapping.from, mapping.to), tilemap);
+  return callback(layerNames.slice(mapping.from, mapping.to), tilemap);
 };
 
 export const getTileRecursivelyAt = (
@@ -51,6 +52,21 @@ export const getTileRecursivelyAt = (
     for (const layer of layers) {
       const tile = tilemap.getTileAt(position.x, position.y, nonNull, layer);
       tiles.push(tile);
+      if (tile) return tile;
+    }
+
+    return null;
+  });
+};
+
+export const removeTileRecursivelyAt = (
+  position: Position,
+  tilemap: Phaser.Tilemaps.Tilemap,
+  layer: string,
+): Phaser.Tilemaps.Tile | null => {
+  return loopLayerRecursively(tilemap, layer, (layers, _) => {
+    for (const layer of layers) {
+      const tile = tilemap.removeTileAt(position.x, position.y, true, true, layer);
       if (tile) return tile;
     }
 
