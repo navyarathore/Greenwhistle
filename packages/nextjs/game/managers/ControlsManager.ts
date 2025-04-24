@@ -10,7 +10,8 @@ import { Game } from "~~/game/scenes/Game";
 
 export default class ControlsManager {
   private sysManager: SystemManager = SystemManager.instance;
-  private itemUseKey?: Phaser.Input.Keyboard.Key;
+  private activeHotbarSlot = -1;
+  private activeHotbarItem: Item | null = null;
 
   constructor(
     private game: Game,
@@ -95,10 +96,9 @@ export default class ControlsManager {
   private setupHotbarControls(): void {
     // Setup number keys (1-5) for hotbar selection using the input component
     for (let i = 0; i < 5; i++) {
-      const keyCode = Phaser.Input.Keyboard.KeyCodes.ONE + i;
-      const key = this.game.input.keyboard!.addKey(keyCode);
-      key.on("down", () => {
-        this.game.player.selectedHotbarSlot = i;
+      const index = i; // Capture the current index in closure
+      this.inputComponent.hotbarKeys[i].on("down", () => {
+        this.game.player.selectedHotbarSlot = index;
       });
     }
 
@@ -113,27 +113,22 @@ export default class ControlsManager {
 
     // Listen for hotbar selection changes to handle item usage
     EventBus.on("hotbar-selection-changed", (slotIndex: number) => {
-      console.log(`Hotbar slot ${slotIndex + 1} selected`);
-      // Use the selected item if applicable
       this.handleHotbarSelection();
     });
+
+    // Check for hotbar keys at regular intervals
+    this.game.events.on("update", this.checkHotbarKeyPresses, this);
   }
 
   private handleHotbarSelection(): void {
     // Get the currently selected hotbar slot
     const selectedSlot = this.game.player.selectedHotbarSlot;
 
-    // This method will be called whenever the player changes their hotbar selection
-    console.log(`Player selected hotbar slot ${selectedSlot + 1}`);
-
     // Get the selected item from the inventory system
     const inventorySystem = this.sysManager.inventorySystem;
     const selectedItem = inventorySystem.getHotbarItem(selectedSlot);
 
     if (selectedItem) {
-      // Show item name in console for debugging
-      console.log(`Selected item: ${selectedItem.id}, quantity: ${selectedItem.quantity}`);
-
       // Update visual representation in HUD
       EventBus.emit("hotbar-item-selected", {
         slot: selectedSlot,
@@ -146,16 +141,12 @@ export default class ControlsManager {
   }
 
   private setupItemUseKey(slotIndex: number, item: Item): void {
-    // Clear any previous item use key listeners
-    if (this.itemUseKey) {
-      this.itemUseKey.removeAllListeners();
-    }
+    // We don't need to clear previous listeners as we're using the InputComponent
+    // We will check for key presses in the update method instead
 
-    // Use the Q key for item usage
-    this.itemUseKey = this.game.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-    this.itemUseKey.on("down", () => {
-      this.useHotbarItem(slotIndex, item);
-    });
+    // Store the current active item information for use in the update method
+    this.activeHotbarSlot = slotIndex;
+    this.activeHotbarItem = item;
   }
 
   /**
@@ -280,9 +271,25 @@ export default class ControlsManager {
     EventBus.emit("inventory-updated", "player");
   }
 
+  /**
+   * Check for hotbar key presses during the game update cycle
+   */
+  private checkHotbarKeyPresses(): void {
+    // We only check for hotbar keys if movement is enabled
+    if (!this.game.player.isMovementEnabled) return;
+
+    // Check each hotbar key
+    for (let i = 0; i < this.inputComponent.hotbarKeys.length; i++) {
+      if (this.inputComponent.isHotbarKeyJustDown(i)) {
+        this.game.player.selectedHotbarSlot = i;
+      }
+    }
+  }
+
   update(): void {
     if (!this.game.player.isMovementEnabled) return;
 
+    // Check for movement input
     if (this.inputComponent.isUpDown) {
       this.gridEngine.move(SPRITE_ID, Direction.UP);
     } else if (this.inputComponent.isDownDown) {
@@ -291,6 +298,11 @@ export default class ControlsManager {
       this.gridEngine.move(SPRITE_ID, Direction.LEFT);
     } else if (this.inputComponent.isRightDown) {
       this.gridEngine.move(SPRITE_ID, Direction.RIGHT);
+    }
+
+    // Check for item use key press
+    if (this.inputComponent.isItemUseKeyJustDown && this.activeHotbarItem) {
+      this.useHotbarItem(this.activeHotbarSlot, this.activeHotbarItem);
     }
   }
 }

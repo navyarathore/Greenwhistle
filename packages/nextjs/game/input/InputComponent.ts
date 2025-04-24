@@ -10,6 +10,10 @@ export class InputComponent {
   readonly aKey: Phaser.Input.Keyboard.Key;
   readonly sKey: Phaser.Input.Keyboard.Key;
   readonly dKey: Phaser.Input.Keyboard.Key;
+  // Hotbar keys (1-5)
+  readonly hotbarKeys: Phaser.Input.Keyboard.Key[];
+  // Item use key
+  readonly itemUseKey: Phaser.Input.Keyboard.Key;
 
   constructor(keyboardPlugin: Phaser.Input.Keyboard.KeyboardPlugin) {
     this.cursorKeys = keyboardPlugin.createCursorKeys();
@@ -22,10 +26,19 @@ export class InputComponent {
     this.sKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     this.dKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
-    // F = B, Inventory
-    // E = A, Talk, Run, Lift, Push/Pull
-    // shift = Select, Open Save Menu
-    // return/enter = Start, Open Inventory
+    // Add hotbar keys (1-5)
+    this.hotbarKeys = [];
+    for (let i = 0; i < 5; i++) {
+      this.hotbarKeys.push(keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.ONE + i));
+    }
+
+    // Add item use key (Q)
+    this.itemUseKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+
+    // E = B, Inventory
+    // F = A, Talk, Run, Lift, Push/Pull
+    // 1-5 = Hotbar selection
+    // Q = Item use
   }
 
   get isUpDown(): boolean {
@@ -66,5 +79,25 @@ export class InputComponent {
 
   get isEnterKeyJustDown(): boolean {
     return Phaser.Input.Keyboard.JustDown(this.enterKey);
+  }
+
+  /**
+   * Checks if a specific hotbar key was just pressed
+   * @param index Index of the hotbar key (0-4)
+   * @returns Whether the key was just pressed
+   */
+  isHotbarKeyJustDown(index: number): boolean {
+    if (index >= 0 && index < this.hotbarKeys.length) {
+      return Phaser.Input.Keyboard.JustDown(this.hotbarKeys[index]);
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the item use key was just pressed
+   * @returns Whether the key was just pressed
+   */
+  get isItemUseKeyJustDown(): boolean {
+    return Phaser.Input.Keyboard.JustDown(this.itemUseKey);
   }
 }
