@@ -54,7 +54,8 @@ export class SystemManager {
     this._controlsManager = new ControlsManager(scene, inputComponent, scene.gridEngine);
     this._interactionManager = new InteractionManager(scene, scene.gridEngine);
     this.controlsManager.setupControls();
-    this.setupEventListeners();
+
+    EventBus.emit("systems-ready", this);
   }
 
   get controlsManager(): ControlsManager {
@@ -63,24 +64,6 @@ export class SystemManager {
 
   get interactionManager(): InteractionManager {
     return this._interactionManager;
-  }
-
-  /**
-   * Setup event listeners
-   */
-  private setupEventListeners(): void {
-    // Listen for player creation to provide inventory system
-    EventBus.once("player-created", (player: any) => {
-      // Provide the inventory manager to the player
-      player.inventoryManager = this.inventoryManager;
-
-      // Trigger initial interactions setup
-      const position = player.config.gridEngine.getPosition(player.config.id);
-      EventBus.emit("player-moved", position);
-    });
-
-    // Track system ready state
-    EventBus.emit("systems-ready", this);
   }
 
   /**
@@ -94,6 +77,6 @@ export class SystemManager {
     this.interactionManager.update(time, delta);
 
     // Emit a system update event for any systems that need to respond
-    EventBus.emit("system-update", { time, delta });
+    // EventBus.emit("system-update", { time, delta });
   }
 }
