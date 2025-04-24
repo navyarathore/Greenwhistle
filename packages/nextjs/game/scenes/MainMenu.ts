@@ -5,7 +5,7 @@ import { SCREEN_WIDTH } from "~~/game/config";
 export class MainMenu extends Scene {
   background!: GameObjects.Image;
   title!: GameObjects.Text;
-  playButton!: GameObjects.Text;
+  playButton!: GameObjects.Sprite;
 
   constructor() {
     super("MainMenu");
@@ -17,7 +17,7 @@ export class MainMenu extends Scene {
 
     // Centered title
     this.title = this.add
-      .text(700, 180, "Green Whistle", {
+      .text(650, 180, "Green Whistle", {
         fontFamily: "Arial Black",
         fontSize: 72,
         color: "#48ff00",
@@ -29,33 +29,25 @@ export class MainMenu extends Scene {
       .setDepth(100)
       .setShadow(5, 5, "rgba(0,0,0,0.5)", 5);
 
-    // Centered play button
-    this.playButton = this.createButton(SCREEN_WIDTH / 2, 450, "Play", () => this.changeScene());
+    // Centered play button using an image instead of text
+    this.playButton = this.createImageButton(SCREEN_WIDTH / 2, 450, "start_button", () => this.changeScene());
 
     EventBus.emit("current-scene-ready", this);
   }
 
-  createButton(x: number, y: number, text: string, callback: () => void): GameObjects.Text {
+  createImageButton(x: number, y: number, texture: string, callback: () => void): GameObjects.Sprite {
     const button = this.add
-      .text(x, y, text, {
-        fontFamily: "Arial Black",
-        fontSize: 48,
-        color: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 6,
-        align: "center",
-      })
+      .sprite(x, y, texture)
       .setOrigin(0.5)
       .setDepth(100)
-      .setPadding(15)
       .setInteractive({ useHandCursor: true })
       .on("pointerover", () => {
         button.setScale(1.1);
-        button.setColor("#ffff00");
+        button.setTint(0xffff00);
       })
       .on("pointerout", () => {
         button.setScale(1);
-        button.setColor("#ffffff");
+        button.clearTint();
       })
       .on("pointerdown", () => {
         button.setScale(0.95);

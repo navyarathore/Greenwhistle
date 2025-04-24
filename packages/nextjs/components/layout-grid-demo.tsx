@@ -66,24 +66,24 @@ const cards = [
     id: 1,
     content: <SkeletonOne />,
     className: "md:col-span-2",
-    thumbnail: "https://i.ibb.co/CRWH571/Green-Whistle.png",
+    thumbnail: "/1.gif",
   },
   {
     id: 2,
     content: <SkeletonTwo />,
     className: "col-span-1",
-    thumbnail: "/town.png",
+    thumbnail: "/3.gif",
   },
   {
     id: 3,
     content: <SkeletonThree />,
     className: "col-span-1",
-    thumbnail: "/green2.png",
+    thumbnail: "/4.gif",
   },
   {
     id: 4,
     content: <SkeletonFour />,
     className: "md:col-span-2",
-    thumbnail: "/shop.png",
+    thumbnail: "/5.gif",
   },
 ];

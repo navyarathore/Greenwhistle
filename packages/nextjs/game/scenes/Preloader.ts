@@ -56,6 +56,7 @@ export class Preloader extends Scene {
 
   preload() {
     this.load.setPath("assets");
+    this.load.image("start_button", "/Button.png");
 
     this.load.tilemapTiledJSON("map", "/maps/albion.json");
     this.load.image("tiles", "/tilesets/albion_tileset.png");
@@ -110,7 +111,5 @@ export class Preloader extends Scene {
         repeat: -1,
       });
     });
-
-    this.scene.start("MainMenu");
   }
 }

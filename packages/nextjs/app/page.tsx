@@ -152,7 +152,7 @@ export default function Home() {
             {" "}
             Welcome to Green Whistle{" "}
           </h2>
-          <p className="text-2xl text-amber-800 mb-6 text-center max-w-3xl font-['PixelGame'] mx-auto">
+          <p className="text-2xl text-amber-800 mb-6 text-center max-w-3xl font-serif mx-auto">
             Dive into a vibrant world of farming, trading, and adventure. Grow your crops, catch fish, and trade with
             friends in this immersive pixelated universe.
           </p>
@@ -160,7 +160,7 @@ export default function Home() {
 
         {/* Game Features Section */}
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-amber-900 text-center mb-12 font-['PixelGame']">Game Features</h2>
+          <h2 className="text-4xl font-bold text-amber-900 text-center mb-12 font-serif">Game Features</h2>
 
           {/* Game Features Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
