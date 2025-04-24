@@ -9,32 +9,53 @@ import { FarmingManager } from "~~/game/managers/FarmingManager";
 
 /**
  * SystemManager class to initialize and manage all game systems
+ * Using singleton pattern to ensure only one instance exists
  */
 export class SystemManager {
+  private static _instance: SystemManager;
+
   readonly inventorySystem: InventoryManager;
   readonly materialManager: MaterialManager;
   readonly craftingManager: CraftingManager;
-  readonly controlsManager: ControlsManager;
   readonly farmingManager: FarmingManager;
+  private _controlsManager!: ControlsManager;
 
-  constructor(private scene: Game) {
-    // Initialize systems in the correct order
-    this.inventorySystem = new InventoryManager(scene);
-    this.materialManager = new MaterialManager();
-    this.craftingManager = new CraftingManager();
-    this.farmingManager = new FarmingManager(scene, this.materialManager);
-
-    const inputComponent = new InputComponent(scene.input.keyboard!);
-
-    this.controlsManager = new ControlsManager(scene, inputComponent, scene.gridEngine);
+  /**
+   * Get the singleton instance of SystemManager
+   */
+  public static get instance(): SystemManager {
+    if (!SystemManager._instance) {
+      SystemManager._instance = new SystemManager();
+    }
+    return SystemManager._instance;
   }
 
-  load(): void {
+  /**
+   * Private constructor to prevent direct instantiation
+   */
+  private constructor() {
+    // Initialize systems in the correct order
+    this.inventorySystem = new InventoryManager();
+    this.materialManager = new MaterialManager();
+    this.craftingManager = new CraftingManager();
+    this.farmingManager = new FarmingManager(this.materialManager);
+  }
+
+  loadResources() {
     this.materialManager.loadItems();
     this.craftingManager.loadRecipes(this.materialManager);
     this.farmingManager.loadCrops();
+  }
+
+  setup(scene: Game): void {
+    const inputComponent = new InputComponent(scene.input.keyboard!);
+    this._controlsManager = new ControlsManager(scene, inputComponent, scene.gridEngine);
     this.controlsManager.setupControls();
     this.setupEventListeners();
+  }
+
+  get controlsManager(): ControlsManager {
+    return this._controlsManager;
   }
 
   /**

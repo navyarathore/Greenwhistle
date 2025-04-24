@@ -10,7 +10,6 @@ export class Game extends Scene {
   player!: Player;
   cursor!: Phaser.Types.Input.Keyboard.CursorKeys;
   gridEngine!: GridEngine;
-  sysManager!: SystemManager;
 
   constructor() {
     super("Game");
@@ -34,8 +33,7 @@ export class Game extends Scene {
       }
     }
 
-    this.sysManager = new SystemManager(this);
-    this.sysManager.load();
+    SystemManager.instance.setup(this);
 
     this.player = new Player(
       {
@@ -45,7 +43,7 @@ export class Game extends Scene {
           x: 12,
           y: 12,
         },
-        controls: this.sysManager.controlsManager.inputComponent,
+        controls: SystemManager.instance.controlsManager.inputComponent,
       },
       {
         maxHealth: 5,
@@ -53,13 +51,18 @@ export class Game extends Scene {
       },
     );
 
+    this.scene.launch("HUD", {
+      player: this.player,
+      inventoryManager: SystemManager.instance.inventorySystem,
+    });
+
     EventBus.emit("current-scene-ready", this);
   }
 
   update(time: number, delta: number): void {
     this.player.update();
 
-    this.sysManager.update(time, delta);
+    SystemManager.instance.update(time, delta);
   }
 
   changeScene() {

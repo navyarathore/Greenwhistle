@@ -18,12 +18,14 @@ export type CharacterConfig = {
   isPlayer: boolean;
   isInvulnerable?: boolean;
   invulnerableAfterHitAnimationDuration?: number;
-  maxLife: number;
-  currentLife?: number;
+  maxHealth: number;
+  currentHealth?: number;
 };
 
 export default class Character extends Phaser.Physics.Arcade.Sprite implements CustomGameObject {
   protected _isPlayer: boolean;
+  protected _currentHealth: number;
+  protected _maxHealth: number;
 
   constructor(config: CharacterConfig) {
     super(config.scene, config.position.x, config.position.y, config.assetKey, config.frame || 0);
@@ -45,6 +47,9 @@ export default class Character extends Phaser.Physics.Arcade.Sprite implements C
 
     config.gridEngine.create(config.scene.map, gridEngineConfig);
 
+    this._currentHealth = config.currentHealth || config.maxHealth;
+    this._maxHealth = config.maxHealth;
+
     this._isPlayer = config.isPlayer;
     if (!this._isPlayer) {
       this.disable();
@@ -53,6 +58,21 @@ export default class Character extends Phaser.Physics.Arcade.Sprite implements C
 
   get isPlayer(): boolean {
     return this._isPlayer;
+  }
+
+  get health(): number {
+    return this._currentHealth;
+  }
+
+  set health(value: number) {
+    this._currentHealth = Math.max(0, Math.min(value, this._maxHealth - this._currentHealth));
+    if (this._currentHealth <= 0) {
+      this.disable();
+    }
+  }
+
+  get maxHealth(): number {
+    return this._maxHealth;
   }
 
   disable(): void {

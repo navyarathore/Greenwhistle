@@ -30,10 +30,7 @@ export class FarmingManager {
   private currentDay = 1;
   private farmableTiles: Set<string> = new Set();
 
-  constructor(
-    private scene: Game,
-    private materialManager: MaterialManager,
-  ) {
+  constructor(private materialManager: MaterialManager) {
     this.initializeEventListeners();
   }
 

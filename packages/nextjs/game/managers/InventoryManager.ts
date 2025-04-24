@@ -15,11 +15,20 @@ export interface Inventory {
 
 export const PLAYER_INVENTORY = "player";
 export const PLAYER_INVENTORY_SIZE = 27;
+export const HOTBAR_SIZE = 5;
+
+/**
+ * Valid indices for the hotbar (0-4)
+ * Using this type ensures that hotbar indices are always within the valid range
+ */
+export type HotbarIndex = 0 | 1 | 2 | 3 | 4;
 
 export default class InventoryManager {
   private inventories: Map<string, Inventory> = new Map();
+  // Assuming a 9x3 inventory grid (27 slots), the lower left 5 slots would be slots 18, 19, 20, 21, 22
+  private hotbarSlots: number[] = [18, 19, 20, 21, 22]; // Lower left 5 slots of player inventory assigned to hotbar
 
-  constructor(private game: Game) {
+  constructor() {
     this.createInventory(PLAYER_INVENTORY, "Player Inventory", PLAYER_INVENTORY_SIZE);
 
     // Listen for inventory-related events
@@ -28,6 +37,71 @@ export default class InventoryManager {
     EventBus.on("item-dropped", this.handleItemDropped.bind(this));
     EventBus.on("item-crafted", this.handleItemCrafted.bind(this));
     EventBus.on("inventory-transfer", this.handleInventoryTransfer.bind(this));
+
+    // For testing: Add a debug item to the first hotbar slot
+    EventBus.on("current-scene-ready", () => {
+      // Wait a short moment to ensure the material manager is loaded
+      setTimeout(() => {
+        this.addTestItemsToHotbar();
+      }, 500);
+    });
+  }
+
+  /**
+   * Adds test items to the hotbar slots for debugging purposes
+   * This helps verify that the hotbar display is working correctly
+   */
+  private addTestItemsToHotbar(): void {
+    console.log("Adding test items to hotbar slots");
+    const inventory = this.getInventory(PLAYER_INVENTORY);
+    if (!inventory) return;
+
+    // Try to get items from the material manager
+    // We'll use a direct approach for testing
+    try {
+      // Add a test item to the first hotbar slot (slot 18)
+      const testItem = new Item(
+        {
+          id: "iron_ore",
+          name: "Iron Ore",
+          type: MaterialCategory.RESOURCE,
+          icon: { id: "iron_ore", path: "/icons/items/pickup/iron_ore.png" },
+          stackable: true,
+          maxStackSize: 64,
+        },
+        5,
+      );
+
+      // Add the test item directly to the slot
+      inventory.slots[this.hotbarSlots[0]].item = testItem;
+      console.log(`Added test item to hotbar slot 1 (inventory slot ${this.hotbarSlots[0]})`);
+
+      // For the second hotbar slot, add another item
+      const testItem2 = new Item(
+        {
+          id: "axe",
+          name: "Axe",
+          type: MaterialCategory.TOOL,
+          icon: { id: "axe", path: "/icons/tools/axe.png" },
+          stackable: false,
+          maxStackSize: 1,
+        },
+        1,
+      );
+
+      // Add the second test item directly to the slot
+      inventory.slots[this.hotbarSlots[1]].item = testItem2;
+      console.log(`Added test item to hotbar slot 2 (inventory slot ${this.hotbarSlots[1]})`);
+
+      // Notify that the inventory was updated
+      EventBus.emit("inventory-updated", {
+        inventoryId: PLAYER_INVENTORY,
+        action: "add",
+        items: this.getItems(PLAYER_INVENTORY),
+      });
+    } catch (error) {
+      console.error("Failed to add test items to hotbar:", error);
+    }
   }
 
   // Create a new inventory container
@@ -408,7 +482,7 @@ export default class InventoryManager {
   moveItem(
     fromSlotIndex: number,
     toSlotIndex: number,
-    quantity: number,
+    quantity?: number,
     inventoryId: string = PLAYER_INVENTORY,
   ): boolean {
     const inventory = this.getInventory(inventoryId);
@@ -425,6 +499,12 @@ export default class InventoryManager {
 
     const fromSlot = inventory.slots[fromSlotIndex];
     const toSlot = inventory.slots[toSlotIndex];
+
+    if (!quantity) {
+      quantity = fromSlot.item?.quantity || 0;
+    }
+
+    if (quantity <= 0) return false;
 
     // Source slot must have an item and enough quantity
     if (fromSlot.item === null || fromSlot.item.quantity < quantity) return false;
@@ -456,6 +536,12 @@ export default class InventoryManager {
         quantity,
       });
 
+      EventBus.emit("inventory-updated", {
+        inventoryId,
+        action: "add",
+        items: this.getItems(inventoryId),
+      });
+
       return true;
     }
 
@@ -482,6 +568,12 @@ export default class InventoryManager {
         fromSlotIndex,
         toSlotIndex,
         quantity: maxQuantityToMove,
+      });
+
+      EventBus.emit("inventory-updated", {
+        inventoryId,
+        action: "add",
+        items: this.getItems(inventoryId),
       });
 
       return true;
@@ -513,6 +605,12 @@ export default class InventoryManager {
       toSlotIndex,
       fromItem: fromSlot.item,
       toItem: toSlot.item,
+    });
+
+    EventBus.emit("inventory-updated", {
+      inventoryId,
+      action: "add",
+      items: this.getItems(inventoryId),
     });
 
     return true;
@@ -619,7 +717,86 @@ export default class InventoryManager {
       .map(slot => slot.item as Item);
   }
 
-  // Event handlers
+  // HOTBAR METHODS
+
+  /**
+   * Get an item from the hotbar at the specified index
+   * @param hotbarIndex The index in the hotbar (0-4)
+   * @returns The item in the specified hotbar slot, or null if empty
+   */
+  getHotbarItem(hotbarIndex: HotbarIndex): Item | null {
+    const inventory = this.getInventory(PLAYER_INVENTORY);
+    if (!inventory) return null;
+
+    const inventorySlotIndex = this.hotbarSlots[hotbarIndex];
+    return inventory.slots[inventorySlotIndex].item;
+  }
+
+  /**
+   * Set an item in the hotbar at the specified index
+   * @param hotbarIndex The index in the hotbar (0-4)
+   * @param item The item to place in the hotbar slot, or null to clear it
+   * @returns True if successful, false otherwise
+   */
+  setHotbarItem(hotbarIndex: HotbarIndex, item: Item | null): boolean {
+    const inventory = this.getInventory(PLAYER_INVENTORY);
+    if (!inventory) return false;
+
+    const inventorySlotIndex = this.hotbarSlots[hotbarIndex];
+    inventory.slots[inventorySlotIndex].item = item;
+
+    // Emit event to update the hotbar UI
+    EventBus.emit("hotbar-item-changed", { hotbarIndex, item });
+
+    return true;
+  }
+
+  /**
+   * Move an item from the inventory to the hotbar
+   * @param inventorySlotIndex The index in the inventory to move from
+   * @param hotbarIndex The index in the hotbar to move to
+   * @returns True if successful, false otherwise
+   */
+  moveItemToHotbar(inventorySlotIndex: number, hotbarIndex: HotbarIndex): boolean {
+    const inventory = this.getInventory(PLAYER_INVENTORY);
+    if (!inventory) return false;
+
+    if (inventorySlotIndex < 0 || inventorySlotIndex >= inventory.slots.length) return false;
+
+    const hotbarSlotIndex = this.hotbarSlots[hotbarIndex];
+    this.moveItem(inventorySlotIndex, hotbarSlotIndex, undefined, PLAYER_INVENTORY);
+    // const item = inventory.slots[inventorySlotIndex].item;
+    // if (!item) return false;
+
+    // // Move the item to the hotbar slot
+    // const hotbarSlotIndex = this.hotbarSlots[hotbarIndex];
+
+    // // Store the item that was in the hotbar slot (if any)
+    // const previousHotbarItem = inventory.slots[hotbarSlotIndex].item;
+
+    // inventory.slots[inventorySlotIndex].item = previousHotbarItem;
+
+    // inventory.slots[hotbarSlotIndex].item = item;
+
+    // // Emit events for UI updates
+    // EventBus.emit("hotbar-item-changed", { hotbarIndex, item });
+    // EventBus.emit("inventory-updated", PLAYER_INVENTORY);
+
+    return true;
+  }
+
+  /**
+   * Get all items currently in the hotbar
+   * @returns An array of items in the hotbar (can contain null for empty slots)
+   */
+  getAllHotbarItems(): Array<Item | null> {
+    const inventory = this.getInventory(PLAYER_INVENTORY);
+    if (!inventory) return Array(HOTBAR_SIZE).fill(null);
+
+    return this.hotbarSlots.map(slotIndex => inventory.slots[slotIndex].item);
+  }
+
+  // EVENT HANDLERS
   private handleItemHarvested(data: { resourceId: number; yield: number; quantity: number }): void {
     // This is a placeholder - you'll need to implement logic to create an Item
     // based on your game's data and resource system

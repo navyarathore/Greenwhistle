@@ -1,4 +1,6 @@
 import { Scene } from "phaser";
+import { SystemManager } from "~~/game/SystemManager";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "~~/game/config";
 import { SPRITE_ID } from "~~/game/entities/Player";
 
 // Define icon paths for recursive loading
@@ -42,10 +44,10 @@ export class Preloader extends Scene {
       frameRate: 10,
       repeat: -1,
     });
-    this.add.sprite(640, 360, "background").play("background");
+    this.add.sprite(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "background").play("background");
 
-    this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
-    const bar = this.add.rectangle(512 - 230, 384, 4, 28, 0xffffff);
+    this.add.rectangle(640, 384, 468, 32).setStrokeStyle(1, 0xffffff);
+    const bar = this.add.rectangle(640 - 230, 384, 4, 28, 0xffffff);
 
     this.load.on("progress", (progress: number) => {
       bar.width = 4 + 460 * progress;
@@ -63,9 +65,16 @@ export class Preloader extends Scene {
       frameHeight: 32,
     });
 
+    // Load HUD assets
+    this.load.image("heart-full", "/ui/heart-full.png");
+    this.load.image("heart-empty", "/ui/heart-empty.png");
+    this.load.image("hotbar", "/ui/hotbar.png");
+
     this.load.image("inventory", "/ui/inventory.png");
 
     this.loadAllIcons();
+
+    SystemManager.instance.loadResources();
   }
 
   private loadAllIcons() {

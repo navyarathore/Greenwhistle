@@ -1,5 +1,6 @@
 import { EventBus } from "../EventBus";
 import { GameObjects, Scene } from "phaser";
+import { SCREEN_WIDTH } from "~~/game/config";
 
 export class MainMenu extends Scene {
   background!: GameObjects.Image;
@@ -12,7 +13,7 @@ export class MainMenu extends Scene {
 
   create() {
     // Background with parallax effect
-    this.background = this.add.sprite(640, 360, "background").play("background");
+    this.background = this.add.sprite(SCREEN_WIDTH / 2, 360, "background").play("background");
 
     // Centered title
     this.title = this.add
@@ -29,7 +30,7 @@ export class MainMenu extends Scene {
       .setShadow(5, 5, "rgba(0,0,0,0.5)", 5);
 
     // Centered play button
-    this.playButton = this.createButton(650, 450, "Play Game", () => this.changeScene());
+    this.playButton = this.createButton(SCREEN_WIDTH / 2, 450, "Play", () => this.changeScene());
 
     EventBus.emit("current-scene-ready", this);
   }
