@@ -6,7 +6,13 @@
 [data-theme] {
   background: oklch(var(--b2));
 }
-
+@font-face {
+  font-family: 'PixelGame';
+  src: url('/fonts/Redaction.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 body {
   min-height: 100vh;
 }
