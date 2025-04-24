@@ -1,8 +1,12 @@
 import { EventBus } from "../EventBus";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
 import Player from "../entities/Player";
 import InventoryManager, { HOTBAR_SIZE, HotbarIndex, PLAYER_INVENTORY } from "../managers/InventoryManager";
 import { Item } from "../resources/Item";
 import { Scene } from "phaser";
+
+const SLOT_SIZE = 48;
+const SLOT_PADDING = 7;
 
 export class HUD extends Scene {
   private healthIcons: Phaser.GameObjects.Image[] = [];
@@ -80,28 +84,24 @@ export class HUD extends Scene {
   }
 
   private createHotbar() {
-    const screenWidth = this.cameras.main.width;
-    const screenHeight = this.cameras.main.height;
-    const slotSize = 48;
-    const padding = 5;
-    const totalWidth = (slotSize + padding) * HOTBAR_SIZE;
+    const totalWidth = (SLOT_SIZE + SLOT_PADDING) * HOTBAR_SIZE - SLOT_PADDING;
 
     // Calculate the position for the hotbar
-    const hotbarX = screenWidth / 2;
-    const hotbarY = screenHeight - 40;
+    const hotbarX = SCREEN_WIDTH / 2;
+    const hotbarY = SCREEN_HEIGHT - 40;
 
     // Add the hotbar background image
     this.hotbarImage = this.add.image(hotbarX, hotbarY, "hotbar").setScrollFactor(0).setDepth(990);
 
     // Scale the hotbar image if needed
-    this.hotbarImage.setScale(1.5);
+    this.hotbarImage.setScale(1.2);
 
     // Create item slots within the hotbar
-    const slotStartX = hotbarX - totalWidth / 2 + slotSize / 2;
+    const slotStartX = hotbarX - totalWidth / 2 + SLOT_SIZE / 2;
 
     for (let i = 0; i < HOTBAR_SIZE; i++) {
       // Calculate the position for this slot
-      const slotX = slotStartX + i * (slotSize + padding);
+      const slotX = slotStartX + i * (SLOT_SIZE + SLOT_PADDING);
 
       // Add slot for an item
       const itemSlot = this.add
@@ -116,10 +116,10 @@ export class HUD extends Scene {
 
     // Create selection indicator as a yellow rectangle around the selected slot
     this.selectedSlotIndicator = this.add
-      .rectangle(slotStartX, hotbarY, slotSize + 4, slotSize + 4, 0xffff00, 0)
+      .rectangle(slotStartX, hotbarY, SLOT_SIZE + 4, SLOT_SIZE + 4, 0xffff00, 0)
       .setOrigin(0.5)
       .setScrollFactor(0)
-      .setStrokeStyle(2, 0xffff00)
+      .setStrokeStyle(4, 0x58515c)
       .setDepth(993);
 
     // Initialize the selection to the first slot
@@ -144,17 +144,35 @@ export class HUD extends Scene {
     // Update the position of the selection indicator to highlight the selected slot
     if (!this.player) return;
 
-    const screenWidth = this.cameras.main.width;
-    const slotSize = 48;
-    const padding = 5;
-    const totalWidth = (slotSize + padding) * HOTBAR_SIZE;
-    const slotStartX = screenWidth / 2 - totalWidth / 2 + slotSize / 2;
+    const totalWidth = (SLOT_SIZE + SLOT_PADDING) * HOTBAR_SIZE - SLOT_PADDING;
+    const slotStartX = SCREEN_WIDTH / 2 - totalWidth / 2 + SLOT_SIZE / 2;
 
     // Position the selection indicator around the selected slot
     this.selectedSlotIndicator.setPosition(
-      slotStartX + this.player.selectedHotbarSlot * (slotSize + padding),
-      this.cameras.main.height - 40,
+      slotStartX + this.player.selectedHotbarSlot * (SLOT_SIZE + SLOT_PADDING),
+      SCREEN_HEIGHT - 40,
     );
+
+    // Scale up the selected item and scale down unselected items
+    this.hotbarItems.forEach((itemSlot, index) => {
+      if (index === this.player.selectedHotbarSlot) {
+        // Scale up the selected item with a smooth animation
+        this.tweens.add({
+          targets: itemSlot,
+          scale: 1.5, // Increased scale for selected item
+          duration: 200,
+          ease: "Power2",
+        });
+      } else {
+        // Scale down unselected items
+        this.tweens.add({
+          targets: itemSlot,
+          scale: 1.2, // Original scale for unselected items
+          duration: 200,
+          ease: "Power2",
+        });
+      }
+    });
   }
 
   /**
