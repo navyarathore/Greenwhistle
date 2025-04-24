@@ -74,8 +74,6 @@ export class HUD extends Scene {
 
   private updateHealthDisplay() {
     // Update hearts based on current health
-    console.log(this.player.health);
-    console.log(this.player);
     this.healthIcons.forEach((heart, index) => {
       if (index < this.player.health) {
         heart.setTexture("heart-full");

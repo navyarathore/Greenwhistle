@@ -1,0 +1,59 @@
+import { Position } from "grid-engine";
+import * as Phaser from "phaser";
+
+interface LayerMapping {
+  from: number;
+  to: number;
+}
+
+const layerMapping = new Map<string, LayerMapping>();
+
+export const loadLayerMapping = (tilemap: Phaser.Tilemaps.Tilemap) => {
+  const layers = tilemap.getTileLayerNames();
+  for (let i = 0; i < layers.length; i++) {
+    const layer = layers[i].split("#")[0];
+    if (layerMapping.has(layer)) {
+      layerMapping.get(layer)!.to = i + 1;
+    } else {
+      layerMapping.set(layer, {
+        from: i,
+        to: i + 1,
+      });
+    }
+  }
+  console.log(layerMapping);
+};
+
+export interface LayerCallback<T> {
+  (layers: string[], tilemap: Phaser.Tilemaps.Tilemap): T;
+}
+
+export const loopLayerRecursively = <T>(
+  tilemap: Phaser.Tilemaps.Tilemap,
+  layer: string,
+  callback: LayerCallback<T>,
+): T => {
+  const mapping = layerMapping.get(layer);
+  if (!mapping) {
+    throw new Error(`Unable to load layer: ${layer}`);
+  }
+  return callback(tilemap.getTileLayerNames().slice(mapping.from, mapping.to), tilemap);
+};
+
+export const getTileRecursivelyAt = (
+  position: Position,
+  tilemap: Phaser.Tilemaps.Tilemap,
+  layer: string,
+  nonNull?: boolean,
+): Phaser.Tilemaps.Tile | null => {
+  return loopLayerRecursively(tilemap, layer, (layers, _) => {
+    const tiles = [];
+    for (const layer of layers) {
+      const tile = tilemap.getTileAt(position.x, position.y, nonNull, layer);
+      tiles.push(tile);
+      if (tile) return tile;
+    }
+
+    return null;
+  });
+};

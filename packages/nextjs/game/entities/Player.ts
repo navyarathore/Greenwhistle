@@ -1,6 +1,6 @@
 import { EventBus } from "../EventBus";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
-import { HotbarIndex } from "../managers/InventoryManager";
+import { HOTBAR_SIZE, HotbarIndex } from "../managers/InventoryManager";
 import { Game, MAP_SCALE } from "../scenes/Game";
 import GridEngine from "grid-engine";
 import { Position } from "grid-engine";
@@ -27,7 +27,6 @@ export default class Player extends Character {
   private movementEnabled = true;
   private previousInputEnabled?: boolean;
   private _selectedHotbarSlot: HotbarIndex = 0;
-  readonly maxHotbarSlots: number = 5;
 
   constructor(config: PlayerConfig, data: PlayerData) {
     super({
@@ -49,6 +48,7 @@ export default class Player extends Character {
       currentHealth: data.health,
     });
     this.config = config;
+    this._selectedHotbarSlot = data.selectedHotbarSlot || 0;
 
     this.scale = 2.5;
     config.scene.camera.startFollow(this, true);
@@ -123,7 +123,7 @@ export default class Player extends Character {
    */
   set selectedHotbarSlot(slotIndex: number) {
     // Ensure the index is within valid range and cast to HotbarIndex
-    const validIndex = Math.max(0, Math.min(slotIndex, this.maxHotbarSlots - 1)) as HotbarIndex;
+    const validIndex = Math.max(0, Math.min(slotIndex, HOTBAR_SIZE - 1)) as HotbarIndex;
 
     // Only update if the selection has changed
     if (this._selectedHotbarSlot !== validIndex) {
@@ -138,7 +138,7 @@ export default class Player extends Character {
    * Select the next hotbar slot (cycling back to the first if at the end)
    */
   selectNextHotbarSlot(): void {
-    const nextIndex = (this._selectedHotbarSlot + 1) % this.maxHotbarSlots;
+    const nextIndex = (this._selectedHotbarSlot + 1) % HOTBAR_SIZE;
     this.selectedHotbarSlot = nextIndex;
   }
 
@@ -146,7 +146,7 @@ export default class Player extends Character {
    * Select the previous hotbar slot (cycling to the last if at the beginning)
    */
   selectPreviousHotbarSlot(): void {
-    const prevIndex = (this._selectedHotbarSlot - 1 + this.maxHotbarSlots) % this.maxHotbarSlots;
+    const prevIndex = (this._selectedHotbarSlot - 1 + HOTBAR_SIZE) % HOTBAR_SIZE;
     this.selectedHotbarSlot = prevIndex;
   }
 

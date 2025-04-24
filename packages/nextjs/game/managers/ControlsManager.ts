@@ -7,6 +7,7 @@ import { InputComponent } from "~~/game/input/InputComponent";
 import { Item, MaterialCategory } from "~~/game/resources/Item";
 import ResourceData from "~~/game/resources/resource.json";
 import { Game } from "~~/game/scenes/Game";
+import { getTileRecursivelyAt } from "~~/game/utils/layer-utils";
 
 export default class ControlsManager {
   private sysManager: SystemManager = SystemManager.instance;
@@ -38,11 +39,10 @@ export default class ControlsManager {
 
       for (const res of ResourceData.pickup) {
         const { layer, id, method, result } = res;
-        const tile = this.game.map.getTileAt(playerPosition.x, playerPosition.y, false, layer);
+        const tile = getTileRecursivelyAt(playerPosition, this.game.map, layer, false);
 
         if (tile && id.includes(tile.index)) {
           const combined = new Set(ResourceData.combined_blocks.filter(block => block.includes(tile.index)).flat());
-          console.log(combined);
           const toRemove = [
             [1, 0],
             [-1, 0],

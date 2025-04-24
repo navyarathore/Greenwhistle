@@ -3,6 +3,7 @@ import { SystemManager } from "../SystemManager";
 import Player from "../entities/Player";
 import GridEngine from "grid-engine";
 import { Scene } from "phaser";
+import { loadLayerMapping } from "~~/game/utils/layer-utils";
 
 export const MAP_SCALE = 3;
 
@@ -21,14 +22,17 @@ export class Game extends Scene {
     this.gridEngine = (this as any).gridEngine;
   }
 
-  create() {
+  preload() {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0x00ff00);
+  }
 
+  create() {
     this.map = this.make.tilemap({ key: "map" });
     const tileset = this.map.addTilesetImage("tileset", "tiles");
 
     if (tileset) {
+      console.log(this.map.layers);
       for (let i = 0; i < this.map.layers.length; i++) {
         const layer = this.map.createLayer(i, "tileset", 0, 0)!;
         layer.scale = MAP_SCALE;
@@ -52,6 +56,9 @@ export class Game extends Scene {
         health: 5,
       },
     );
+
+    console.log(this.map.getTileLayerNames());
+    loadLayerMapping(this.map);
 
     this.scene.launch("HUD", {
       player: this.player,
