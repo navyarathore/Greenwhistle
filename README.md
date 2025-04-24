@@ -1,6 +1,6 @@
 ![github-submission-banner](https://github.com/user-attachments/assets/a1493b84-e4e2-456e-a791-ce35ee2bcf2f)
 
-# 🚀 Project Title
+# 🚀 Greenwhistle
 
 > A one-line tagline or mission statement for your project.
 
@@ -8,10 +8,7 @@
 
 ## 📌 Problem Statement
 
-Select the problem statement number and title from the official list given in Participant Manual.
-
-**Example:**  
-**Problem Statement 7 – Transform the Future of Rural Commerce**
+**Problem Statement 2 – Unleash Blockchain Gameplay with Monad**
 
 ---
 
@@ -25,13 +22,12 @@ Briefly describe the real-world use case and the value it provides.
 ## 🧠 Team & Approach
 
 ### Team Name:  
-`Your team name here`
+`XLR8`
 
 ### Team Members:  
-- Name 1 (GitHub / LinkedIn / Role)  
-- Name 2  
-- Name 3  
-*(Add links if you want)*
+- Vaibhav Kothari [GitHub](https://github.com/vaibhavkothari33) | [Linkedin](https://www.linkedin.com/in/vaibhavkothari33) | Fullstack Developer
+- Abhigya Krishna [GitHub](https://github.com/abhigyakrishna) | [Linkedin](https://www.linkedin.com/in/abhigya-krishna) | Blockchain Developer
+- Navya Rathore [GitHub](https://github.com/navyarathore) | [Linkedin](https://www.linkedin.com/in/navya-rathore) | AI Engineer
 
 ### Your Approach:  
 - Why you chose this problem  
