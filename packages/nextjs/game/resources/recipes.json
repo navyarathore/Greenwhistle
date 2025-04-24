@@ -47,6 +47,58 @@
         "id": "hoe",
         "quantity": 1
       }
+    },
+    {
+      "ingredients": [
+        {
+          "id": "iron_bar", 
+          "quantity": 2
+        },
+        {
+          "id": "branches",
+          "quantity": 1
+        }
+      ],
+      "result": {
+        "id": "sword",
+        "quantity": 1
+      }
+    },
+    {
+      "ingredients": [
+        {
+          "id": "iron_ore",
+          "quantity": 4
+        }
+      ],
+      "result": {
+        "id": "iron_bar",
+        "quantity": 1
+      }
+    },
+    {
+      "ingredients": [
+        {
+          "id": "diamond_ore",
+          "quantity": 4
+        }
+      ],
+      "result": {
+        "id": "diamond_bar",
+        "quantity": 1
+      }
+    },
+    {
+      "ingredients": [
+        {
+          "id": "rock",
+          "quantity": 4
+        }
+      ],
+      "result": {
+        "id": "stone_bar",
+        "quantity": 1
+      }
     }
   ]
 }
