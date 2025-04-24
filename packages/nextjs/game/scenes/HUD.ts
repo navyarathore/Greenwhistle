@@ -34,11 +34,13 @@ export class HUD extends Scene {
     if (this.player) {
       this.createHealthDisplay();
       this.createHotbar();
+      this.setupInteractionFeedback();
     } else {
       EventBus.once("player-created", (player: Player) => {
         this.player = player;
         this.createHealthDisplay();
         this.createHotbar();
+        this.setupInteractionFeedback();
       });
     }
 
@@ -246,5 +248,45 @@ export class HUD extends Scene {
         itemSlot.setData("quantityText", null);
       }
     }
+  }
+
+  /**
+   * Set up event listeners for interaction feedback in the UI
+   */
+  private setupInteractionFeedback(): void {
+    // Listen for interaction messages to display them
+    EventBus.on("show-interaction-message", (data: { message: string; color?: string }) => {
+      this.showTemporaryMessage(data.message, data.color || "#ffffff");
+    });
+  }
+
+  /**
+   * Show a temporary message in the center of the screen
+   */
+  private showTemporaryMessage(message: string, color = "#ffffff"): void {
+    // Create message text in center of screen
+    const messageText = this.add
+      .text(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 100, message, {
+        fontSize: "24px",
+        color: color,
+        stroke: "#000000",
+        strokeThickness: 4,
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(1000);
+
+    // Animate the message
+    this.tweens.add({
+      targets: messageText,
+      alpha: { from: 1, to: 0 },
+      y: "-=50",
+      ease: "Power2",
+      duration: 2000,
+      onComplete: () => {
+        messageText.destroy();
+      },
+    });
   }
 }

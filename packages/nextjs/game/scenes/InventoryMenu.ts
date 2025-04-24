@@ -154,12 +154,7 @@ export class InventoryMenu extends Phaser.Scene {
       img.on("pointerdown", () => {
         const itemsNotNull = this.inventoryManager.getItemsNotNull();
         if (this.craftingManager.canCraft(recipe.id, itemsNotNull)) {
-          this.craftingManager.craftItem(
-            recipe.id,
-            itemsNotNull,
-            items => this.inventoryManager.removeItems(items),
-            item => this.inventoryManager.addItem(item),
-          );
+          this.craftingManager.craftItem(recipe.id);
           // Refresh the inventory display
           this.scene.restart({
             inventoryManager: this.inventoryManager,

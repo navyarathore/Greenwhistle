@@ -1,6 +1,5 @@
 import { EventBus } from "../EventBus";
 import { Item, MaterialCategory } from "../resources/Item";
-import { Game } from "../scenes/Game";
 import { MaterialManager } from "./MaterialManager";
 
 export interface Crop {
@@ -40,6 +39,17 @@ export class FarmingManager {
   private initializeEventListeners(): void {
     // Listen for day changes to update crop growth
     EventBus.on("day-changed", this.onDayChanged.bind(this));
+
+    // Listen for crop interaction events from the InteractionManager
+    EventBus.on("crop-watered", (data: { position: { x: number; y: number } }) => {
+      // Additional visual effects or state updates when crops are watered
+      this.showCropState(data.position.x, data.position.y);
+    });
+
+    EventBus.on("crop-harvested", (data: { position: { x: number; y: number }; cropId: string }) => {
+      // Additional effects or state updates when crops are harvested
+      this.resetFarmTile(data.position.x, data.position.y);
+    });
   }
 
   /**
@@ -233,5 +243,34 @@ export class FarmingManager {
   public getPlantedCropAt(x: number, y: number): PlantedCrop | undefined {
     const tileKey = `${x},${y}`;
     return Array.from(this.plantedCrops.values()).find(crop => `${crop.position.x},${crop.position.y}` === tileKey);
+  }
+
+  /**
+   * Show visual indication of crop state (visual feedback)
+   */
+  private showCropState(x: number, y: number): void {
+    const crop = this.getPlantedCropAt(x, y);
+    if (!crop) return;
+
+    // Here you could trigger visual effects like:
+    // - Water particles
+    // - Growth stage changes
+    // - Status indicators
+
+    // For example, emit an event for the game scene to handle
+    EventBus.emit("show-crop-state", {
+      position: { x, y },
+      isWatered: crop.isWatered,
+      isGrown: crop.isGrown,
+      growthProgress: (this.currentDay - crop.plantedDay) / crop.cropData.growthTime,
+    });
+  }
+
+  /**
+   * Reset a farm tile after harvesting
+   */
+  private resetFarmTile(x: number, y: number): void {
+    // The tile remains farmable after harvesting
+    // This method could handle any additional cleanup or state reset
   }
 }

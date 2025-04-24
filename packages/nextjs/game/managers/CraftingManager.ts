@@ -1,6 +1,7 @@
 import { EventBus } from "../EventBus";
 import { Item } from "../resources/Item";
 import Recipes from "../resources/recipes.json";
+import InventoryManager from "./InventoryManager";
 import { MaterialManager } from "~~/game/managers/MaterialManager";
 
 interface Recipe {
@@ -12,9 +13,7 @@ interface Recipe {
 export class CraftingManager {
   private recipes: Map<string, Recipe> = new Map();
 
-  constructor(initialRecipes: Recipe[] = []) {
-    initialRecipes.forEach(recipe => this.registerRecipe(recipe));
-  }
+  constructor(private inventoryManager: InventoryManager) {}
 
   loadRecipes(materialManager: MaterialManager): void {
     const convertItem = (item: { id: string; quantity: number }): Item => {
@@ -60,24 +59,21 @@ export class CraftingManager {
     );
   }
 
-  public craftItem(
-    recipeId: string,
-    playerInventory: Item[],
-    consumeIngredients: (items: Item[]) => boolean,
-    addItemToInventory: (item: Item) => void,
-  ): boolean {
+  public craftItem(recipeId: string): boolean {
     const recipe = this.recipes.get(recipeId);
 
     if (!recipe) return false;
-    if (!this.canCraft(recipeId, playerInventory)) return false;
+    if (!this.canCraft(recipeId, this.inventoryManager.getItemsNotNull())) return false;
+    if (!this.inventoryManager.canAddItem(recipe.result)) return false;
 
     // Consume ingredients
-    const success = consumeIngredients(recipe.ingredients);
+    const success = this.inventoryManager.removeItems(recipe.ingredients);
     if (!success) return false;
 
     // Add crafted item to inventory immediately
-    addItemToInventory(recipe.result);
+    this.inventoryManager.addItem(recipe.result);
 
+    // Emit crafting events for visual feedback and sound effects
     EventBus.emit("craft-item", recipe.result);
 
     return true;

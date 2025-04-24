@@ -57,6 +57,9 @@ export default class Player extends Character {
     // Set camera bounds to prevent showing void outside map
     this.setupCameraBounds();
 
+    // Set up movement-related event listeners for interaction system
+    this.setupMovementEvents();
+
     // Emit event to get inventory system
     EventBus.emit("player-created", this);
   }
@@ -153,6 +156,35 @@ export default class Player extends Character {
 
     this.config.scene.time.delayedCall(1000, () => {
       this.config.scene.changeScene();
+    });
+  }
+
+  /**
+   * Sets up events that fire when the player moves to a new grid position
+   * This is used by the InteractionManager to highlight interactable objects
+   */
+  private setupMovementEvents(): void {
+    // Listen for movement events from GridEngine
+    this.config.gridEngine.movementStarted().subscribe(({ charId, direction }) => {
+      if (charId === SPRITE_ID) {
+        // Player has started moving in a direction
+        EventBus.emit("player-movement-started", {
+          position: this.config.gridEngine.getPosition(SPRITE_ID),
+          direction,
+        });
+      }
+    });
+
+    this.config.gridEngine.movementStopped().subscribe(({ charId, direction }) => {
+      if (charId === SPRITE_ID) {
+        const position = this.config.gridEngine.getPosition(SPRITE_ID);
+
+        // Player has stopped at a new position
+        EventBus.emit("player-moved", position);
+
+        // Check for any auto-interactions at this position (like picking up items)
+        EventBus.emit("check-position-interactions", position);
+      }
     });
   }
 }

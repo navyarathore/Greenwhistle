@@ -6,6 +6,7 @@ import { InputComponent } from "~~/game/input/InputComponent";
 import ControlsManager from "~~/game/managers/ControlsManager";
 import { CraftingManager } from "~~/game/managers/CraftingManager";
 import { FarmingManager } from "~~/game/managers/FarmingManager";
+import InteractionManager from "~~/game/managers/InteractionManager";
 
 /**
  * SystemManager class to initialize and manage all game systems
@@ -14,10 +15,11 @@ import { FarmingManager } from "~~/game/managers/FarmingManager";
 export class SystemManager {
   private static _instance: SystemManager;
 
-  readonly inventorySystem: InventoryManager;
+  readonly inventoryManager: InventoryManager;
   readonly materialManager: MaterialManager;
   readonly craftingManager: CraftingManager;
   readonly farmingManager: FarmingManager;
+  private _interactionManager!: InteractionManager;
   private _controlsManager!: ControlsManager;
 
   /**
@@ -35,9 +37,9 @@ export class SystemManager {
    */
   private constructor() {
     // Initialize systems in the correct order
-    this.inventorySystem = new InventoryManager();
+    this.inventoryManager = new InventoryManager();
     this.materialManager = new MaterialManager();
-    this.craftingManager = new CraftingManager();
+    this.craftingManager = new CraftingManager(this.inventoryManager);
     this.farmingManager = new FarmingManager(this.materialManager);
   }
 
@@ -50,6 +52,7 @@ export class SystemManager {
   setup(scene: Game): void {
     const inputComponent = new InputComponent(scene.input.keyboard!);
     this._controlsManager = new ControlsManager(scene, inputComponent, scene.gridEngine);
+    this._interactionManager = new InteractionManager(scene, scene.gridEngine);
     this.controlsManager.setupControls();
     this.setupEventListeners();
   }
@@ -58,35 +61,39 @@ export class SystemManager {
     return this._controlsManager;
   }
 
+  get interactionManager(): InteractionManager {
+    return this._interactionManager;
+  }
+
   /**
    * Setup event listeners
    */
   private setupEventListeners(): void {
     // Listen for player creation to provide inventory system
-    EventBus.on("player-created", (_: any) => {
-      EventBus.emit("inventory-system-ready", this.inventorySystem);
+    EventBus.once("player-created", (player: any) => {
+      // Provide the inventory manager to the player
+      player.inventoryManager = this.inventoryManager;
+
+      // Trigger initial interactions setup
+      const position = player.config.gridEngine.getPosition(player.config.id);
+      EventBus.emit("player-moved", position);
     });
 
-    // Listen for day change
-    EventBus.on("day-change", (day: number) => {
-      EventBus.emit("day-changed", day);
-    });
-
-    // Listen for inventory UI updates
-    EventBus.on("inventory-updated", this.handleInventoryUpdate.bind(this));
-  }
-
-  /**
-   * Handle inventory updates
-   */
-  private handleInventoryUpdate(): void {
-    EventBus.emit("update-inventory-ui", this.inventorySystem.getItems());
+    // Track system ready state
+    EventBus.emit("systems-ready", this);
   }
 
   /**
    * Update method called every frame
    */
   public update(time: number, delta: number): void {
+    // Update controls first to capture player input
     this.controlsManager.update();
+
+    // Update interaction manager to handle all interaction effects and animations
+    this.interactionManager.update(time, delta);
+
+    // Emit a system update event for any systems that need to respond
+    EventBus.emit("system-update", { time, delta });
   }
 }

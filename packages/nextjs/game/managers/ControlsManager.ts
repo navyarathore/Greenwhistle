@@ -10,8 +10,6 @@ import { Game } from "~~/game/scenes/Game";
 
 export default class ControlsManager {
   private sysManager: SystemManager = SystemManager.instance;
-  private activeHotbarSlot = -1;
-  private activeHotbarItem: Item | null = null;
 
   constructor(
     private game: Game,
@@ -27,7 +25,7 @@ export default class ControlsManager {
         this.game.player.enableMovement();
       } else {
         this.game.scene.launch("InventoryMenu", {
-          inventoryManager: this.sysManager.inventorySystem,
+          inventoryManager: this.sysManager.inventoryManager,
           craftingManager: this.sysManager.craftingManager,
         });
         this.game.player.disableMovement();
@@ -76,7 +74,7 @@ export default class ControlsManager {
             );
           }
 
-          const added = this.sysManager.inventorySystem.addItems(toAdd);
+          const added = this.sysManager.inventoryManager.addItems(toAdd);
           if (!added) return;
 
           for (const { x, y } of toRemove) {
@@ -125,7 +123,7 @@ export default class ControlsManager {
     const selectedSlot = this.game.player.selectedHotbarSlot;
 
     // Get the selected item from the inventory system
-    const inventorySystem = this.sysManager.inventorySystem;
+    const inventorySystem = this.sysManager.inventoryManager;
     const selectedItem = inventorySystem.getHotbarItem(selectedSlot);
 
     if (selectedItem) {
@@ -134,19 +132,7 @@ export default class ControlsManager {
         slot: selectedSlot,
         item: selectedItem,
       });
-
-      // Add a key listener for item usage
-      this.setupItemUseKey(selectedSlot, selectedItem);
     }
-  }
-
-  private setupItemUseKey(slotIndex: number, item: Item): void {
-    // We don't need to clear previous listeners as we're using the InputComponent
-    // We will check for key presses in the update method instead
-
-    // Store the current active item information for use in the update method
-    this.activeHotbarSlot = slotIndex;
-    this.activeHotbarItem = item;
   }
 
   /**
@@ -178,80 +164,61 @@ export default class ControlsManager {
    * Use a tool item (axe, pickaxe, etc.)
    */
   private useToolItem(item: Item): void {
-    // Emit an event that the tool was used - other systems can react to this
+    // Get the position in front of the player
+    const targetPosition = this.sysManager.interactionManager.getPositionInFrontOfPlayer();
+
+    // Emit an event that the tool was used - the InteractionManager will handle the details
     EventBus.emit("tool-used", {
       toolId: item.id,
       position: this.gridEngine.getPosition(SPRITE_ID),
+      targetPosition: targetPosition,
     });
-
-    // Tools don't get consumed when used
   }
 
   /**
    * Use a consumable item (food, potion, etc.)
    */
   private useConsumableItem(item: Item): void {
-    // Apply the consumable effect (health, stamina, etc.)
-    if (item.id.includes("berry") || item.id.includes("carrot") || item.id.includes("food")) {
-      // Food items restore health
-      this.game.player.health = Math.min(this.game.player.health + 1, this.game.player.maxHealth);
+    // Emit an event for the InteractionManager to handle consumable effects
+    EventBus.emit("item-used", {
+      itemId: item.id,
+      position: this.gridEngine.getPosition(SPRITE_ID),
+    });
 
-      // Consume one of the item
-      this.consumeHotbarItem(item);
-    }
+    // The InteractionManager now handles all consumable effects, including:
+    // - Health restoration
+    // - Visual effects (particles, animations)
+    // - Sound effects
+    // - Inventory management (consuming the item)
   }
 
   /**
    * Use a placeable item (building block, furniture, etc.)
    */
   private usePlaceableItem(item: Item): void {
-    const playerPosition = this.gridEngine.getPosition(SPRITE_ID);
-    const facingDirection = this.gridEngine.getFacingDirection(SPRITE_ID);
+    // Get the position in front of the player from the InteractionManager
+    const targetPosition = this.sysManager.interactionManager.getPositionInFrontOfPlayer();
 
-    // Calculate position in front of player
-    let targetX = playerPosition.x;
-    let targetY = playerPosition.y;
+    // Emit an event that a placeable was used - InteractionManager will handle the details
+    EventBus.emit("item-placed", {
+      itemId: item.id,
+      position: targetPosition,
+    });
 
-    switch (facingDirection) {
-      case Direction.UP:
-        targetY--;
-        break;
-      case Direction.DOWN:
-        targetY++;
-        break;
-      case Direction.LEFT:
-        targetX--;
-        break;
-      case Direction.RIGHT:
-        targetX++;
-        break;
-    }
-
-    // Check if the target position is empty and can be built on
-    const targetTile = this.game.map.getTileAt(targetX, targetY, false, 0);
-    if (!targetTile || targetTile.index === -1) {
-      // Placeholder for actual placement logic
-      console.log(`Placing ${item.id} at position (${targetX}, ${targetY})`);
-
-      // Emit an event that a placeable was used
-      EventBus.emit("item-placed", {
-        itemId: item.id,
-        position: { x: targetX, y: targetY },
-      });
-
-      // Consume one of the item
-      this.consumeHotbarItem(item);
-    } else {
-      console.log("Cannot place item here - position is occupied");
-    }
+    // InteractionManager now handles all the placement logic, visual effects,
+    // and inventory management when items are successfully placed
   }
 
   /**
    * Consume one of an item from the hotbar (reduce quantity by 1)
+   * This is now a proxy to the InteractionManager's item consumption functionality
    */
   private consumeHotbarItem(item: Item): void {
+    // Let the InteractionManager handle item consumption for consistency
+    // This method remains for backward compatibility with existing code
+
     const selectedSlot = this.game.player.selectedHotbarSlot;
-    const inventorySystem = this.sysManager.inventorySystem;
+    const inventorySystem = this.sysManager.inventoryManager;
 
     // Decrement the item quantity
     item.quantity--;
@@ -301,8 +268,17 @@ export default class ControlsManager {
     }
 
     // Check for item use key press
-    if (this.inputComponent.isItemUseKeyJustDown && this.activeHotbarItem) {
-      this.useHotbarItem(this.activeHotbarSlot, this.activeHotbarItem);
+    if (this.inputComponent.isItemUseKeyJustDown) {
+      // Get the currently selected hotbar slot
+      const selectedSlot = this.game.player.selectedHotbarSlot;
+
+      // Get the item directly from inventory
+      const selectedItem = this.sysManager.inventoryManager.getHotbarItem(selectedSlot);
+
+      // Use the item if one exists
+      if (selectedItem) {
+        this.useHotbarItem(selectedSlot, selectedItem);
+      }
     }
   }
 }

@@ -55,7 +55,7 @@ export class Game extends Scene {
 
     this.scene.launch("HUD", {
       player: this.player,
-      inventoryManager: SystemManager.instance.inventorySystem,
+      inventoryManager: SystemManager.instance.inventoryManager,
     });
 
     EventBus.emit("current-scene-ready", this);

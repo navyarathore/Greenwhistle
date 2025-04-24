@@ -1,6 +1,5 @@
 import { EventBus } from "../EventBus";
 import { Item, MaterialCategory } from "../resources/Item";
-import { Game } from "../scenes/Game";
 
 export interface InventorySlot {
   item: Item | null;
