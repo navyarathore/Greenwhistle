@@ -12,7 +12,8 @@
       "type": "seed",
       "icon": {
         "path": "/items/pickup/wheat_seed.png"
-      }
+      },
+      "placeable": true
     },
     "blueberry": {
       "name": "Blueberry",
@@ -26,6 +27,48 @@
       "type": "consumable",
       "icon": {
         "path": "/items/pickup/strawberry.png"
+      }
+    },
+    "iron_ore": {
+      "name": "Iron Ore",
+      "type": "resources",
+      "icon": {
+        "path": "/items/pickup/iron_ore.png"
+      }
+    },
+    "diamond_ore": {
+      "name": "Diamond Ore",
+      "type": "resources",
+      "icon": {
+        "path": "/items/pickup/diamond_ore.png"
+      }
+    },
+    "rock": {
+      "name": "Rock",
+      "type": "resources",
+      "icon": {
+        "path": "/items/pickup/rock.png"
+      }
+    },
+    "iron_bar": {
+      "name": "Iron Bar",
+      "type": "resources",
+      "icon": {
+        "path": "/items/pickup/iron_bar.png"
+      }
+    },
+    "diamond_bar": {
+      "name": "Diamond Bar",
+      "type": "resources",
+      "icon": {
+        "path": "/items/pickup/diamond_bar.png"
+      }
+    },
+    "stone_bar": {
+      "name": "Stone",
+      "type": "resources",
+      "icon": {
+        "path": "/items/pickup/stone_bar.png"
       }
     },
     "axe": {
@@ -59,6 +102,54 @@
       "icon": {
         "path": "/tools/hoe.png"
       }
+    },
+    "sword": {
+      "name": "Sword",
+      "type": "tool",
+      "stackable": false,
+      "icon": {
+        "path": "/tools/sword.png"
+      }
+    },
+    "anvil": {
+      "name": "Anvil",
+      "type": "other",
+      "icon": {
+        "path": "/items/placeable/anvil.png"
+      },
+      "placeable": true
+    },
+    "chest": { 
+      "name": "Chest",
+      "type": "other",
+      "icon": {
+        "path": "/items/placeable/chest.png"
+      },
+      "placeable": true
+    },
+    "workbench": {
+      "name": "Workbench",
+      "type": "other",
+      "icon": {
+        "path": "/items/placeable/workbench.png"
+      },
+      "placeable": true
+    },
+    "bed": {
+      "name": "Bed",
+      "type": "furniture",
+      "icon": {
+        "path": "/placeable/bed.png"
+      },
+      "placeable": true
+    },
+    "bed_vertical": {
+      "name": "Bed",
+      "type": "furniture",
+      "icon": {
+        "path": "/placeable/bed_vertical.png"
+      },
+      "placeable": true
     }
   },
   "combined_blocks": [
@@ -68,7 +159,7 @@
   ],
   "pickup": [
     {
-      "layer": "Branches",
+      "layer": "Height 0",
       "id": [799],
       "method": "direct",
       "result": [
@@ -79,7 +170,7 @@
       ]
     },
     {
-      "layer": "Logs",
+      "layer": "Height 1",
       "id": [392, 393, 396, 397],
       "method": "direct",
         "result": [
@@ -90,7 +181,7 @@
         ]
     },
     {
-      "layer": "Seed Bush",
+      "layer": "Height 1",
       "id": [798, 848],
       "method": "random",
       "result": [
@@ -101,7 +192,7 @@
       ]
     },
     {
-      "layer": "Berries",
+      "layer": "Height 1",
       "id": [106],
       "method": "direct",
       "result": [
@@ -112,13 +203,46 @@
       ]
     },
     {
-      "layer": "Berries",
+      "layer": "Height 1",
       "id": [156],
       "method": "direct",
       "result": [
         {
           "id": "blueberry",
           "amount": 1
+        }
+      ]
+    },
+    {
+      "layer": "Height 1",
+      "id": [1492],
+      "method": "direct",
+      "result": [
+        {
+          "id": "iron_ore",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "layer": "Height 1",
+      "id": [1592],
+      "method": "direct",
+      "result": [
+        {
+          "id": "diamond_ore",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "layer": "Height 1",
+      "id": [646, 647, 648, 649, 746, 747, 748, 749],
+      "method": "direct",
+      "result": [
+        {
+          "id": "rock",
+          "amount": 2
         }
       ]
     }
