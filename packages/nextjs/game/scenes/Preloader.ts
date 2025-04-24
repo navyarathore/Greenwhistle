@@ -56,24 +56,20 @@ export class Preloader extends Scene {
 
   preload() {
     this.load.setPath("assets");
-
+    this.load.image("start_button", "/start2.png");
+    this.load.image("logo", "/logo.png");
     this.load.tilemapTiledJSON("map", "/maps/albion.json");
     this.load.image("tiles", "/tilesets/albion_tileset.png");
-
     this.load.spritesheet(SPRITE_ID, "/player/player_movement.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
-
     // Load HUD assets
     this.load.image("heart-full", "/ui/heart-full.png");
     this.load.image("heart-empty", "/ui/heart-empty.png");
     this.load.image("hotbar", "/ui/hotbar.png");
-
     this.load.image("inventory", "/ui/inventory.png");
-
     this.loadAllIcons();
-
     SystemManager.instance.loadResources();
   }
 

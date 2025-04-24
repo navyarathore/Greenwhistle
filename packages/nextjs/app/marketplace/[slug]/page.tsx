@@ -27,6 +27,26 @@ import { Item, getItemBySlug } from "../types/item";
 
 // app/marketplace/[slug]/page.tsx
 
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
 export default function ItemDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -134,13 +154,6 @@ export default function ItemDetailPage() {
   return (
     <div className="bg-amber-300 text-amber-900 min-h-screen p-4 font-mono">
       <div className="max-w-6xl mx-auto">
-        {/* Header with game logo placeholder */}
-        <div className="mb-8 text-center">
-          <div className="inline-block px-6 py-2 bg-amber-200 rounded-lg shadow-md border-b-2 border-amber-400">
-            <h2 className="text-2xl md:text-3xl font-bold text-amber-800">Green Whistle Marketplace</h2>
-          </div>
-        </div>
-
         {/* Breadcrumb */}
         <div className="mb-6 text-sm bg-amber-200 p-3 rounded-lg shadow-md inline-block">
           <Link href="/marketplace" className="text-amber-700 hover:text-amber-900 hover:underline font-bold">
