@@ -26,7 +26,7 @@ export default (scenes: Phaser.Types.Scenes.SceneType[]): Phaser.Types.Core.Game
   scene: scenes,
   input: {
     mouse: {
-      preventDefaultWheel: false,
+      preventDefaultWheel: true,
     },
   },
 });

@@ -94,7 +94,7 @@ export class HUD extends Scene {
     this.hotbarImage = this.add.image(hotbarX, hotbarY, "hotbar").setScrollFactor(0).setDepth(990);
 
     // Scale the hotbar image if needed
-    this.hotbarImage.setScale(1.2);
+    this.hotbarImage.setScale(1.5);
 
     // Create item slots within the hotbar
     const slotStartX = hotbarX - totalWidth / 2 + SLOT_SIZE / 2;
