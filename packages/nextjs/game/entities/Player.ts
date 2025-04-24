@@ -1,8 +1,8 @@
 import { EventBus } from "../EventBus";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
 import { HotbarIndex } from "../managers/InventoryManager";
-import { Game } from "../scenes/Game";
-import GridEngine, { Direction } from "grid-engine";
+import { Game, MAP_SCALE } from "../scenes/Game";
+import GridEngine from "grid-engine";
 import { Position } from "grid-engine";
 import Character from "~~/game/entities/Character";
 import { InputComponent } from "~~/game/input/InputComponent";
@@ -54,8 +54,27 @@ export default class Player extends Character {
     config.scene.camera.startFollow(this, true);
     config.scene.camera.setFollowOffset(-this.width, -this.height);
 
+    // Set camera bounds to prevent showing void outside map
+    this.setupCameraBounds();
+
     // Emit event to get inventory system
     EventBus.emit("player-created", this);
+  }
+
+  /**
+   * Sets up camera bounds to match the game map dimensions
+   * This prevents the camera from showing empty void beyond map edges
+   */
+  private setupCameraBounds(): void {
+    const map = this.config.scene.map;
+    if (map) {
+      // Calculate the bounds based on the tilemap dimensions and tile scale
+      const mapWidth = map.widthInPixels * MAP_SCALE;
+      const mapHeight = map.heightInPixels * MAP_SCALE;
+
+      // Set camera bounds to match the map dimensions
+      this.config.scene.camera.setBounds(0, 0, mapWidth, mapHeight);
+    }
   }
 
   get health(): number {

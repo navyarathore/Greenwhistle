@@ -4,6 +4,8 @@ import Player from "../entities/Player";
 import GridEngine from "grid-engine";
 import { Scene } from "phaser";
 
+export const MAP_SCALE = 3;
+
 export class Game extends Scene {
   camera!: Phaser.Cameras.Scene2D.Camera;
   map!: Phaser.Tilemaps.Tilemap;
@@ -29,7 +31,7 @@ export class Game extends Scene {
     if (tileset) {
       for (let i = 0; i < this.map.layers.length; i++) {
         const layer = this.map.createLayer(i, "tileset", 0, 0)!;
-        layer.scale = 3;
+        layer.scale = MAP_SCALE;
       }
     }
 
