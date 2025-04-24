@@ -63,7 +63,6 @@ export default class ControlsManager {
             visited: Set<string>,
             positions: Array<Position & { layer: string }> = [],
           ): Array<Position & { layer: string }> => {
-            console.log(`x: ${x}, y: ${y}, layer: ${layer}, Visited: `, visited);
             const key = `${x}:${y}`;
             if (visited.has(key)) return positions;
 
