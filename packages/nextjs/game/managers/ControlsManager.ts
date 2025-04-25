@@ -48,6 +48,11 @@ export default class ControlsManager {
               .flatMap(block => Object.entries(block))
               .map(([key, value]) => [parseInt(key), value as string]),
           );
+          // collision tiles
+          combined.set(403, "Height 0");
+          combined.set(404, "Height 0");
+          combined.set(405, "Height 0");
+          combined.set(454, "Height 0");
           const layers = new Set(combined.values());
 
           const delta = [
