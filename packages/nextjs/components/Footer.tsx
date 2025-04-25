@@ -26,26 +26,31 @@ export const Footer = () => {
           <div className="w-full md:w-2/5 flex flex-col items-center text-center gap-4">
             <div className="mb-2">
               <h2 className="text-2xl font-bold mb-3 text-amber-900">Adventure Awaits</h2>
+              <span className="text-amber-900 font-bold whitespace-nowrap block mb-4">
+                Craft Your Tools, Build Your World, Live the Adventure.
+              </span>
               <p className="text-md text-amber-800 mb-4">
                 Explore the magical world of Greenwhistle where blockchain meets fantasy. Collect unique heroes, battle
                 in tournaments, and trade legendary artifacts in this immersive gaming experience.
               </p>
 
-              <div className="flex justify-center gap-8 mt-4">
-                {[
-                  { name: "Home", path: "/" },
-                  { name: "Game", path: "/game" },
-                  { name: "Marketplace", path: "/marketplace" },
-                  { name: "Recipes", path: "/recipes" },
-                ].map(link => (
-                  <Link
-                    key={link.path}
-                    href={link.path}
-                    className="text-amber-900 hover:text-amber-600 font-bold px-3 py-2 rounded-lg hover:bg-amber-100 transition-all"
-                  >
-                    {link.name}
-                  </Link>
-                ))}
+              <div className="flex flex-col items-center justify-center mt-4">
+                <div className="flex justify-center gap-8">
+                  {[
+                    { name: "Home", path: "/" },
+                    { name: "Game", path: "/game" },
+                    { name: "Marketplace", path: "/marketplace" },
+                    { name: "Recipes", path: "/recipes" },
+                  ].map(link => (
+                    <Link
+                      key={link.path}
+                      href={link.path}
+                      className="text-amber-900 hover:text-amber-600 font-bold px-3 py-2 rounded-lg hover:bg-amber-100 transition-all"
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
