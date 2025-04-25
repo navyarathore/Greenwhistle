@@ -6,7 +6,7 @@ const DEFAULT_MAX_STACK = 8;
 /**
  * ItemManager class responsible for loading, managing, and providing access to game items
  */
-export class MaterialManager {
+export default class MaterialManager {
   private items: Map<string, Material> = new Map();
 
   /**

@@ -1,12 +1,12 @@
 import GridEngine, { Direction, Position } from "grid-engine";
 import * as Phaser from "phaser";
 import { EventBus } from "~~/game/EventBus";
-import { SystemManager } from "~~/game/SystemManager";
+import SystemManager from "~~/game/SystemManager";
 import { SPRITE_ID } from "~~/game/entities/Player";
-import { InputComponent } from "~~/game/input/InputComponent";
+import InputComponent from "~~/game/input/InputComponent";
 import { Item, MaterialCategory } from "~~/game/resources/Item";
 import ResourceData from "~~/game/resources/resource.json";
-import { Game } from "~~/game/scenes/Game";
+import Game from "~~/game/scenes/Game";
 import { getTileRecursivelyAt } from "~~/game/utils/layer-utils";
 
 export default class ControlsManager {
@@ -79,7 +79,6 @@ export default class ControlsManager {
               const nextY = y + dy;
               for (const l of layers) {
                 const nextTile = getTileRecursivelyAt({ x: nextX, y: nextY }, this.game.map, l, false);
-                console.log(nextTile);
                 if (nextTile && combined.get(nextTile.index) === l) {
                   checkTiles(nextX, nextY, nextTile.layer.name, visited, positions);
                   break;
@@ -109,7 +108,12 @@ export default class ControlsManager {
             this.game.map.removeTileAt(x, y, false, true, layer);
           }
 
-          EventBus.emit("item-picked-up", tile.properties);
+          EventBus.emit("item-picked-up", {
+            items: toAdd,
+            position: playerPosition,
+            layer,
+            actualLayer: tile.layer.name,
+          });
           break;
         }
       }
@@ -138,7 +142,7 @@ export default class ControlsManager {
     });
 
     // Listen for hotbar selection changes to handle item usage
-    EventBus.on("hotbar-selection-changed", (slotIndex: number) => {
+    EventBus.on("hotbar-selection-changed", _ => {
       this.handleHotbarSelection();
     });
 
@@ -157,7 +161,7 @@ export default class ControlsManager {
     if (selectedItem) {
       // Update visual representation in HUD
       EventBus.emit("hotbar-item-selected", {
-        slot: selectedSlot,
+        slotIndex: selectedSlot,
         item: selectedItem,
       });
     }
@@ -208,11 +212,9 @@ export default class ControlsManager {
    */
   private useConsumableItem(item: Item): void {
     // Emit an event for the InteractionManager to handle consumable effects
-    EventBus.emit("item-used", {
-      itemId: item.id,
-      position: this.gridEngine.getPosition(SPRITE_ID),
-    });
-
+    // EventBus.emit("item-used", {
+    //   item: item,
+    // });
     // The InteractionManager now handles all consumable effects, including:
     // - Health restoration
     // - Visual effects (particles, animations)
@@ -229,7 +231,7 @@ export default class ControlsManager {
 
     // Emit an event that a placeable was used - InteractionManager will handle the details
     EventBus.emit("item-placed", {
-      itemId: item.id,
+      item: item,
       position: targetPosition,
     });
 
@@ -257,13 +259,17 @@ export default class ControlsManager {
     } else {
       // Update the UI
       EventBus.emit("hotbar-item-changed", {
-        hotbarIndex: selectedSlot,
+        slotIndex: selectedSlot,
         item: item,
       });
     }
 
     // Notify that inventory was updated
-    EventBus.emit("inventory-updated", "player");
+    EventBus.emit("inventory-updated", {
+      inventoryId: "player",
+      action: "update",
+      items: this.sysManager.inventoryManager.getItems(),
+    });
   }
 
   /**

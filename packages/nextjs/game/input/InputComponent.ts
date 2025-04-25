@@ -1,6 +1,4 @@
-import * as Phaser from "phaser";
-
-export class InputComponent {
+export default class InputComponent {
   readonly cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
   readonly inventoryKey: Phaser.Input.Keyboard.Key;
   readonly actionKey: Phaser.Input.Keyboard.Key;

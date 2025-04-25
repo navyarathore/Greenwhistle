@@ -12,7 +12,7 @@ interface IProps {
 }
 
 export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene }, ref) {
-  const game = useRef<Phaser.Game | null>(null!);
+  const game = useRef<Phaser.Game | null>(null);
 
   useLayoutEffect(() => {
     if (game.current === null) {
@@ -36,15 +36,15 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
   }, [ref]);
 
   useEffect(() => {
-    EventBus.on("current-scene-ready", (scene_instance: Phaser.Scene) => {
+    EventBus.on("current-scene-ready", event => {
       if (currentActiveScene && typeof currentActiveScene === "function") {
-        currentActiveScene(scene_instance);
+        currentActiveScene(event.scene);
       }
 
       if (typeof ref === "function") {
-        ref({ game: game.current, scene: scene_instance });
+        ref({ game: game.current, scene: event.scene });
       } else if (ref) {
-        ref.current = { game: game.current, scene: scene_instance };
+        ref.current = { game: game.current, scene: event.scene };
       }
     });
     return () => {

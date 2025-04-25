@@ -1,9 +1,16 @@
 import { EventBus } from "../EventBus";
-import { SystemManager } from "../SystemManager";
+import SystemManager from "../SystemManager";
 import { SPRITE_ID } from "../entities/Player";
 import { Item, MaterialCategory } from "../resources/Item";
-import { Game } from "../scenes/Game";
+import Game from "../scenes/Game";
 import GridEngine, { Direction, Position } from "grid-engine";
+import {
+  HotbarSelectionChangedEvent,
+  ItemPlacedEvent,
+  ItemUsedEvent,
+  PlayerMovedEvent,
+  ToolUsedEvent,
+} from "~~/game/EventTypes";
 
 export enum InteractionType {
   TOOL_USE = "tool-use",
@@ -23,11 +30,13 @@ export interface InteractionResult {
   affectedPosition?: { x: number; y: number };
 }
 
+const COOLDOWN_DURATION = 500;
+
 /**
  * InteractionManager handles all interactions between the player and the game world,
  * including tool use, item placement, harvesting, and NPC interactions.
  */
-export class InteractionManager {
+export default class InteractionManager {
   private sysManager: SystemManager = SystemManager.instance;
   private interactionZones: Map<
     string,
@@ -36,7 +45,6 @@ export class InteractionManager {
   private activeInteractions: Set<string> = new Set();
   private interactionVisuals: Map<string, Phaser.GameObjects.GameObject> = new Map();
   private interactionCooldowns: Map<string, number> = new Map();
-  private readonly COOLDOWN_DURATION = 500; // ms
 
   constructor(
     private game: Game,
@@ -92,8 +100,8 @@ export class InteractionManager {
   /**
    * Handle tool use (e.g., axe, pickaxe, hoe)
    */
-  private handleToolUse(data: { toolId: string; position: Position; targetPosition: Position }): void {
-    const { toolId, targetPosition } = data;
+  private handleToolUse(event: ToolUsedEvent): void {
+    const { toolId, targetPosition } = event;
 
     // Check if this tool interaction is on cooldown
     const interactionId = `tool_${toolId}_${targetPosition.x}_${targetPosition.y}`;
@@ -134,12 +142,12 @@ export class InteractionManager {
   /**
    * Handle general item use
    */
-  private handleItemUse(data: { itemId: string; position: { x: number; y: number } }): void {
-    const { itemId, position } = data;
+  private handleItemUse(event: ItemUsedEvent): void {
+    const { item } = event;
     const targetPosition = this.getPositionInFrontOfPlayer();
 
     // Check if this item interaction is on cooldown
-    const interactionId = `item_${itemId}_${targetPosition.x}_${targetPosition.y}`;
+    const interactionId = `item_${item.id}_${targetPosition.x}_${targetPosition.y}`;
     if (this.isInteractionOnCooldown(interactionId)) {
       this.showFloatingText(targetPosition, "Too soon!", 0xff0000);
       return;
@@ -148,17 +156,11 @@ export class InteractionManager {
     // Set interaction cooldown to prevent spam
     this.setInteractionCooldown(interactionId);
 
-    // Get the item from inventory manager
-    const inventorySystem = this.sysManager.inventoryManager;
-    const item = inventorySystem.getItem(itemId);
-
-    if (!item) return;
-
     // Create use animation/effect
     this.createItemUseEffect(item, targetPosition);
 
     // Handle the specific item action
-    let result: InteractionResult = { success: false };
+    let result: InteractionResult;
 
     // Check item category and handle accordingly
     switch (item.type.type) {
@@ -198,24 +200,15 @@ export class InteractionManager {
   /**
    * Handle the placement of items in the world
    */
-  private handleItemPlacement(data: { itemId: string; position: { x: number; y: number } }): void {
-    const { itemId, position } = data;
-
-    // Get the item from the material manager
-    const materialManager = this.sysManager.materialManager;
-    const material = materialManager.getMaterial(itemId);
-
-    if (!material) {
-      console.error(`Cannot place item: Material with ID ${itemId} not found`);
-      return;
-    }
+  private handleItemPlacement(event: ItemPlacedEvent): void {
+    const { item, position } = event;
 
     const targetTile = this.game.map.getTileAt(position.x, position.y, false, 0);
 
     if (!targetTile || targetTile.index === -1) {
       // Place the item at the specified position
       // This is a placeholder for actual placement logic
-      console.log(`Placing ${itemId} at position (${position.x}, ${position.y})`);
+      console.log(`Placing ${item.id} at position (${position.x}, ${position.y})`);
 
       // In a real implementation, you would:
       // 1. Update the tilemap with the appropriate tile
@@ -223,12 +216,12 @@ export class InteractionManager {
       // 3. Update any relevant state
 
       EventBus.emit("item-placed-success", {
-        itemId,
+        item,
         position,
       });
     } else {
       EventBus.emit("item-placed-failed", {
-        itemId,
+        item,
         position,
         reason: "Position is occupied",
       });
@@ -527,7 +520,7 @@ export class InteractionManager {
 
     // Emit event
     EventBus.emit("item-placed-success", {
-      itemId: item.id,
+      item: item,
       position,
     });
 
@@ -609,14 +602,14 @@ export class InteractionManager {
    * Check for nearby interactable objects when the player moves
    * This highlights interactive objects and tiles around the player
    */
-  private checkForNearbyInteractables(position: { x: number; y: number }): void {
+  private checkForNearbyInteractables(event: PlayerMovedEvent): void {
     // Clear previous highlights
     this.clearInteractionHighlights();
 
     // Get a 3x3 area around the player to check for interactable objects
     const range = 1;
-    for (let y = position.y - range; y <= position.y + range; y++) {
-      for (let x = position.x - range; x <= position.x + range; x++) {
+    for (let y = event.y - range; y <= event.y + range; y++) {
+      for (let x = event.x - range; x <= event.x + range; x++) {
         this.checkTileForInteractions({ x, y });
       }
     }
@@ -625,7 +618,7 @@ export class InteractionManager {
   /**
    * Check if a specific tile has any interactive properties and highlight it if needed
    */
-  private checkTileForInteractions(position: { x: number; y: number }): void {
+  private checkTileForInteractions(position: Position): void {
     const groundLayer = this.game.map.getLayer(0)?.name || "ground";
     const objectLayer = this.game.map.getLayer(1)?.name || "objects";
 
@@ -717,12 +710,12 @@ export class InteractionManager {
   /**
    * Update the interaction preview based on the currently selected tool
    */
-  private updateToolInteractionPreview(hotbarIndex: number): void {
+  private updateToolInteractionPreview(event: HotbarSelectionChangedEvent): void {
     // Clear previous previews
     this.clearInteractionHighlights();
 
     // Get the currently selected item
-    const selectedItem = this.sysManager.inventoryManager.getHotbarItem(hotbarIndex as any);
+    const selectedItem = this.sysManager.inventoryManager.getHotbarItem(event.slotIndex);
     if (!selectedItem) return;
 
     // If it's a tool, show what it can interact with
@@ -791,7 +784,7 @@ export class InteractionManager {
    * Set a cooldown for an interaction to prevent spam
    */
   private setInteractionCooldown(interactionId: string): void {
-    this.interactionCooldowns.set(interactionId, this.game.time.now + this.COOLDOWN_DURATION);
+    this.interactionCooldowns.set(interactionId, this.game.time.now + COOLDOWN_DURATION);
   }
 
   /**
@@ -934,11 +927,11 @@ export class InteractionManager {
 
     // If this was the last one, remove it from the slot
     if (item.quantity <= 0) {
-      inventorySystem.setHotbarItem(selectedSlot as any, null);
+      inventorySystem.setHotbarItem(selectedSlot, null);
     } else {
       // Update the UI
       EventBus.emit("hotbar-item-changed", {
-        hotbarIndex: selectedSlot,
+        slotIndex: selectedSlot,
         item: item,
       });
     }
@@ -947,7 +940,7 @@ export class InteractionManager {
     EventBus.emit("inventory-updated", {
       inventoryId: "player",
       action: "update",
-      items: [], // This would normally contain the updated inventory items
+      items: inventorySystem.getItems(),
     });
   }
 
@@ -1014,5 +1007,3 @@ export class InteractionManager {
     this.createSimpleParticles(x, y, color, count);
   }
 }
-
-export default InteractionManager;

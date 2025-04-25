@@ -1,5 +1,6 @@
 import { EventBus } from "../EventBus";
 import { Item, MaterialCategory } from "../resources/Item";
+import { ItemDroppedEvent, ItemHarvestedEvent, ItemUsedEvent } from "~~/game/EventTypes";
 
 export interface InventorySlot {
   item: Item | null;
@@ -34,8 +35,6 @@ export default class InventoryManager {
     EventBus.on("item-harvested", this.handleItemHarvested.bind(this));
     EventBus.on("item-used", this.handleItemUsed.bind(this));
     EventBus.on("item-dropped", this.handleItemDropped.bind(this));
-    EventBus.on("item-crafted", this.handleItemCrafted.bind(this));
-    EventBus.on("inventory-transfer", this.handleInventoryTransfer.bind(this));
   }
 
   // Create a new inventory container
@@ -190,7 +189,6 @@ export default class InventoryManager {
 
     // Emit events
     EventBus.emit("item-added", {
-      itemId: newItem.id,
       inventoryId,
       slotIndex,
       item: newItem,
@@ -297,33 +295,29 @@ export default class InventoryManager {
   }
 
   // Remove a quantity of an item from a specific slot
-  removeItemFromSlot(slotIndex: number, quantity: number, inventoryId: string = PLAYER_INVENTORY): boolean {
+  removeItemFromSlot(slotIndex: number, quantity?: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
     if (!inventory || slotIndex < 0 || slotIndex >= inventory.maxSlots) return false;
 
     const slot = inventory.slots[slotIndex];
-    if (slot.item === null || slot.item.quantity < quantity) return false;
+    if (slot.item === null || (quantity && slot.item.quantity < quantity)) return false;
 
     // Get the item for event emission
     const item = slot.item;
 
     // Reduce the quantity
-    item.quantity -= quantity;
+    item.quantity -= quantity || item.quantity;
 
     // If quantity is now 0, clear the slot
     if (item.quantity <= 0) {
       slot.item = null;
     }
 
-    // Create a copy of the item with the removed quantity for the event
-    const removedItem = { ...item, quantity: quantity };
-
     // Emit events
     EventBus.emit("item-removed", {
-      item: removedItem,
+      item: new Item(item.type, quantity),
       inventoryId,
       slotIndex,
-      quantity,
     });
 
     // Emit a generic inventory update event
@@ -463,11 +457,10 @@ export default class InventoryManager {
 
       // Emit event
       EventBus.emit("item-moved", {
-        item: itemToMove,
+        item: new Item(itemToMove.type, quantity),
         inventoryId,
         fromSlotIndex,
         toSlotIndex,
-        quantity,
       });
 
       EventBus.emit("inventory-updated", {
@@ -497,11 +490,10 @@ export default class InventoryManager {
 
       // Emit event
       EventBus.emit("item-moved", {
-        item: { ...itemToMove, quantity: maxQuantityToMove },
+        item: new Item(itemToMove.type, maxQuantityToMove),
         inventoryId,
         fromSlotIndex,
         toSlotIndex,
-        quantity: maxQuantityToMove,
       });
 
       EventBus.emit("inventory-updated", {
@@ -558,14 +550,10 @@ export default class InventoryManager {
     const slot = inventory.slots[slotIndex];
     if (slot.item === null || slot.item.quantity <= 0) return false;
 
-    // Get the item ID for the event
-    const itemId = slot.item.id;
+    const item = slot.item;
 
     // Reduce quantity by 1
     slot.item.quantity -= 1;
-
-    // Track the new quantity for the event
-    const newQuantity = slot.item.quantity;
 
     // If quantity is now 0, clear the slot
     if (slot.item.quantity <= 0) {
@@ -574,10 +562,9 @@ export default class InventoryManager {
 
     // Emit events
     EventBus.emit("item-used", {
-      itemId,
+      item,
       inventoryId,
       slotIndex,
-      quantity: newQuantity,
     });
 
     // Emit a generic inventory update event
@@ -591,8 +578,7 @@ export default class InventoryManager {
   }
 
   // Use an item by its ID
-  useItem(itemId: string, inventoryId: string = PLAYER_INVENTORY): boolean {
-    const slotIndex = this.findItemSlot(itemId, inventoryId);
+  useItem(item: Item, slotIndex: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     if (slotIndex === -1) return false;
 
     return this.useItemInSlot(slotIndex, inventoryId);
@@ -680,7 +666,7 @@ export default class InventoryManager {
     inventory.slots[inventorySlotIndex].item = item;
 
     // Emit event to update the hotbar UI
-    EventBus.emit("hotbar-item-changed", { hotbarIndex, item });
+    EventBus.emit("hotbar-item-changed", { slotIndex: hotbarIndex, item });
 
     return true;
   }
@@ -699,22 +685,6 @@ export default class InventoryManager {
 
     const hotbarSlotIndex = this.hotbarSlots[hotbarIndex];
     this.moveItem(inventorySlotIndex, hotbarSlotIndex, undefined, PLAYER_INVENTORY);
-    // const item = inventory.slots[inventorySlotIndex].item;
-    // if (!item) return false;
-
-    // // Move the item to the hotbar slot
-    // const hotbarSlotIndex = this.hotbarSlots[hotbarIndex];
-
-    // // Store the item that was in the hotbar slot (if any)
-    // const previousHotbarItem = inventory.slots[hotbarSlotIndex].item;
-
-    // inventory.slots[inventorySlotIndex].item = previousHotbarItem;
-
-    // inventory.slots[hotbarSlotIndex].item = item;
-
-    // // Emit events for UI updates
-    // EventBus.emit("hotbar-item-changed", { hotbarIndex, item });
-    // EventBus.emit("inventory-updated", PLAYER_INVENTORY);
 
     return true;
   }
@@ -731,7 +701,7 @@ export default class InventoryManager {
   }
 
   // EVENT HANDLERS
-  private handleItemHarvested(data: { resourceId: number; yield: number; quantity: number }): void {
+  private handleItemHarvested(event: ItemHarvestedEvent): void {
     // This is a placeholder - you'll need to implement logic to create an Item
     // based on your game's data and resource system
     // TODO get item from item manager
@@ -744,47 +714,12 @@ export default class InventoryManager {
     // }
   }
 
-  private handleItemUsed(data: { itemId: string }): void {
-    this.useItem(data.itemId);
+  private handleItemUsed(event: ItemUsedEvent): void {
+    this.useItem(event.item, event.slotIndex);
   }
 
-  private handleItemDropped(item: Item): void {
+  private handleItemDropped(event: ItemDroppedEvent): void {
     // Remove the item from the player's inventory
-    const inventoryItem = this.getItem(item.id);
-    if (this.removeItem(item) && inventoryItem) {
-      EventBus.emit("show-message", `Dropped ${item.quantity} ${inventoryItem.name}`);
-    }
-  }
-
-  private handleItemCrafted(data: { recipe: any; result: any }): void {
-    // Remove recipe ingredients from inventory
-    const allIngredientsAvailable = data.recipe.ingredients.every((ingredient: any) => {
-      return this.hasEnoughItems(ingredient.id, ingredient.quantity);
-    });
-
-    if (allIngredientsAvailable) {
-      // Remove ingredients
-      data.recipe.ingredients.forEach((ingredient: any) => {
-        // Create a temporary item with the same ID and quantity
-        const itemToRemove = { id: ingredient.id, quantity: ingredient.quantity } as Item;
-        this.removeItem(itemToRemove);
-      });
-
-      // Add crafted item
-      if (this.addItem(data.result.item)) {
-        EventBus.emit("show-message", `Crafted ${data.result.item.name}`);
-      } else {
-        EventBus.emit("show-message", `Inventory full! Could not add ${data.result.item.name}`);
-      }
-    }
-  }
-
-  private handleInventoryTransfer(data: {
-    item: Item;
-    sourceId: string;
-    targetId: string;
-    sourceSlotIndex?: number;
-  }): void {
-    this.transferItem(data.item, data.sourceId, data.targetId, data.sourceSlotIndex);
+    this.removeItemFromSlot(event.slotIndex);
   }
 }

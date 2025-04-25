@@ -60,7 +60,7 @@ export class Item {
     return this.type.maxStackSize;
   }
 
-  clone(): Item {
-    return new Item(this.type, this.quantity);
+  clone(quantity?: number): Item {
+    return new Item(this.type, quantity || this.quantity);
   }
 }

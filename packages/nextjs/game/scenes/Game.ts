@@ -1,5 +1,5 @@
 import { EventBus } from "../EventBus";
-import { SystemManager } from "../SystemManager";
+import SystemManager from "../SystemManager";
 import Player from "../entities/Player";
 import GridEngine from "grid-engine";
 import { Scene } from "phaser";
@@ -7,7 +7,7 @@ import { loadLayerMapping } from "~~/game/utils/layer-utils";
 
 export const MAP_SCALE = 3;
 
-export class Game extends Scene {
+export default class Game extends Scene {
   camera!: Phaser.Cameras.Scene2D.Camera;
   map!: Phaser.Tilemaps.Tilemap;
   player!: Player;
@@ -65,7 +65,7 @@ export class Game extends Scene {
       inventoryManager: SystemManager.instance.inventoryManager,
     });
 
-    EventBus.emit("current-scene-ready", this);
+    EventBus.emit("current-scene-ready", { scene: this });
   }
 
   update(time: number, delta: number): void {

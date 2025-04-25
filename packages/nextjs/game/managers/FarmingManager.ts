@@ -1,6 +1,7 @@
 import { EventBus } from "../EventBus";
 import { Item, MaterialCategory } from "../resources/Item";
-import { MaterialManager } from "./MaterialManager";
+import MaterialManager from "./MaterialManager";
+import { CropHarvestedEvent, CropWateredEvent } from "~~/game/EventTypes";
 
 export interface Crop {
   seedId: string;
@@ -23,7 +24,7 @@ export interface PlantedCrop {
 /**
  * FarmingManager class responsible for managing crop planting, growth, and harvesting
  */
-export class FarmingManager {
+export default class FarmingManager {
   private crops: Map<string, Crop> = new Map();
   private plantedCrops: Map<string, PlantedCrop> = new Map();
   private currentDay = 1;
@@ -41,14 +42,14 @@ export class FarmingManager {
     EventBus.on("day-changed", this.onDayChanged.bind(this));
 
     // Listen for crop interaction events from the InteractionManager
-    EventBus.on("crop-watered", (data: { position: { x: number; y: number } }) => {
+    EventBus.on("crop-watered", (event: CropWateredEvent) => {
       // Additional visual effects or state updates when crops are watered
-      this.showCropState(data.position.x, data.position.y);
+      this.showCropState(event.position.x, event.position.y);
     });
 
-    EventBus.on("crop-harvested", (data: { position: { x: number; y: number }; cropId: string }) => {
+    EventBus.on("crop-harvested", (event: CropHarvestedEvent) => {
       // Additional effects or state updates when crops are harvested
-      this.resetFarmTile(data.position.x, data.position.y);
+      this.resetFarmTile(event.position.x, event.position.y);
     });
   }
 
@@ -137,7 +138,14 @@ export class FarmingManager {
     this.plantedCrops.set(plantedCrop.id, plantedCrop);
 
     // Emit event that a crop was planted
-    EventBus.emit("crop-planted", plantedCrop);
+    EventBus.emit("crop-planted", {
+      position: { x: plantedCrop.position.x, y: plantedCrop.position.y },
+      seedId: plantedCrop.cropData.seedId,
+      cropId: plantedCrop.id,
+      growthStage: 0,
+      daysUntilNextStage: plantedCrop.cropData.growthTime,
+      isWatered: plantedCrop.isWatered,
+    });
 
     return true;
   }
@@ -161,7 +169,9 @@ export class FarmingManager {
     plantedCrop.isWatered = true;
 
     // Emit event that a crop was watered
-    EventBus.emit("crop-watered", plantedCrop);
+    EventBus.emit("crop-watered", {
+      position: plantedCrop.position,
+    });
 
     return true;
   }
@@ -202,8 +212,8 @@ export class FarmingManager {
   /**
    * Handle day change for crop growth
    */
-  private onDayChanged(day: number): void {
-    this.currentDay = day;
+  private onDayChanged(data: { day: number }): void {
+    this.currentDay = data.day;
 
     // Update all planted crops
     this.plantedCrops.forEach(crop => {
@@ -221,7 +231,10 @@ export class FarmingManager {
 
         // Emit event if the crop just finished growing
         if (!wasGrown && crop.isGrown) {
-          EventBus.emit("crop-grown", crop);
+          EventBus.emit("crop-grown", {
+            cropId: crop.id,
+            position: crop.position,
+          });
         }
       }
 

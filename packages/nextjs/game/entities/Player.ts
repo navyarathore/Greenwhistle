@@ -1,11 +1,10 @@
 import { EventBus } from "../EventBus";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
 import { HOTBAR_SIZE, HotbarIndex } from "../managers/InventoryManager";
-import { Game, MAP_SCALE } from "../scenes/Game";
-import GridEngine from "grid-engine";
-import { Position } from "grid-engine";
+import Game, { MAP_SCALE } from "../scenes/Game";
+import GridEngine, { Position } from "grid-engine";
 import Character from "~~/game/entities/Character";
-import { InputComponent } from "~~/game/input/InputComponent";
+import InputComponent from "~~/game/input/InputComponent";
 
 export type PlayerConfig = {
   scene: Game;
@@ -61,7 +60,7 @@ export default class Player extends Character {
     this.setupMovementEvents();
 
     // Emit event to get inventory system
-    EventBus.emit("player-created", this);
+    EventBus.emit("player-created", { player: this });
   }
 
   /**
@@ -86,7 +85,7 @@ export default class Player extends Character {
 
   set health(value: number) {
     super.health = value;
-    EventBus.emit("player-health-changed", this.health);
+    EventBus.emit("player-health-changed", { health: this.health });
   }
 
   get isMovementEnabled(): boolean {
@@ -130,7 +129,7 @@ export default class Player extends Character {
       this._selectedHotbarSlot = validIndex;
 
       // Emit an event so other systems (like HUD) can react to the change
-      EventBus.emit("hotbar-selection-changed", this._selectedHotbarSlot);
+      EventBus.emit("hotbar-selection-changed", { slotIndex: this._selectedHotbarSlot });
     }
   }
 
@@ -138,16 +137,14 @@ export default class Player extends Character {
    * Select the next hotbar slot (cycling back to the first if at the end)
    */
   selectNextHotbarSlot(): void {
-    const nextIndex = (this._selectedHotbarSlot + 1) % HOTBAR_SIZE;
-    this.selectedHotbarSlot = nextIndex;
+    this.selectedHotbarSlot = (this._selectedHotbarSlot + 1) % HOTBAR_SIZE;
   }
 
   /**
    * Select the previous hotbar slot (cycling to the last if at the beginning)
    */
   selectPreviousHotbarSlot(): void {
-    const prevIndex = (this._selectedHotbarSlot - 1 + HOTBAR_SIZE) % HOTBAR_SIZE;
-    this.selectedHotbarSlot = prevIndex;
+    this.selectedHotbarSlot = (this._selectedHotbarSlot - 1 + HOTBAR_SIZE) % HOTBAR_SIZE;
   }
 
   disable(): void {
@@ -183,7 +180,7 @@ export default class Player extends Character {
         EventBus.emit("player-moved", position);
 
         // Check for any auto-interactions at this position (like picking up items)
-        EventBus.emit("check-position-interactions", position);
+        EventBus.emit("check-position-interactions", { position, direction });
       }
     });
   }

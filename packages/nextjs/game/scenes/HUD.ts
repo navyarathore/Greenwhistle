@@ -4,6 +4,7 @@ import Player from "../entities/Player";
 import InventoryManager, { HOTBAR_SIZE, HotbarIndex, PLAYER_INVENTORY } from "../managers/InventoryManager";
 import { Item } from "../resources/Item";
 import { Scene } from "phaser";
+import { HotbarItemChangedEvent, InventoryUpdatedEvent, PlayerCreatedEvent } from "~~/game/EventTypes";
 
 const SLOT_SIZE = 48;
 const SLOT_PADDING = 7;
@@ -36,8 +37,8 @@ export class HUD extends Scene {
       this.createHotbar();
       this.setupInteractionFeedback();
     } else {
-      EventBus.once("player-created", (player: Player) => {
-        this.player = player;
+      EventBus.once("player-created", (event: PlayerCreatedEvent) => {
+        this.player = event.player;
         this.createHealthDisplay();
         this.createHotbar();
         this.setupInteractionFeedback();
@@ -45,19 +46,19 @@ export class HUD extends Scene {
     }
 
     // Subscribe to player health changes
-    EventBus.on("player-health-changed", (_: number) => {
+    EventBus.on("player-health-changed", _ => {
       this.updateHealthDisplay();
     });
 
     // Subscribe to hotbar selection changes
-    EventBus.on("hotbar-selection-changed", (_: number) => {
+    EventBus.on("hotbar-selection-changed", _ => {
       if (this.selectedSlotIndicator) {
         this.updateHotbarSelection();
       }
     });
 
     // Let the game scene know HUD is ready
-    EventBus.emit("hud-ready", this);
+    EventBus.emit("current-scene-ready", { scene: this });
   }
 
   private createHealthDisplay() {
@@ -129,12 +130,12 @@ export class HUD extends Scene {
     this.updateHotbarItems();
 
     // Listen for inventory and hotbar updates
-    EventBus.on("hotbar-item-changed", (data: { hotbarIndex: HotbarIndex; item: Item | null }) => {
-      this.updateHotbarItemAtIndex(data.hotbarIndex, data.item);
+    EventBus.on("hotbar-item-changed", (event: HotbarItemChangedEvent) => {
+      this.updateHotbarItemAtIndex(event.slotIndex, event.item);
     });
 
-    EventBus.on("inventory-updated", (data: { inventoryId: string; action: string; items: Array<Item | null> }) => {
-      if (data.inventoryId === PLAYER_INVENTORY) {
+    EventBus.on("inventory-updated", (event: InventoryUpdatedEvent) => {
+      if (event.inventoryId === PLAYER_INVENTORY) {
         this.updateHotbarItems();
       }
     });
@@ -253,9 +254,9 @@ export class HUD extends Scene {
    */
   private setupInteractionFeedback(): void {
     // Listen for interaction messages to display them
-    EventBus.on("show-interaction-message", (data: { message: string; color?: string }) => {
-      this.showTemporaryMessage(data.message, data.color || "#ffffff");
-    });
+    // EventBus.on("show-interaction-message", (data: { message: string; color?: string }) => {
+    //   this.showTemporaryMessage(data.message, data.color || "#ffffff");
+    // });
   }
 
   /**

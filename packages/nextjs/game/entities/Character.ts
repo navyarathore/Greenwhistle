@@ -1,7 +1,7 @@
 import GridEngine, { GridEngineConfig, Position, WalkingAnimationMapping } from "grid-engine";
 import * as Phaser from "phaser";
-import { InputComponent } from "~~/game/input/InputComponent";
-import { Game } from "~~/game/scenes/Game";
+import InputComponent from "~~/game/input/InputComponent";
+import Game from "~~/game/scenes/Game";
 import { CustomGameObject } from "~~/game/types";
 
 export type CharacterConfig = {

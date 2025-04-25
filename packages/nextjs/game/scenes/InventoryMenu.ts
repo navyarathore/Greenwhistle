@@ -1,5 +1,5 @@
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../config";
-import { CraftingManager } from "~~/game/managers/CraftingManager";
+import CraftingManager from "~~/game/managers/CraftingManager";
 import InventoryManager, { PLAYER_INVENTORY_SIZE } from "~~/game/managers/InventoryManager";
 
 const FIRST_CELL_OFFSET_X = 150;

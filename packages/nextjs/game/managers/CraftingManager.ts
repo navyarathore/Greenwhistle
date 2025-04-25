@@ -2,15 +2,15 @@ import { EventBus } from "../EventBus";
 import { Item } from "../resources/Item";
 import Recipes from "../resources/recipes.json";
 import InventoryManager from "./InventoryManager";
-import { MaterialManager } from "~~/game/managers/MaterialManager";
+import MaterialManager from "~~/game/managers/MaterialManager";
 
-interface Recipe {
+export interface Recipe {
   id: string;
   ingredients: Item[];
   result: Item;
 }
 
-export class CraftingManager {
+export default class CraftingManager {
   private recipes: Map<string, Recipe> = new Map();
 
   constructor(private inventoryManager: InventoryManager) {}
@@ -74,7 +74,10 @@ export class CraftingManager {
     this.inventoryManager.addItem(recipe.result);
 
     // Emit crafting events for visual feedback and sound effects
-    EventBus.emit("craft-item", recipe.result);
+    EventBus.emit("craft-item", {
+      result: recipe.result,
+      recipe,
+    });
 
     return true;
   }

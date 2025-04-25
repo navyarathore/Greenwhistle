@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { SystemManager } from "~~/game/SystemManager";
+import SystemManager from "~~/game/SystemManager";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "~~/game/config";
 import { SPRITE_ID } from "~~/game/entities/Player";
 

@@ -1,18 +1,18 @@
 import { EventBus } from "./EventBus";
 import InventoryManager from "./managers/InventoryManager";
-import { MaterialManager } from "./managers/MaterialManager";
-import { Game } from "./scenes/Game";
-import { InputComponent } from "~~/game/input/InputComponent";
+import MaterialManager from "./managers/MaterialManager";
+import Game from "./scenes/Game";
+import InputComponent from "~~/game/input/InputComponent";
 import ControlsManager from "~~/game/managers/ControlsManager";
-import { CraftingManager } from "~~/game/managers/CraftingManager";
-import { FarmingManager } from "~~/game/managers/FarmingManager";
+import CraftingManager from "~~/game/managers/CraftingManager";
+import FarmingManager from "~~/game/managers/FarmingManager";
 import InteractionManager from "~~/game/managers/InteractionManager";
 
 /**
  * SystemManager class to initialize and manage all game systems
  * Using singleton pattern to ensure only one instance exists
  */
-export class SystemManager {
+export default class SystemManager {
   private static _instance: SystemManager;
 
   readonly inventoryManager: InventoryManager;
@@ -55,7 +55,7 @@ export class SystemManager {
     this._interactionManager = new InteractionManager(scene, scene.gridEngine);
     this.controlsManager.setupControls();
 
-    EventBus.emit("systems-ready", this);
+    EventBus.emit("systems-ready", { systemManager: this });
   }
 
   get controlsManager(): ControlsManager {

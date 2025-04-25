@@ -21,7 +21,7 @@ export class MainMenu extends Scene {
     // Centered play button using an image
     this.playButton = this.createImageButton(SCREEN_WIDTH / 2, 450, "start_button", () => this.changeScene());
 
-    EventBus.emit("current-scene-ready", this);
+    EventBus.emit("current-scene-ready", { scene: this });
   }
 
   createImageButton(x: number, y: number, texture: string, callback: () => void): GameObjects.Sprite {
