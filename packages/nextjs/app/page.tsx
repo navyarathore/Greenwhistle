@@ -45,13 +45,14 @@ export default function Home() {
       variant: "yellow",
     },
     {
-      title: "🎣 Fishing",
-      description: "Fish in the lake area to earn extra money. Different fish have different values and rarity.",
+      title: "⚔️ Combat",
+      description:
+        "Engage in intense battles against wild creatures and enemies. Use your skills and weapons to survive and grow stronger.",
       details: [
-        "Use fishing rod near water",
-        "Catch different types of fish",
-        "Sell fish at the market",
-        "Special rare catches",
+        "Explore dangerous zones with enemy spawns",
+        "Fight using melee, ranged, or magic attacks",
+        "Earn XP and level up your combat skills",
+        "Collect loot from defeated enemies",
       ],
       variant: "default",
     },
@@ -115,28 +116,28 @@ export default function Home() {
         />
 
         {/* Game Logo with Parallax Effect */}
-        <Image
-          src="/logo.png"
-          alt="Green Whistle Logo"
-          width={550}
-          height={200}
-          priority
-          className="absolute left-1/2 top-[10%] w-[500px] max-w-[80vw] z-10 pointer-events-none select-none"
-          style={{
-            transform: `translate(-50%, ${scrollY * 0.15}px)`,
-            transition: "transform 0.1s linear",
-          }}
-        />
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-10 z-20">
+          <Image
+            src="/logo.png"
+            alt="Green Whistle Logo"
+            width={550}
+            height={200}
+            priority
+            className="w-[500px] max-w-[80vw] pointer-events-none select-none"
+            style={{
+              transform: `translateY(${scrollY * 0.15}px)`,
+              transition: "transform 0.1s linear",
+            }}
+          />
 
-        {/* Start Adventure Button */}
-        <div className="relative z-20 h-full flex flex-col items-center justify-end pb-16">
+          {/* Start Adventure Button */}
           <motion.a
             href="/game"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="bg-amber-800 text-amber-100 font-bold py-4 px-8 rounded-lg text-xl hover:bg-amber-700 
-              transition-all shadow-lg border-2 border-amber-900 inline-block transform hover:scale-105"
+      transition-all shadow-lg border-2 border-amber-900 inline-block transform hover:scale-105"
           >
             Start Your Adventure
           </motion.a>

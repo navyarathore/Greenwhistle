@@ -16,7 +16,7 @@ export class MainMenu extends Scene {
     this.background = this.add.sprite(SCREEN_WIDTH / 2, 360, "background").play("background");
 
     // Centered logo image instead of text
-    this.logo = this.add.image(670, 180, "logo").setOrigin(0.5).setDepth(100);
+    // this.logo = this.add.image(670, 180, "logo").setOrigin(0.5).setDepth(100);
 
     // Centered play button using an image
     this.playButton = this.createImageButton(SCREEN_WIDTH / 2, 450, "start_button", () => this.changeScene());

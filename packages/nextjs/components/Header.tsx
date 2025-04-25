@@ -39,9 +39,6 @@ export const menuLinks: HeaderMenuLink[] = [
   },
 ];
 
-/**
- * Site header with vintage game theme and improved dropdown menu
- */
 export const Header = () => {
   const { targetNetwork } = useTargetNetwork();
   const isLocalNetwork = targetNetwork.id === hardhat.id;
@@ -54,64 +51,42 @@ export const Header = () => {
     useCallback(() => setIsDropdownOpen(false), []),
   );
 
-  // Find the active menu item
-  const activeMenu = menuLinks.find(link => link.href === pathname) || menuLinks[0];
-
   return (
-    <div className="top-0 navbar min-h-0 flex-shrink-0 justify-between z-50 px-2 sm:px-4 bg-amber-200 bg-opacity-95 ">
-      {/* Left side - Logo and Dropdown */}
+    <div className="top-0 w-full navbar min-h-0 z-50 px-4 py-2 bg-amber-200 bg-opacity-95 border-b-2 border-amber-800 flex items-center justify-between relative">
+      {/* Left - Logo */}
       <div className="flex items-center">
-        {/* Logo */}
-        <Link href="/" passHref className="flex items-center gap-3 mr-4 shrink-0">
+        <Link href="/" passHref className="flex items-center gap-3 shrink-0">
           <Image
             alt="Greenwhistle Logo"
-            width={200} // increased from 80
-            height={100} // increased from 80
-            className="h-20 w-48 rounded-lg transform hover:scale-105 transition" // increased from h-12 w-12
+            width={200}
+            height={100}
+            className="h-16 w-[120px] rounded-lg transform hover:scale-105 transition"
             src="/logo.png"
           />
         </Link>
-
-        {/* Dropdown Menu */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center space-x-2 py-2 px-4 text-amber-900 hover:bg-amber-300 rounded-lg border-2 border-amber-800 font-bold transition-all"
-          >
-            <span className="flex items-center gap-2">
-              {activeMenu.icon}
-              <span>{activeMenu.label}</span>
-            </span>
-            <ChevronDownIcon className={`h-5 w-5 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
-          </button>
-
-          {isDropdownOpen && (
-            <div className="absolute mt-2 w-56 bg-amber-100 rounded-lg shadow-lg border-2 border-amber-800 py-2 z-50">
-              {menuLinks.map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsDropdownOpen(false)}
-                  className={`
-                    flex items-center px-4 py-3 text-sm hover:bg-amber-300 transition-colors
-                    ${pathname === link.href ? "bg-amber-300 font-bold text-amber-900" : "text-amber-900"}
-                  `}
-                >
-                  <span className="mr-3">{link.icon}</span>
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Right side - Wallet Connection */}
-      <div className="flex items-center space-x-3">
+      {/* Center - Navigation Links */}
+      <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-6">
+        {menuLinks.map(link => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-amber-900 font-semibold hover:bg-amber-300 border-2 border-transparent hover:border-amber-800 transition-all ${
+              pathname === link.href ? "bg-amber-300 border-amber-800 font-bold" : ""
+            }`}
+          >
+            {link.icon}
+            <span>{link.label}</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* Right - Wallet Connection */}
+      <div className="flex items-center gap-3">
         <div className="bg-amber-300 p-1.5 rounded-lg border-2 border-amber-800 shadow-md hover:bg-amber-400 transition-colors">
           <OnchainKitCustomConnectButton />
         </div>
-
         {isLocalNetwork && (
           <div className="bg-amber-300 p-1.5 rounded-lg border-2 border-amber-800 shadow-md hover:bg-amber-400 transition-colors">
             <FaucetButton />

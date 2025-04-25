@@ -57,7 +57,7 @@ export class Preloader extends Scene {
   preload() {
     this.load.setPath("assets");
     this.load.image("start_button", "/start2.png");
-    this.load.image("logo", "/logo.png");
+    // this.load.image("logo", "/logo.png");
     this.load.tilemapTiledJSON("map", "/maps/albion.json");
     this.load.image("tiles", "/tilesets/albion_tileset.png");
     this.load.spritesheet(SPRITE_ID, "/player/player_movement.png", {
