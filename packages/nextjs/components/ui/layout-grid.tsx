@@ -34,14 +34,17 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
             onClick={() => handleClick(card)}
             className={cn(
               card.className,
-              "relative overflow-hidden shadow-2xl border-4 border-black",
+              "relative overflow-hidden",
               selected?.id === card.id
-                ? "rounded-lg cursor-pointer  shadow-2xl border-2 border-white absolute inset-0 h-1/2 w-full md:w-1/2 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
+                ? "rounded-lg cursor-pointer drop-shadow-[0_0_40px_rgba(0,0,0,0.5)] border-2 border-white absolute inset-0 h-1/2 w-full md:w-1/2 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
                 : lastSelected?.id === card.id
                   ? "z-40 bg-white rounded-xl h-full w-full"
                   : "bg-white rounded-xl h-full w-full",
             )}
             layoutId={`card-${card.id}`}
+            style={{
+              filter: selected?.id === card.id ? "drop-shadow(0 0 30px rgba(0,0,0,1))" : "none",
+            }}
           >
             {selected?.id === card.id && <SelectedCard selected={selected} />}
             <ImageComponent card={card} />

@@ -58,16 +58,6 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-
-      {/* Divider */}
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="border-t border-amber-800 opacity-30 my-2"></div>
-      </div>
-
-      {/* Copyright */}
-      <div className="bg-amber-900 text-amber-200 text-center text-sm py-3">
-        © 2025 Greenwhistle. All rights reserved.
-      </div>
     </footer>
   );
 };
