@@ -177,7 +177,7 @@ export default class Player extends Character {
         const position = this.config.gridEngine.getPosition(SPRITE_ID);
 
         // Player has stopped at a new position
-        EventBus.emit("player-moved", position);
+        EventBus.emit("player-moved", { position, direction });
 
         // Check for any auto-interactions at this position (like picking up items)
         EventBus.emit("check-position-interactions", { position, direction });

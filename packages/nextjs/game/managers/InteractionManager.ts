@@ -603,13 +603,14 @@ export default class InteractionManager {
    * This highlights interactive objects and tiles around the player
    */
   private checkForNearbyInteractables(event: PlayerMovedEvent): void {
+    const { position } = event;
     // Clear previous highlights
     this.clearInteractionHighlights();
 
     // Get a 3x3 area around the player to check for interactable objects
     const range = 1;
-    for (let y = event.y - range; y <= event.y + range; y++) {
-      for (let x = event.x - range; x <= event.x + range; x++) {
+    for (let y = position.y - range; y <= position.y + range; y++) {
+      for (let x = position.x - range; x <= position.x + range; x++) {
         this.checkTileForInteractions({ x, y });
       }
     }
