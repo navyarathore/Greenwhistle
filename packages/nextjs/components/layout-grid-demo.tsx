@@ -5,7 +5,7 @@ import { LayoutGrid } from "./ui/layout-grid";
 
 export function LayoutGridDemo() {
   return (
-    <div className="h-screen bg-amber-200 py-20 w-full">
+    <div className="h-screen bg-[#1b1b1b] py-20 w-full">
       <LayoutGrid cards={cards} />
     </div>
   );

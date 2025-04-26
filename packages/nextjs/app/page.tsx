@@ -21,7 +21,7 @@ export default function Home() {
 
   const gameFeatures = [
     {
-      title: "🌾 Farming",
+      title: "Farming",
       description:
         "Till soil, plant crops, water them daily, and harvest when ready. Different crops have different growth times and values.",
       details: [
@@ -33,7 +33,7 @@ export default function Home() {
       variant: "blue",
     },
     {
-      title: "🏪 Marketplace",
+      title: "Marketplace",
       description: "Trade your harvested crops and items using Sepolia ETH. Buy seeds, tools, and special items.",
       details: [
         "Sell crops for Sepolia ETH",
@@ -45,7 +45,7 @@ export default function Home() {
       variant: "yellow",
     },
     {
-      title: "⚔️ Combat",
+      title: "Combat",
       description:
         "Engage in intense battles against wild creatures and enemies. Use your skills and weapons to survive and grow stronger.",
       details: [
@@ -57,7 +57,7 @@ export default function Home() {
       variant: "default",
     },
     {
-      title: "👥 NPCs",
+      title: "NPCs",
       description: "Interact with villagers to learn farming tips, get quests, and trade special items.",
       details: [
         "Talk to NPCs using 'E' key",
@@ -99,14 +99,14 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-amber-100 overflow-x-hidden">
+    <div className="min-h-screen bg-[#1b1b1b] overflow-x-hidden">
       {/* Hero Section with Parallax */}
       <div className="relative h-screen">
         {/* Parallax Background */}
         <div
           className="absolute inset-0 h-full w-full"
           style={{
-            backgroundImage: "url('/background.jpeg')",
+            backgroundImage: "url('/3.gif')",
             backgroundPosition: "center bottom",
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
@@ -147,35 +147,36 @@ export default function Home() {
       <LayoutGridDemo />
 
       {/* Welcome Section */}
-      <div className="bg-amber-200 py-16 px-4">
+      <div className="bg-[#1b1b1b] py-16 px-4">
         <div className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-6xl font-bold text-amber-900 text-center mb-8 font-['PixelGame']">
+          {/* <h2 className="text-6xl font-bold text-amber-900 text-center mb-8 font-['PixelGame']"> */}
+          <h2 className="text-6xl font-bold text-[#c6c607] text-center mb-8 font-['PixelHeading']">
             {" "}
             Welcome to Green Whistle{" "}
           </h2>
-          <p className="text-2xl text-amber-800 mb-6 text-center max-w-3xl font-serif mx-auto">
+          <p className="text-xl text-white font-['Montserrat-Medium'] mb-6 text-center max-w-3xl mx-auto">
             Dive into a vibrant world of farming, trading, and adventure. Grow your crops, catch fish, and trade with
             friends in this immersive pixelated universe.
           </p>
         </div>
 
         {/* Game Features Section */}
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-amber-900 text-center mb-12 font-serif">Game Features</h2>
+        <div className="max-w-7xl mt-20 mx-auto">
+          <h2 className="text-4xl font-[PixelHeading] text-[#c6c607] text-center mb-12 ">Game Features</h2>
 
           {/* Game Features Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {gameFeatures.map((feature, index) => (
               <motion.div
                 key={index}
-                className="bg-amber-100 p-6 rounded-3xl border-4 border-amber-800 shadow-lg"
+                className="bg-[#1a1c2c] p-6 "
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 * index }}
               >
-                <h3 className="text-xl font-bold text-amber-900 mb-3">{feature.title}</h3>
-                <p className="text-amber-800 mb-4">{feature.description}</p>
-                <ul className="list-disc list-inside text-amber-700 space-y-2">
+                <h3 className="text-xl font-bold text-[#c6c607] mb-3">{feature.title}</h3>
+                <p className="text-white mb-4">{feature.description}</p>
+                <ul className="list-disc list-inside text-white space-y-2">
                   {feature.details.map((detail, i) => (
                     <li key={i} className="pl-2">
                       {detail}
@@ -195,7 +196,7 @@ export default function Home() {
           >
             <motion.button
               onClick={() => setShowRules(!showRules)}
-              className="bg-amber-800 text-amber-100 py-3 px-6 rounded-lg border-2 border-amber-900 font-bold"
+              className="bg-[#1a1c2c] text-white py-3 px-6 font-bold"
               whileHover={{ scale: 1.05 }}
             >
               {showRules ? "Hide Game Controls" : "Show Game Controls"}
@@ -214,13 +215,13 @@ export default function Home() {
                     {gameControls.map((control, index) => (
                       <motion.div
                         key={index}
-                        className="bg-amber-100 p-6 rounded-3xl border-4 border-amber-800 shadow-lg"
+                        className="bg-[#1a1c2c] p-6"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 * index }}
                       >
-                        <h3 className="text-xl font-bold text-amber-900 mb-3">{control.title}</h3>
-                        <ul className="list-disc list-inside text-amber-700 space-y-2">
+                        <h3 className="text-xl font-bold align-left text-left text-[#c6c607] mb-3">{control.title}</h3>
+                        <ul className="align-left text-left ml-[-8px] space-y-2 text-white">
                           {control.details.map((detail, i) => (
                             <li key={i} className="pl-2">
                               {detail}

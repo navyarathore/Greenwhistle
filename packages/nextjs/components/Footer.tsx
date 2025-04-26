@@ -5,7 +5,8 @@ import AnimatedTooltipPreview from "./animated-tooltip-demo";
 
 export const Footer = () => {
   return (
-    <footer className="bg-gradient-to-b from-amber-200 to-amber-300 text-amber-900">
+    // <footer className="bg-gradient-to-b from-amber-200 to-amber-300 text-amber-900">
+    <footer className="bg-[#1b1b1b] text-white">
       {/* Main footer content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -25,11 +26,11 @@ export const Footer = () => {
           {/* Center - Game info and navigation */}
           <div className="w-full md:w-2/5 flex flex-col items-center text-center gap-4">
             <div className="mb-2">
-              <h2 className="text-2xl font-bold mb-3 text-amber-900">Adventure Awaits</h2>
-              <span className="text-amber-900 font-bold whitespace-nowrap block mb-4">
+              <h2 className="text-2xl font-bold mb-3 font-['PixelHeading'] text-[#c6c607]">Adventure Awaits</h2>
+              <span className="text-white font-['Montserrat-Medium'] whitespace-nowrap block mb-4">
                 Craft Your Tools, Build Your World, Live the Adventure.
               </span>
-              <p className="text-md text-amber-800 mb-4">
+              <p className="text-sm font-['Montserrat-Medium'] text-white mb-4">
                 Explore the magical world of Greenwhistle where blockchain meets fantasy. Collect unique heroes, battle
                 in tournaments, and trade legendary artifacts in this immersive gaming experience.
               </p>
@@ -45,7 +46,7 @@ export const Footer = () => {
                     <Link
                       key={link.path}
                       href={link.path}
-                      className="text-amber-900 hover:text-amber-600 font-bold px-3 py-2 rounded-lg hover:bg-amber-100 transition-all"
+                      className="text-[#c6c607] hover:text-[#1a1c2c] font-bold px-3 py-2 rounded-lg hover:bg-[#c6c607] transition-all"
                     >
                       {link.name}
                     </Link>

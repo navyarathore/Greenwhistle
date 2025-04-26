@@ -67,10 +67,10 @@ export const OnchainKitCustomConnectButton = () => {
   return (
     <Wallet>
       {/* Display balance and network same as original */}
-      <div className="flex text-black items-center gap-1">
-        <div className="flex flex-col items-center mr-1 text-black">
-          <EthBalance address={address} className="min-h-0 text-black h-auto" />
-          <span className="text-xs text-black">{chain.name}</span>
+      <div className="flex text-white items-center gap-1 p-2 ">
+        <div className="flex flex-col items-center mr-1 text-white">
+          <EthBalance address={address} className="min-h-0 text-white h-auto" />
+          <span className="text-xs text-white">{chain.name}</span>
         </div>
 
         <div className="flex text-white items-center gap-1">

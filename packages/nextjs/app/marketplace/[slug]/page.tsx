@@ -47,6 +47,26 @@ import { Item, getItemBySlug } from "../types/item";
 
 // app/marketplace/[slug]/page.tsx
 
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
+// app/marketplace/[slug]/page.tsx
+
 export default function ItemDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -152,7 +172,7 @@ export default function ItemDetailPage() {
   const rarityStyles = item.rarity ? getRarityStyles(item.rarity) : getRarityStyles("common");
 
   return (
-    <div className="bg-amber-300 text-amber-900 min-h-screen p-4 font-mono">
+    <div className="bg-[#1b1b1b] text-white min-h-screen p-4 font-mono">
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumb */}
         <div className="mb-6 text-sm bg-amber-200 p-3 rounded-lg shadow-md inline-block">
@@ -167,13 +187,13 @@ export default function ItemDetailPage() {
             {item.game}
           </Link>
           <span className="mx-2 text-amber-500">&gt;</span>
-          <span className="font-bold text-amber-900">{item.name}</span>
+          <span className="font-bold text-amber-800">{item.name}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Item Image with Frame */}
           <div
-            className="bg-amber-200 p-6 rounded-xl shadow-md border-2 border-amber-400 flex flex-col"
+            className="bg-[#1a1c2c] p-6 rounded-xl shadow-md border-2 border-amber-400 flex flex-col"
             style={{ imageRendering: "pixelated" }}
           >
             <div
@@ -203,13 +223,9 @@ export default function ItemDetailPage() {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-2 mt-auto">
-              <div className="bg-amber-100 p-3 rounded text-center shadow-inner border border-amber-300">
+              <div className="bg-amber-100 mb-[300px] rounded text-center shadow-inner border border-amber-300">
                 <p className="text-xs text-amber-700 mb-1">Quantity</p>
                 <p className="text-lg font-bold text-amber-900">{item.quantity.toLocaleString()}</p>
-              </div>
-              <div className="bg-amber-100 p-3 rounded text-center shadow-inner border border-amber-300">
-                <p className="text-xs text-amber-700 mb-1">Game</p>
-                <p className="text-lg font-bold text-amber-900 truncate">{item.game}</p>
               </div>
             </div>
           </div>
@@ -217,31 +233,33 @@ export default function ItemDetailPage() {
           {/* Item Details with Tabs */}
           <div className="lg:col-span-2 flex flex-col">
             {/* Item Header */}
-            <div className="bg-amber-200 p-6 rounded-xl shadow-md border-2 border-amber-400 mb-6">
+            <div className="bg-[#1a1c2c] p-6 rounded-2xl shadow-lg border-2 border-amber-400 mb-6">
               <div className="flex justify-between items-start mb-6">
+                {/* Item Name */}
                 <div>
                   <h1
-                    className="text-3xl font-extrabold text-amber-900"
-                    style={{ textShadow: "1px 1px 0 rgba(251,191,36,0.3)" }}
+                    className="text-3xl font-['PixelHeading'] text-white"
+                    style={{ textShadow: "1px 1px 0 rgba(251,191,36,0.5)" }}
                   >
                     {item.name}
                   </h1>
-                  <p className="text-amber-700">{item.game}</p>
                 </div>
-                <div className="bg-gradient-to-r from-green-100 to-green-200 px-4 py-2 rounded shadow-md border border-green-300">
-                  <p className="text-xs text-green-800">Current Price</p>
-                  <p className="text-xl font-mono font-bold text-green-900">
+
+                {/* Price Box */}
+                <div className="bg-gradient-to-r from-green-100 to-green-200 px-5 py-3 rounded-lg shadow border border-green-300 text-right">
+                  <p className="text-xs text-green-700">Current Price</p>
+                  <p className="text-2xl font-mono font-extrabold text-green-900">
                     ${item.price.amount.toFixed(2)} {item.price.currency}
                   </p>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4 mt-4">
-                <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded shadow-md transition-all duration-150 flex-1">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow transition-all duration-150 flex-1">
                   Mint Now
                 </button>
-                <button className="bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold py-3 px-6 rounded shadow-md transition-all duration-150 border border-amber-500 flex-1">
+                <button className="bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold py-3 px-6 rounded-lg shadow transition-all duration-150 border border-amber-500 flex-1">
                   Add to Wishlist
                 </button>
               </div>
@@ -251,40 +269,28 @@ export default function ItemDetailPage() {
             <div className="flex border-b-2 border-amber-400 mb-6">
               <button
                 onClick={() => setActiveTab("details")}
-                className={`py-2 px-4 font-bold ${
-                  activeTab === "details"
-                    ? "text-amber-900 border-b-2 border-amber-500 -mb-0.5"
-                    : "text-amber-700 hover:text-amber-800"
-                }`}
+                className={`py-2 px-4 font-bold ${activeTab === "details" ? "text-[#c6c607] -mb-0.5" : "text-[white]"}`}
               >
                 Details
               </button>
               <button
                 onClick={() => setActiveTab("history")}
-                className={`py-2 px-4 font-bold ${
-                  activeTab === "history"
-                    ? "text-amber-900 border-b-2 border-amber-500 -mb-0.5"
-                    : "text-amber-700 hover:text-amber-800"
-                }`}
+                className={`py-2 px-4 font-bold ${activeTab === "history" ? "text-[#c6c607] -mb-0.5" : "text-[white]"}`}
               >
                 Market History
               </button>
             </div>
 
             {/* Tab Content */}
-            <div className="bg-amber-200 p-6 rounded-xl shadow-md border-2 border-amber-400 flex-grow">
+            <div className="bg-[#1a1c2c] p-6 rounded-xl shadow-md border-2 border-amber-400 flex-grow">
               {activeTab === "details" && (
                 <div>
-                  <h3 className="text-xl font-bold mb-4 text-amber-800 border-b border-amber-300 pb-2">
-                    Item Description
-                  </h3>
-                  <p className="text-amber-900 text-base leading-relaxed mb-6">
+                  <h3 className="text-xl font-bold mb-4 text-white border-b border-amber-300 pb-2">Item Description</h3>
+                  <p className="text-white text-base leading-relaxed mb-6">
                     {item.description || "No description available for this item."}
                   </p>
 
-                  <h3 className="text-xl font-bold mb-4 text-amber-800 border-b border-amber-300 pb-2">
-                    Item Properties
-                  </h3>
+                  <h3 className="text-xl font-bold mb-4 text-white border-b border-amber-300 pb-2">Item Properties</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-amber-100 p-3 rounded shadow-inner border border-amber-300">
                       <p className="text-amber-700 text-sm">Type</p>
@@ -312,7 +318,7 @@ export default function ItemDetailPage() {
                 <div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="text-xl font-bold mb-4 text-amber-800 border-b border-amber-300 pb-2">
+                      <h3 className="text-xl font-bold mb-4 text-white border-b border-amber-300 pb-2">
                         Price History
                       </h3>
                       <div className="bg-white h-64 rounded shadow-md border border-amber-300 p-4">
@@ -358,19 +364,19 @@ export default function ItemDetailPage() {
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold mb-4 text-amber-800 border-b border-amber-300 pb-2">
+                      <h3 className="text-xl font-bold mb-4  text-white border-b border-amber-300 pb-2">
                         Recent Sales
                       </h3>
                       <div className="bg-white rounded shadow-md border border-amber-300">
                         <table className="w-full font-mono text-sm">
                           <thead>
-                            <tr className="text-left text-amber-700 border-b border-amber-300">
+                            <tr className="text-left text-white border-b border-amber-300">
                               <th className="p-3">Date</th>
                               <th className="p-3">Buyer</th>
                               <th className="p-3 text-right">Price</th>
                             </tr>
                           </thead>
-                          <tbody>
+                          <tbody className="text-amber-900">
                             <tr className="border-b border-amber-200 hover:bg-amber-100">
                               <td className="p-3">Apr 22, 2025</td>
                               <td className="p-3 text-amber-800">Pixel_Hero</td>

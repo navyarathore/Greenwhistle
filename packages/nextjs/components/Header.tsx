@@ -52,7 +52,8 @@ export const Header = () => {
   );
 
   return (
-    <div className="top-0 w-full navbar min-h-0 z-50 px-4 py-2 bg-amber-200 bg-opacity-95 border-b-2 border-amber-800 flex items-center justify-between relative">
+    <div className="top-0 w-full navbar min-h-0 z-50 px-4 py-2 bg-[#1b1b1b] bg-opacity-95 flex items-center justify-between relative">
+      {/* <div className="top-0 w-full navbar min-h-0 z-50 px-4 py-2 bg-amber-200 bg-opacity-95 border-b-2 border-amber-800 flex items-center justify-between relative"> */}
       {/* Left - Logo */}
       <div className="flex items-center">
         <Link href="/" passHref className="flex items-center gap-3 shrink-0">
@@ -60,7 +61,7 @@ export const Header = () => {
             alt="Greenwhistle Logo"
             width={200}
             height={100}
-            className="h-16 w-[120px] rounded-lg transform hover:scale-105 transition"
+            className="h-16 w-[108px]  aspect-square rounded-lg transform hover:scale-105 transition"
             src="/logo.png"
           />
         </Link>
@@ -72,8 +73,9 @@ export const Header = () => {
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-amber-900 font-semibold hover:bg-amber-300 border-2 border-transparent hover:border-amber-800 transition-all ${
-              pathname === link.href ? "bg-amber-300 border-amber-800 font-bold" : ""
+            // className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold hover:bg-amber-300 border-2 border-transparent hover:border-amber-800 transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[#c6c607] font-semibold hover:bg-[#c6c607] hover:text-[#1a1c2c] border-2 border-transparent hover:border-[#1a1c2c] transition-all ${
+              pathname === link.href ? "bg-[#1a1c2c] border-amber-800 font-bold" : ""
             }`}
           >
             {link.icon}
@@ -84,14 +86,10 @@ export const Header = () => {
 
       {/* Right - Wallet Connection */}
       <div className="flex items-center gap-3">
-        <div className="bg-amber-300 p-1.5 rounded-lg border-2 border-amber-800 shadow-md hover:bg-amber-400 transition-colors">
+        <div className="rounded-lg border-2 shadow-md transition-colors">
           <OnchainKitCustomConnectButton />
         </div>
-        {isLocalNetwork && (
-          <div className="bg-amber-300 p-1.5 rounded-lg border-2 border-amber-800 shadow-md hover:bg-amber-400 transition-colors">
-            <FaucetButton />
-          </div>
-        )}
+        {isLocalNetwork && <FaucetButton />}
       </div>
     </div>
   );
