@@ -2,7 +2,7 @@
 
 # 🚀 Greenwhistle
 
-> A one-line tagline or mission statement for your project.
+> Craft Your Tools, Build Your World, Live the Adventure.
 
 ---
 
