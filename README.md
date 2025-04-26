@@ -40,19 +40,25 @@ Briefly describe the real-world use case and the value it provides.
 
 ### Core Technologies Used:
 - Frontend:
+    1. Next.js
+    2. TailwindCSS
 - Backend:
-- Database:
-- APIs:
-- Hosting:
+  1. Solidity
+  2. Ether.js
+  3. Monad Blockchain Network
+- Game Development:
+  1. Phaser
+  2. Grid Engine
+- Wallet Integration:
+  1. Base OnChainKit
 
 ### Sponsor Technologies Used (if any):
 - [ ] **Groq:** _How you used Groq_  
-- [ ] **Monad:** _Your blockchain implementation_  
+- [✅] **Monad:** _Your blockchain implementation_  
 - [ ] **Fluvio:** _Real-time data handling_  
-- [ ] **Base:** _AgentKit / OnchainKit / Smart Wallet usage_  
+- [✅] **Base:** _AgentKit / OnchainKit / Smart Wallet usage_  
 - [ ] **Screenpipe:** _Screen-based analytics or workflows_  
 - [ ] **Stellar:** _Payments, identity, or token usage_
-*(Mark with ✅ if completed)*
 ---
 
 ## ✨ Key Features
@@ -77,11 +83,9 @@ Add images, GIFs, or screenshots if helpful!
 
 ## ✅ Tasks & Bonus Checklist
 
-- [ ] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form** (Details in Participant Manual)  
+- [✅] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form** (Details in Participant Manual)  
 - [ ] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**  (Details in Participant Manual)
 - [ ] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**  (Details in Participant Manual)
-
-*(Mark with ✅ if completed)*
 
 ---
 
