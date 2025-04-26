@@ -1,5 +1,4 @@
 import { Position } from "grid-engine";
-import * as Phaser from "phaser";
 
 interface LayerMapping {
   from: number;
@@ -57,6 +56,26 @@ export const getTileRecursivelyAt = (
 
     return null;
   });
+};
+
+export const getMultipleTileRecursivelyAt = (
+  position: Position,
+  tilemap: Phaser.Tilemaps.Tilemap,
+  layers: string[],
+  nonNull?: boolean,
+): Phaser.Tilemaps.Tile[] => {
+  return layers.reduce<Phaser.Tilemaps.Tile[]>((tiles, layer) => {
+    return loopLayerRecursively(tilemap, layer, (layers, _) => {
+      for (const layer of layers) {
+        const tile = tilemap.getTileAt(position.x, position.y, nonNull, layer);
+        if (tile) {
+          tiles.push(tile);
+        }
+      }
+
+      return tiles;
+    });
+  }, []);
 };
 
 export const removeTileRecursivelyAt = (

@@ -6,6 +6,7 @@ import { Scene } from "phaser";
 import { loadLayerMapping } from "~~/game/utils/layer-utils";
 
 export const MAP_SCALE = 3;
+export const COLLISION_LAYER = "Collision Layer";
 
 export default class Game extends Scene {
   camera!: Phaser.Cameras.Scene2D.Camera;
@@ -57,7 +58,6 @@ export default class Game extends Scene {
       },
     );
 
-    console.log(this.map.getTileLayerNames());
     loadLayerMapping(this.map);
 
     this.scene.launch("HUD", {

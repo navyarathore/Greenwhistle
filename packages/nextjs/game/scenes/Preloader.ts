@@ -57,13 +57,18 @@ export class Preloader extends Scene {
   preload() {
     this.load.setPath("assets");
     this.load.image("start_button", "/start2.png");
-    // this.load.image("logo", "/logo.png");
+
     this.load.tilemapTiledJSON("map", "/maps/albion.json");
     this.load.image("tiles", "/tilesets/albion_tileset.png");
     this.load.spritesheet(SPRITE_ID, "/player/player_movement.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
+    this.load.spritesheet("ori_actions", "/player/player_actions.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
     // Load HUD assets
     this.load.image("heart-full", "/ui/heart-full.png");
     this.load.image("heart-empty", "/ui/heart-empty.png");
@@ -104,6 +109,23 @@ export class Preloader extends Scene {
         }),
         frameRate: 20,
         repeat: -1,
+      });
+    });
+
+    const tools = ["water", "pickaxe", "hoe", "axe"];
+    tools.forEach((tool, i) => {
+      animations.forEach((anim, j) => {
+        this.anims.create({
+          key: `ori-${tool}-${anim}`,
+          frames: [
+            { key: "ori_actions", frame: i * 8 + j },
+            { key: "ori_actions", frame: i * 8 + j + 4 },
+          ],
+          frameRate: 15,
+          repeat: 0,
+          yoyo: true,
+          duration: 300, // Total animation duration in ms
+        });
       });
     });
 

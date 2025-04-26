@@ -19,7 +19,7 @@ export type MaterialIcon = {
 export interface Material {
   id: string;
   name: string;
-  type: MaterialCategory;
+  category: MaterialCategory;
   icon: MaterialIcon;
   description?: string;
   stackable: boolean;
@@ -45,7 +45,7 @@ export class Item {
   }
 
   get category(): MaterialCategory {
-    return this.type.type;
+    return this.type.category;
   }
 
   get description(): string | undefined {

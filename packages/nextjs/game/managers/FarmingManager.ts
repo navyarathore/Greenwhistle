@@ -73,7 +73,7 @@ export default class FarmingManager {
       const cropId = seed.id.replace("seed_", "crop_");
       const crop = this.materialManager.getMaterial(cropId);
 
-      if (crop && crop.type === MaterialCategory.CROP) {
+      if (crop && crop.category === MaterialCategory.CROP) {
         // Register the crop with default values
         this.registerCrop({
           seedId: seed.id,

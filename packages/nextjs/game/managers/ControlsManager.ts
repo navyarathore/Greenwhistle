@@ -1,6 +1,7 @@
 import GridEngine, { Direction, Position } from "grid-engine";
 import * as Phaser from "phaser";
 import { EventBus } from "~~/game/EventBus";
+import { HotbarSelectionChangedEvent } from "~~/game/EventTypes";
 import SystemManager from "~~/game/SystemManager";
 import { SPRITE_ID } from "~~/game/entities/Player";
 import InputComponent from "~~/game/input/InputComponent";
@@ -35,88 +36,7 @@ export default class ControlsManager {
 
     // Action key
     this.inputComponent.actionKey.on("up", () => {
-      const playerPosition = this.gridEngine.getPosition(SPRITE_ID);
-
-      for (const res of ResourceData.pickup) {
-        const { layer, id, method, result } = res;
-        const tile = getTileRecursivelyAt(playerPosition, this.game.map, layer, false);
-
-        if (tile && id.includes(tile.index)) {
-          const combined: Map<number, string> = new Map(
-            ResourceData.combined_blocks
-              .filter(block => Object.keys(block).includes(String(tile.index)))
-              .flatMap(block => Object.entries(block))
-              .map(([key, value]) => [parseInt(key), value as string]),
-          );
-          // collision tiles
-          combined.set(403, "Height 0");
-          combined.set(404, "Height 0");
-          combined.set(405, "Height 0");
-          combined.set(454, "Height 0");
-          const layers = new Set(combined.values());
-
-          const delta = [
-            [1, 0],
-            [-1, 0],
-            [0, 1],
-            [0, -1],
-          ];
-          const checkTiles = (
-            x: number,
-            y: number,
-            layer: string,
-            visited: Set<string>,
-            positions: Array<Position & { layer: string }> = [],
-          ): Array<Position & { layer: string }> => {
-            const key = `${x}:${y}`;
-            if (visited.has(key)) return positions;
-
-            visited.add(key);
-            positions.push({ x, y, layer });
-
-            for (const [dx, dy] of delta) {
-              const nextX = x + dx;
-              const nextY = y + dy;
-              for (const l of layers) {
-                const nextTile = getTileRecursivelyAt({ x: nextX, y: nextY }, this.game.map, l, false);
-                if (nextTile && combined.get(nextTile.index) === l) {
-                  checkTiles(nextX, nextY, nextTile.layer.name, visited, positions);
-                  break;
-                }
-              }
-            }
-
-            return positions;
-          };
-
-          const toRemove = checkTiles(tile.x, tile.y, tile.layer.name, new Set<string>());
-
-          const toAdd: Item[] = [];
-          if (method === "random") {
-            const randomResult = Phaser.Math.RND.pick(result);
-            toAdd.push(new Item(this.sysManager.materialManager.getMaterial(randomResult.id)!, randomResult.amount));
-          } else if (method === "direct") {
-            toAdd.push(
-              ...result.map(res => new Item(this.sysManager.materialManager.getMaterial(res.id)!, res.amount)),
-            );
-          }
-
-          const added = this.sysManager.inventoryManager.addItems(toAdd);
-          if (!added) return;
-
-          for (const { x, y, layer } of toRemove) {
-            this.game.map.removeTileAt(x, y, false, true, layer);
-          }
-
-          EventBus.emit("item-picked-up", {
-            items: toAdd,
-            position: playerPosition,
-            layer,
-            actualLayer: tile.layer.name,
-          });
-          break;
-        }
-      }
+      this.sysManager.interactionManager.pickupItem();
     });
 
     // Hotbar number keys (1-5)
@@ -142,17 +62,12 @@ export default class ControlsManager {
     });
 
     // Listen for hotbar selection changes to handle item usage
-    EventBus.on("hotbar-selection-changed", _ => {
-      this.handleHotbarSelection();
-    });
-
-    // Check for hotbar keys at regular intervals
-    this.game.events.on("update", this.checkHotbarKeyPresses, this);
+    EventBus.on("hotbar-selection-changed", this.handleHotbarSelection.bind(this));
   }
 
-  private handleHotbarSelection(): void {
+  private handleHotbarSelection(event: HotbarSelectionChangedEvent): void {
     // Get the currently selected hotbar slot
-    const selectedSlot = this.game.player.selectedHotbarSlot;
+    const selectedSlot = event.slotIndex;
 
     // Get the selected item from the inventory system
     const inventorySystem = this.sysManager.inventoryManager;
@@ -164,31 +79,6 @@ export default class ControlsManager {
         slotIndex: selectedSlot,
         item: selectedItem,
       });
-    }
-  }
-
-  /**
-   * Use the item from the specified hotbar slot
-   * @param slotIndex The index of the hotbar slot containing the item to use
-   * @param item The item to use
-   */
-  private useHotbarItem(slotIndex: number, item: Item): void {
-    console.log(`Using item ${item.id} from hotbar slot ${slotIndex + 1}`);
-
-    // Different behavior based on item type
-    switch (item.type.type) {
-      case MaterialCategory.TOOL:
-        this.useToolItem(item);
-        break;
-      case MaterialCategory.CONSUMABLE:
-        this.useConsumableItem(item);
-        break;
-      case MaterialCategory.FURNITURE:
-        this.usePlaceableItem(item);
-        break;
-      default:
-        console.log(`Item ${item.id} cannot be used directly`);
-        break;
     }
   }
 
@@ -272,46 +162,32 @@ export default class ControlsManager {
     });
   }
 
-  /**
-   * Check for hotbar key presses during the game update cycle
-   */
-  private checkHotbarKeyPresses(): void {
-    // We only check for hotbar keys if movement is enabled
-    if (!this.game.player.isMovementEnabled) return;
+  update(): void {
+    if (this.game.player.isMovementEnabled) {
+      // Check for movement input
+      if (this.inputComponent.isUpDown) {
+        this.gridEngine.move(SPRITE_ID, Direction.UP);
+      } else if (this.inputComponent.isDownDown) {
+        this.gridEngine.move(SPRITE_ID, Direction.DOWN);
+      } else if (this.inputComponent.isLeftDown) {
+        this.gridEngine.move(SPRITE_ID, Direction.LEFT);
+      } else if (this.inputComponent.isRightDown) {
+        this.gridEngine.move(SPRITE_ID, Direction.RIGHT);
+      }
+    }
 
-    // Check each hotbar key
     for (let i = 0; i < this.inputComponent.hotbarKeys.length; i++) {
       if (this.inputComponent.isHotbarKeyJustDown(i)) {
         this.game.player.selectedHotbarSlot = i;
       }
     }
-  }
-
-  update(): void {
-    if (!this.game.player.isMovementEnabled) return;
-
-    // Check for movement input
-    if (this.inputComponent.isUpDown) {
-      this.gridEngine.move(SPRITE_ID, Direction.UP);
-    } else if (this.inputComponent.isDownDown) {
-      this.gridEngine.move(SPRITE_ID, Direction.DOWN);
-    } else if (this.inputComponent.isLeftDown) {
-      this.gridEngine.move(SPRITE_ID, Direction.LEFT);
-    } else if (this.inputComponent.isRightDown) {
-      this.gridEngine.move(SPRITE_ID, Direction.RIGHT);
-    }
 
     // Check for item use key press
     if (this.inputComponent.isItemUseKeyJustDown) {
-      // Get the currently selected hotbar slot
       const selectedSlot = this.game.player.selectedHotbarSlot;
-
-      // Get the item directly from inventory
       const selectedItem = this.sysManager.inventoryManager.getHotbarItem(selectedSlot);
-
-      // Use the item if one exists
       if (selectedItem) {
-        this.useHotbarItem(selectedSlot, selectedItem);
+        this.sysManager.interactionManager.useHotbarItem(selectedSlot, selectedItem);
       }
     }
   }

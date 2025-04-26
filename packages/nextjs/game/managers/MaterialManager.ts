@@ -19,7 +19,7 @@ export default class MaterialManager {
           ...itemData,
           id: id,
           name: itemData.name,
-          type: itemData.type
+          category: itemData.type
             ? MaterialCategory[itemData.type.toUpperCase() as keyof typeof MaterialCategory]
             : MaterialCategory.OTHER,
           stackable: itemData.stackable !== undefined ? itemData.stackable : true,
@@ -58,6 +58,6 @@ export default class MaterialManager {
    * Get materials by type
    */
   public getMaterialByCategory(type: MaterialCategory): Material[] {
-    return this.getAllMaterials().filter(item => item.type === type);
+    return this.getAllMaterials().filter(item => item.category === type);
   }
 }
