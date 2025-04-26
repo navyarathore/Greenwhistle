@@ -9,7 +9,6 @@ export default function MarketplacePage() {
   const items = getItems();
   const [searchTerm, setSearchTerm] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [activeTab, setActiveTab] = useState("popular");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -211,7 +210,7 @@ export default function MarketplacePage() {
                     >
                       <div className="col-span-6 md:col-span-7 flex items-center">
                         <div className="h-16 w-16 relative mr-20 overflow-hidden">
-                          <Image src={item.imageUrl} alt={item.name} layout="fill" objectFit="contain" />
+                          <Image src={item.imageUrl} alt={item.name} fill objectFit="contain" />
                         </div>
                         <div>
                           <h3 className="font-bold text-[#c6c607] group-hover:text-[#1a1c2c]">{item.name}</h3>

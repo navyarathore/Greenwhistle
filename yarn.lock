@@ -975,6 +975,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dimforge/rapier3d-compat@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "@dimforge/rapier3d-compat@npm:0.12.0"
+  checksum: 86cb3b39925673761aa5dca5429ca44e0c7ac8072472cca925e2ca732be695292e318501a2ab39110be1549d4f143a0af0620246657f76570c8cdd1b0b3df36c
+  languageName: node
+  linkType: hard
+
 "@ecies/ciphers@npm:^0.2.2":
   version: 0.2.3
   resolution: "@ecies/ciphers@npm:0.2.3"
@@ -4022,8 +4029,8 @@ __metadata:
   linkType: hard
 
 "@react-three/drei@npm:^10.0.6":
-  version: 10.0.6
-  resolution: "@react-three/drei@npm:10.0.6"
+  version: 10.0.7
+  resolution: "@react-three/drei@npm:10.0.7"
   dependencies:
     "@babel/runtime": ^7.26.0
     "@mediapipe/tasks-vision": 0.10.17
@@ -4041,7 +4048,7 @@ __metadata:
     suspend-react: ^0.1.3
     three-mesh-bvh: ^0.8.3
     three-stdlib: ^2.35.6
-    troika-three-text: ^0.52.0
+    troika-three-text: ^0.52.4
     tunnel-rat: ^0.1.2
     use-sync-external-store: ^1.4.0
     utility-types: ^3.11.0
@@ -4054,7 +4061,7 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 89c52aeae81f1f48cf2bd5aa5ddd22a90c1dfafc4aaf1d4dbd8db91539f836e93b5572d01060f4c8286266603affa73c849a7e016d7bb48b318caaefaf61db7c
+  checksum: 12b1f82903b70c5af5c499317f04b40d59ba69c3e983395552c5f2efd035547ca8f331d51faece98b0bac8e9d21336574b7947a0fe6c7b72e2089789f88a0f30
   languageName: node
   linkType: hard
 
@@ -5824,7 +5831,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/three@npm:*, @types/three@npm:^0":
+"@types/three@npm:*":
+  version: 0.176.0
+  resolution: "@types/three@npm:0.176.0"
+  dependencies:
+    "@dimforge/rapier3d-compat": ^0.12.0
+    "@tweenjs/tween.js": ~23.1.3
+    "@types/stats.js": "*"
+    "@types/webxr": "*"
+    "@webgpu/types": "*"
+    fflate: ~0.8.2
+    meshoptimizer: ~0.18.1
+  checksum: 84821e0c7ddf5cc7e7a17561631f4d6e91fc7377898ce4402f69f24dfce08ea875b527620fb3d2f9772d0440cbbee6da97819cdb3a63f368aac284b8a10c9cbe
+  languageName: node
+  linkType: hard
+
+"@types/three@npm:^0":
   version: 0.175.0
   resolution: "@types/three@npm:0.175.0"
   dependencies:
@@ -5845,10 +5867,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/webxr@npm:*, @types/webxr@npm:^0.5.2":
+"@types/webxr@npm:*":
   version: 0.5.21
   resolution: "@types/webxr@npm:0.5.21"
   checksum: a2b9a8689c286723990a31abed7d06de0f61940cc6d3c0179ec3fba660395a1562f1ec84d45140e451e253a107639042811e47e38a837d909e87df42adccffb3
+  languageName: node
+  linkType: hard
+
+"@types/webxr@npm:^0.5.2":
+  version: 0.5.22
+  resolution: "@types/webxr@npm:0.5.22"
+  checksum: 063dc810937058526476a7f38c87779a0e4fa1d2483f82c3fc713c9ea0c0e404f47e4ba0b08a3279a152ce37f0effcc30c0457642d9fd558dd511d9ce3f6f727
   languageName: node
   linkType: hard
 
@@ -18392,8 +18421,8 @@ __metadata:
   linkType: hard
 
 "three-stdlib@npm:^2.35.6":
-  version: 2.35.15
-  resolution: "three-stdlib@npm:2.35.15"
+  version: 2.35.16
+  resolution: "three-stdlib@npm:2.35.16"
   dependencies:
     "@types/draco3d": ^1.4.0
     "@types/offscreencanvas": ^2019.6.4
@@ -18403,7 +18432,7 @@ __metadata:
     potpack: ^1.0.1
   peerDependencies:
     three: ">=0.128.0"
-  checksum: 7c8e8b724a0710f39a018811bdcd4897e03b1513fef5267d17aabdad17974f259b9d935c322e99fc83193b06c023e12d588f23b880cd15f9ef20b2b903444325
+  checksum: 81da846ea8b027748e680b9e4625593f93b484e0e5e3e4bdf85ca3d380d8c2e0113082e8a8c08ca3b5137f899a393362720c122089ade366837fdac5d55224e3
   languageName: node
   linkType: hard
 
@@ -18562,7 +18591,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"troika-three-text@npm:^0.52.0":
+"troika-three-text@npm:^0.52.4":
   version: 0.52.4
   resolution: "troika-three-text@npm:0.52.4"
   dependencies:
