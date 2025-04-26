@@ -4285,6 +4285,7 @@ __metadata:
     hardhat-deploy: ~0.12.4
     hardhat-deploy-ethers: ~0.4.2
     hardhat-gas-reporter: ~2.2.1
+    openzeppelin: ^1.0.0
     prettier: ^3.5.3
     prettier-plugin-solidity: ~1.4.1
     qrcode: ~1.5.4
@@ -15340,6 +15341,15 @@ __metadata:
   dependencies:
     mimic-fn: ^4.0.0
   checksum: 0846ce78e440841335d4e9182ef69d5762e9f38aa7499b19f42ea1c4cd40f0b4446094c455c713f9adac3f4ae86f613bb5e30c99e52652764d06a89f709b3788
+  languageName: node
+  linkType: hard
+
+"openzeppelin@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "openzeppelin@npm:1.0.0"
+  bin:
+    openzeppelin-contracts-migrate-imports: scripts/migrate-imports.js
+  checksum: c35f67b29c9574487c6899f7792f09559d0f13d5bba427ca90f04d40318f1c0f5755f8f70f911f781c6781fb4c4ac7be7b3b0132cf9132dbf4a21e4981141cb4
   languageName: node
   linkType: hard
 

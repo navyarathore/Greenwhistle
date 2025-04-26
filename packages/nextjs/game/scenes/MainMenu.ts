@@ -19,7 +19,7 @@ export class MainMenu extends Scene {
     // this.logo = this.add.image(670, 180, "logo").setOrigin(0.5).setDepth(100);
 
     // Centered play button using an image
-    this.playButton = this.createImageButton(SCREEN_WIDTH / 2, 450, "start_button", () => this.changeScene());
+    this.playButton = this.createImageButton(650, 375, "start_button", () => this.changeScene());
 
     EventBus.emit("current-scene-ready", { scene: this });
   }
