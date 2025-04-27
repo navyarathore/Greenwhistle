@@ -42,33 +42,35 @@ Briefly describe the real-world use case and the value it provides.
 - Frontend:
     1. Next.js
     2. TailwindCSS
+    3. Framer Motion
 - Backend:
-  1. Solidity
-  2. Ether.js
-  3. Monad Blockchain Network
+    1. Solidity
+    2. Ether.js
+    3. Monad Blockchain Network
 - Game Development:
-  1. Phaser
-  2. Grid Engine
+    1. Phaser
+    2. Grid Engine
 - Wallet Integration:
-  1. Base OnChainKit
+    1. Base OnChainKit
+- Hosting:
+    1. Vercel
 
 ### Sponsor Technologies Used (if any):
-- [ ] **Groq:** _How you used Groq_  
-- [✅] **Monad:** _Your blockchain implementation_  
-- [ ] **Fluvio:** _Real-time data handling_  
+- [✅] **Monad:** _Your blockchain implementation_ 
 - [✅] **Base:** _AgentKit / OnchainKit / Smart Wallet usage_  
+- [ ] **Fluvio:** _Real-time data handling_  
+- [ ] **Groq:** _How you used Groq_  
 - [ ] **Screenpipe:** _Screen-based analytics or workflows_  
 - [ ] **Stellar:** _Payments, identity, or token usage_
 ---
 
 ## ✨ Key Features
 
-Highlight the most important features of your project:
-
-- ✅ Feature 1  
-- ✅ Feature 2  
-- ✅ Feature 3  
-- ✅ Feature 4  
+- ✅ **Immersive Blockchain Game Experience:** A farming/crafting game where players can build their virtual world
+- ✅ **Decentralized Marketplace:** Players can trade resources, tools, and NFTs in a decentralized marketplace powered by smart contracts
+- ✅ **High-Performance Gaming on Monad:** Utilizing Monad's high-throughput blockchain to enable smoother gameplay  
+- ✅ **Simplified Onboarding with Base Integration:** Using Bases's OnChainKit for seamless wallet connection and management
+- [:white_check_mark:] **Resource Gathering & Crafting:** Implementing a comprehensive system where players can gather resources in the game world and craft tools, items, and structures
 
 Add images, GIFs, or screenshots if helpful!
 
@@ -84,32 +86,41 @@ Add images, GIFs, or screenshots if helpful!
 ## ✅ Tasks & Bonus Checklist
 
 - [✅] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form** (Details in Participant Manual)  
-- [ ] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**  (Details in Participant Manual)
-- [ ] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**  (Details in Participant Manual)
+- [:white_check_mark:] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**  (Details in Participant Manual)
+- [:white_check_mark:] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**  (Details in Participant Manual)
 
 ---
 
 ## 🧪 How to Run the Project
 
 ### Requirements:
-- Node.js / Python / Docker / etc.
-- API Keys (if any)
-- .env file setup (if needed)
+- Node.js 
+- Yarn package manager
+
+### Contract Deployment
+```bash
+#start local blockchain
+cd packages/hardhat
+yarn chain
+
+#deploy contarcts in new terminal
+yarn deploy
+```
 
 ### Local Setup:
 ```bash
 # Clone the repo
-git clone https://github.com/your-team/project-name
+git clone https://github.com/navyarathore/greenwhistle
 
 # Install dependencies
-cd project-name
-npm install
+cd greenwistle/packages/nextjs
+yarn install
 
 # Start development server
-npm run dev
+yarn dev
 ```
 
-Provide any backend/frontend split or environment setup notes here.
+Navigate to https://localhost:3000 in your browser
 
 ---
 
@@ -125,9 +136,14 @@ List improvements, extensions, or follow-up features:
 
 ## 📎 Resources / Credits
 
-- APIs or datasets used  
-- Open source libraries or tools referenced  
-- Acknowledgements  
+- Scaffold-ETH 2
+- Phaser Game Framework
+- Grid Engine Plugin
+- OnChainKit by Base
+- TailwindCSS/DaisyUI 
+- Monad Blockchain
+- OpneZeppelin Contracts
+- Framer Motion
 
 ---
 
