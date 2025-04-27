@@ -72,29 +72,24 @@ export default function Home() {
   const gameControls = [
     {
       title: "Movement",
-      details: ["WASD or Arrow keys to move", "Hold Shift to run"],
+      details: ["W --> Move Up", "A --> Move Left", "S --> Move Down", "D --> Move Right"],
     },
     {
       title: "Actions",
-      details: ["E or Space to interact", "1-5 to select items", "I to open inventory"],
+      details: ["F To Collect Items", "E To Open Inventory", "Q To use the Tools"],
     },
     {
       title: "Tools",
       details: [
+        "Axe: Chop trees and collect wood",
+        "Pickaxe: Mine ores and stones",
         "Hoe: Till soil for planting",
-        "Watering Can: Water crops",
         "Seeds: Plant in tilled soil",
-        "Fishing Rod: Fish in water",
       ],
     },
     {
       title: "Tips",
-      details: [
-        "Water crops daily for faster growth",
-        "Check market prices before selling",
-        "Talk to NPCs for useful tips",
-        "Use the mini-map for navigation",
-      ],
+      details: ["Check market prices before selling"],
     },
   ];
 
@@ -235,6 +230,21 @@ export default function Home() {
               )}
             </AnimatePresence>
           </motion.div>
+        </div>
+      </div>
+      {/* YouTube Video Section */}
+      <div className="max-w-7xl mx-auto py-16 px-4">
+        <h2 className="text-4xl font-[PixelHeading] text-[#c6c607] text-center mb-12">Game Preview</h2>
+        <div className="relative w-full aspect-video">
+          <iframe
+            className="absolute top-0 left-0 w-full h-full"
+            src="https://www.youtube.com/embed/MTDZzDe7_Gc?si=406hL-dPwwKKvWOy"
+            title="Green Whistle Gameplay Preview"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
         </div>
       </div>
     </div>
