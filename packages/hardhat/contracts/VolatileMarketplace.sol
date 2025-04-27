@@ -224,83 +224,102 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
-     * @dev Buy a game item from the marketplace
-     * @param listingId The ID of the listing
-     * @param quantity The quantity to buy (must be <= listing quantity)
+     * @dev Buy multiple game items from the marketplace at once
+     * @param listingIds Array of listing IDs to purchase
+     * @param quantities Array of quantities to buy for each listing
      */
-    function buyGameItem(uint256 listingId, uint256 quantity) external payable whenNotPaused nonReentrant {
-        Listing storage listing = listings[listingId];
-
-        require(listing.active, "Listing is not active");
-        require(quantity > 0 && quantity <= listing.quantity, "Invalid quantity");
-        require(listing.seller != msg.sender, "Cannot buy your own listing");
-
-        uint256 totalPrice = listing.price * quantity;
-        uint256 fee = (totalPrice * marketplaceFeePercentage) / 10000;
-        uint256 sellerAmount = totalPrice - fee;
-
-        // Check if buyer has sent enough MON
-        require(msg.value >= totalPrice, "Insufficient funds sent");
-
-        // Transfer MON to seller and marketplace
-        (bool sellerTransferSuccess, ) = payable(listing.seller).call{value: sellerAmount}("");
-        require(sellerTransferSuccess, "MON transfer to seller failed");
+    function buyGameItems(uint256[] calldata listingIds, uint256[] calldata quantities) external payable whenNotPaused nonReentrant {
+        require(listingIds.length > 0, "Must provide at least one listing");
+        require(listingIds.length == quantities.length, "Arrays length mismatch");
         
-        (bool feeTransferSuccess, ) = payable(feeCollector).call{value: fee}("");
-        require(feeTransferSuccess, "Fee transfer failed");
-
+        uint256 totalCost = 0;
+        
+        // Calculate total cost first
+        for (uint256 i = 0; i < listingIds.length; i++) {
+            Listing storage listing = listings[listingIds[i]];
+            
+            require(listing.active, "Listing is not active");
+            require(quantities[i] > 0 && quantities[i] <= listing.quantity, "Invalid quantity");
+            require(listing.seller != msg.sender, "Cannot buy your own listing");
+            
+            totalCost += listing.price * quantities[i];
+        }
+        
+        // Check if buyer has sent enough MON
+        require(msg.value >= totalCost, "Insufficient funds sent");
+        
+        uint256 remainingValue = msg.value;
+        
+        // Process each purchase
+        for (uint256 i = 0; i < listingIds.length; i++) {
+            uint256 listingId = listingIds[i];
+            uint256 quantity = quantities[i];
+            Listing storage listing = listings[listingId];
+            
+            uint256 itemCost = listing.price * quantity;
+            uint256 fee = (itemCost * marketplaceFeePercentage) / 10000;
+            uint256 sellerAmount = itemCost - fee;
+            
+            // Transfer MON to seller and marketplace
+            (bool sellerTransferSuccess, ) = payable(listing.seller).call{value: sellerAmount}("");
+            require(sellerTransferSuccess, "MON transfer to seller failed");
+            
+            (bool feeTransferSuccess, ) = payable(feeCollector).call{value: fee}("");
+            require(feeTransferSuccess, "Fee transfer failed");
+            
+            remainingValue -= itemCost;
+            
+            // Update listing
+            if (quantity == listing.quantity) {
+                listing.active = false;
+                gameItemStats[listing.gameItemId].currentListings--;
+                
+                // Check if this was the last listing for this item and remove from unique items if so
+                if (gameItemStats[listing.gameItemId].currentListings == 0) {
+                    _removeUniqueGameItem(listing.gameItemId);
+                }
+                
+                // Update lowest price listing if this was the lowest price
+                if (lowestPriceListingForGameItem[listing.gameItemId] == listingId) {
+                    _recalculateLowestPriceGameItemListing(listing.gameItemId);
+                }
+            } else {
+                listing.quantity -= quantity;
+            }
+            
+            // Release item from escrow
+            bool released = _releaseGameItemFromEscrow(listing.seller, listing.gameItemId, quantity);
+            require(released, "Failed to release item from escrow");
+            
+            // Record sale in history
+            SaleRecord memory record = SaleRecord({ timestamp: block.timestamp, price: listing.price, quantity: quantity });
+            gameItemSaleHistory[listing.gameItemId].push(record);
+            
+            // Update market stats
+            MarketStats storage stats = gameItemStats[listing.gameItemId];
+            stats.totalVolume += itemCost;
+            stats.numberOfSales++;
+            stats.lastSoldPrice = listing.price;
+            
+            // Update highest/lowest price if applicable
+            if (listing.price > stats.highestPrice) {
+                stats.highestPrice = listing.price;
+            }
+            if (stats.lowestPrice == 0 || listing.price < stats.lowestPrice) {
+                stats.lowestPrice = listing.price;
+            }
+            
+            // Update average price (simple rolling average)
+            stats.avgSoldPrice = (stats.avgSoldPrice * (stats.numberOfSales - 1) + listing.price) / stats.numberOfSales;
+            
+            emit ItemSold(listingId, listing.seller, msg.sender, listing.gameItemId, listing.price, quantity);
+        }
+        
         // Refund excess MON if any
-        if (msg.value > totalPrice) {
-            (bool refundSuccess, ) = payable(msg.sender).call{value: msg.value - totalPrice}("");
+        if (remainingValue > 0) {
+            (bool refundSuccess, ) = payable(msg.sender).call{value: remainingValue}("");
             require(refundSuccess, "Refund of excess MON failed");
         }
-
-        // Update listing
-        if (quantity == listing.quantity) {
-            listing.active = false;
-            gameItemStats[listing.gameItemId].currentListings--;
-
-            // Check if this was the last listing for this item and remove from unique items if so
-            if (gameItemStats[listing.gameItemId].currentListings == 0) {
-                _removeUniqueGameItem(listing.gameItemId);
-            }
-
-            // Update lowest price listing if this was the lowest price
-            if (lowestPriceListingForGameItem[listing.gameItemId] == listingId) {
-                _recalculateLowestPriceGameItemListing(listing.gameItemId);
-            }
-        } else {
-            listing.quantity -= quantity;
-        }
-
-        // Release item from escrow
-        bool released = _releaseGameItemFromEscrow(listing.seller, listing.gameItemId, quantity);
-        require(released, "Failed to release item from escrow");
-
-        // Record sale in history
-        SaleRecord memory record = SaleRecord({ timestamp: block.timestamp, price: listing.price, quantity: quantity });
-        gameItemSaleHistory[listing.gameItemId].push(record);
-
-        // Update market stats
-        MarketStats storage stats = gameItemStats[listing.gameItemId];
-        stats.totalVolume += totalPrice;
-        stats.numberOfSales++;
-        stats.lastSoldPrice = listing.price;
-
-        // Update highest/lowest price if applicable
-        if (listing.price > stats.highestPrice) {
-            stats.highestPrice = listing.price;
-        }
-        if (stats.lowestPrice == 0 || listing.price < stats.lowestPrice) {
-            stats.lowestPrice = listing.price;
-        }
-
-        // Update average price (simple rolling average)
-        stats.avgSoldPrice = (stats.avgSoldPrice * (stats.numberOfSales - 1) + listing.price) / stats.numberOfSales;
-
-        // Update buyer's inventory (handled off-chain)
-
-        emit ItemSold(listingId, listing.seller, msg.sender, listing.gameItemId, listing.price, quantity);
     }
 
     /**
