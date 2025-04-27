@@ -97,6 +97,8 @@ Add images, GIFs, or screenshots if helpful!
 ![Alt Text](./packages/nextjs/public/5.png)
 ![Alt Text](./packages/nextjs/public/1.gif)
 ![Alt Text](./packages/nextjs/public/3.gif)
+[![Alt Text](./packages/nextjs/public/2.png)](https://youtu.be/4AXkOjrZsaI)
+
 ---
 
 ## 📽️ Demo & Deliverables
