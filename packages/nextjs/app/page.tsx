@@ -182,54 +182,60 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Game Controls Section */}
-          <motion.div
-            className="text-center mt-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <motion.button
-              onClick={() => setShowRules(!showRules)}
-              className="bg-[#1a1c2c] text-white py-3 px-6 font-bold"
-              whileHover={{ scale: 1.05 }}
-            >
-              {showRules ? "Hide Game Controls" : "Show Game Controls"}
-            </motion.button>
+          {/* Game Controls Section - Prominent Version */}
+          <div className="bg-[#2a2a2a] py-16 px-4 mt-16 border-t-2 border-b-2 border-[#c6c607]">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-4xl font-[PixelHeading] text-[#c6c607] text-center mb-12">Game Controls</h2>
 
-            <AnimatePresence>
-              {showRules && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="mt-6"
-                >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {gameControls.map((control, index) => (
-                      <motion.div
-                        key={index}
-                        className="bg-[#1a1c2c] p-6"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 * index }}
-                      >
-                        <h3 className="text-xl font-bold align-left text-left text-[#c6c607] mb-3">{control.title}</h3>
-                        <ul className="align-left text-left ml-[-8px] space-y-2 text-white">
-                          {control.details.map((detail, i) => (
-                            <li key={i} className="pl-2">
-                              {detail}
-                            </li>
-                          ))}
-                        </ul>
-                      </motion.div>
-                    ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {gameControls.map((control, index) => (
+                  <motion.div
+                    key={index}
+                    className="bg-[#1a1c2c] p-6 rounded-lg border-2 border-[#c6c607] hover:border-[#e6e600] 
+                    transition-all duration-300 hover:transform hover:scale-105"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * index }}
+                  >
+                    <div className="flex items-center mb-4">
+                      <h3 className="text-2xl font-bold text-[#c6c607]">{control.title}</h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {control.details.map((detail, i) => (
+                        <li key={i} className="flex items-center text-white text-lg">
+                          <span className="mr-2">→</span>
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Quick Reference */}
+              <div className="mt-12 bg-[#1a1c2c] p-6 rounded-lg border-2 border-[#c6c607]">
+                <h3 className="text-xl font-bold text-[#c6c607] mb-4 text-center">Quick Reference</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-white">
+                  <div>
+                    <span className="bg-[#c6c607] text-black px-2 py-1 rounded">W A S D</span>
+                    <span className="ml-2">Movement</span>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+                  <div>
+                    <span className="bg-[#c6c607] text-black px-2 py-1 rounded">E</span>
+                    <span className="ml-2">Inventory</span>
+                  </div>
+                  <div>
+                    <span className="bg-[#c6c607] text-black px-2 py-1 rounded">F</span>
+                    <span className="ml-2">Collect</span>
+                  </div>
+                  <div>
+                    <span className="bg-[#c6c607] text-black px-2 py-1 rounded">Q</span>
+                    <span className="ml-2">Use Tool</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       {/* YouTube Video Section */}
