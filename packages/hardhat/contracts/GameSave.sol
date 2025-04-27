@@ -146,7 +146,7 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
         address user,
         InventoryItem[] calldata _inventory
     ) external whenNotPaused nonReentrant {
-        require(marketplaceApprovals[user], "Marketplace approval required");
+        require(marketplaceApprovals[msg.sender], "Marketplace approval required");
         require(hasSave[user], "No save data found for this address");
 
         SaveData storage saveData = gameSaves[user];
