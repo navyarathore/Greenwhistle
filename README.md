@@ -91,6 +91,12 @@ The real-world value comes from creating a digital economy where players can ear
 
 Add images, GIFs, or screenshots if helpful!
 
+![Alt Text](./packages/nextjs/public/2.png)
+![Alt Text](./packages/nextjs/public/3.png)
+![Alt Text](./packages/nextjs/public/4.png)
+![Alt Text](./packages/nextjs/public/5.png)
+![Alt Text](./packages/nextjs/public/1.gif)
+![Alt Text](./packages/nextjs/public/3.gif)
 ---
 
 ## 📽️ Demo & Deliverables
@@ -144,7 +150,35 @@ Navigate to https://localhost:3000 in your browser
 
 List improvements, extensions, or follow-up features:
 
+1. **Multiplayer Features**
+   - Implement real-time player interaction
+   - Add cooperative farming and crafting mechanics
+   - Create player guilds and shared land ownership
+   - Social features like trading chat and friend lists
 
+2. **Enhanced Game Mechanics**
+   - Seasonal events and weather effects
+   - Advanced farming mechanics with crop diseases and fertilizers
+   - More complex crafting recipes and rare items
+   - Quest system with on-chain achievements
+
+3. **Economic Improvements**
+   - Implementation of lending/borrowing for in-game assets
+   - Automated Market Maker (AMM) for stable resource pricing
+   - Governance token for community-driven game decisions
+
+4. **Technical Enhancements**
+   - Layer 2 scaling solution integration for even faster transactions
+   - Cross-chain bridge support for multi-chain asset transfers
+   - Mobile-responsive game client
+   - Advanced anti-cheat mechanisms
+   - Performance optimizations for larger player base
+
+5. **Community Features**
+   - DAO for game governance decisions
+   - Community marketplace fee sharing
+   - Player-created content system
+   - Regular community events and competitions
 
 ---
 
