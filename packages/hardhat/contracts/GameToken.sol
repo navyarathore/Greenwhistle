@@ -10,14 +10,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract GameToken is ERC20, Ownable {
     uint8 private immutable _decimals;
-    
+
     // Additional user data structure
     struct UserData {
         uint256 totalEarned;
         uint256 totalSpent;
         uint256 lastUpdateTime;
     }
-    
+
     // Mapping to track additional user data
     mapping(address => UserData) private _userData;
 
@@ -36,7 +36,7 @@ contract GameToken is ERC20, Ownable {
     ) ERC20(name_, symbol_) Ownable(msg.sender) {
         _decimals = decimals_;
         _mint(msg.sender, initialSupply);
-        
+
         // Initialize user data for the initial holder
         _userData[msg.sender].totalEarned = initialSupply;
         _userData[msg.sender].lastUpdateTime = block.timestamp;
@@ -66,15 +66,12 @@ contract GameToken is ERC20, Ownable {
      * @param amount The amount of tokens to burn
      */
     function burn(address from, uint256 amount) external {
-        require(
-            from == msg.sender || owner() == msg.sender,
-            "GameToken: Caller must be owner or burning own tokens"
-        );
+        require(from == msg.sender || owner() == msg.sender, "GameToken: Caller must be owner or burning own tokens");
         _burn(from, amount);
         _userData[from].totalSpent += amount;
         _userData[from].lastUpdateTime = block.timestamp;
     }
-    
+
     /**
      * @dev Returns detailed user balance data
      * @param user The address of the user
@@ -83,12 +80,9 @@ contract GameToken is ERC20, Ownable {
      * @return totalSpent Total tokens spent/burned
      * @return lastUpdateTime Last time user data was updated
      */
-    function getUserData(address user) external view returns (
-        uint256 currentBalance,
-        uint256 totalEarned,
-        uint256 totalSpent,
-        uint256 lastUpdateTime
-    ) {
+    function getUserData(
+        address user
+    ) external view returns (uint256 currentBalance, uint256 totalEarned, uint256 totalSpent, uint256 lastUpdateTime) {
         return (
             balanceOf(user),
             _userData[user].totalEarned,
@@ -96,13 +90,13 @@ contract GameToken is ERC20, Ownable {
             _userData[user].lastUpdateTime
         );
     }
-    
+
     /**
      * @dev Override the _update function to track user stats on transfers
      */
     function _update(address from, address to, uint256 amount) internal override {
         super._update(from, to, amount);
-        
+
         // Skip minting and burning as they're handled in their respective functions
         if (from != address(0) && to != address(0)) {
             _userData[to].totalEarned += amount;

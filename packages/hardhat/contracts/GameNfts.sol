@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import {Counters} from "openzeppelin/contracts/utils/Counters.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import { ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import { Counters } from "openzeppelin/contracts/utils/Counters.sol";
 
 contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
@@ -15,9 +15,9 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
     struct NFTMetadata {
         string earningReason;
         uint256 earnedTimestamp;
-        string imageURI;         // Direct URI to the NFT image
-        string additionalData;   // JSON string for any additional data
-        string rarity;           // Rarity level (common, uncommon, rare, epic, legendary, unique)
+        string imageURI; // Direct URI to the NFT image
+        string additionalData; // JSON string for any additional data
+        string rarity; // Rarity level (common, uncommon, rare, epic, legendary, unique)
     }
 
     // Mapping from token ID to metadata
@@ -30,10 +30,7 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
     event NFTTransferred(address indexed from, address indexed to, uint256 indexed tokenId);
     event BatchNFTTransferred(address indexed from, address indexed to, uint256[] tokenIds);
 
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) ERC721(name_, symbol_) Ownable(msg.sender) {}
+    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) Ownable(msg.sender) {}
 
     // Mint new NFT with specified earning reason and image
     function mintNFT(
@@ -101,9 +98,11 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
     // Transfer NFT
     function transferNFT(address from, address to, uint256 tokenId) public {
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
-        require(from == msg.sender || getApproved(tokenId) == msg.sender || isApprovedForAll(from, msg.sender), 
-                "Caller is not owner nor approved");
-        
+        require(
+            from == msg.sender || getApproved(tokenId) == msg.sender || isApprovedForAll(from, msg.sender),
+            "Caller is not owner nor approved"
+        );
+
         safeTransferFrom(from, to, tokenId);
         emit NFTTransferred(from, to, tokenId);
     }
@@ -111,16 +110,18 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
     // Batch transfer NFTs
     function batchTransferNFTs(address from, address to, uint256[] memory tokenIds) public {
         require(tokenIds.length > 0, "Must transfer at least one NFT");
-        
+
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             require(_ownerOf(tokenId) != address(0), "Token does not exist");
-            require(from == msg.sender || getApproved(tokenId) == msg.sender || isApprovedForAll(from, msg.sender), 
-                    "Caller is not owner nor approved for one or more tokens");
-            
+            require(
+                from == msg.sender || getApproved(tokenId) == msg.sender || isApprovedForAll(from, msg.sender),
+                "Caller is not owner nor approved for one or more tokens"
+            );
+
             safeTransferFrom(from, to, tokenId);
         }
-        
+
         emit BatchNFTTransferred(from, to, tokenIds);
     }
 
@@ -128,7 +129,7 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
     function gameMasterTransfer(address from, address to, uint256 tokenId) public onlyOwner {
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
         require(ownerOf(tokenId) == from, "From address is not the owner");
-        
+
         _safeTransfer(from, to, tokenId, "");
         emit NFTTransferred(from, to, tokenId);
     }
@@ -136,32 +137,38 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
     // Game master controlled batch transfer
     function gameMasterBatchTransfer(address from, address to, uint256[] memory tokenIds) public onlyOwner {
         require(tokenIds.length > 0, "Must transfer at least one NFT");
-        
+
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             require(_ownerOf(tokenId) != address(0), "Token does not exist");
             require(ownerOf(tokenId) == from, "From address is not the owner of one or more tokens");
-            
+
             _safeTransfer(from, to, tokenId, "");
         }
-        
+
         emit BatchNFTTransferred(from, to, tokenIds);
     }
 
     // Get NFT metadata
-    function getNFTMetadata(uint256 tokenId) public view returns (
-        string memory earningReason,
-        uint256 earnedTimestamp,
-        string memory imageURI,
-        string memory additionalData,
-        string memory rarity
-    ) {
+    function getNFTMetadata(
+        uint256 tokenId
+    )
+        public
+        view
+        returns (
+            string memory earningReason,
+            uint256 earnedTimestamp,
+            string memory imageURI,
+            string memory additionalData,
+            string memory rarity
+        )
+    {
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
         NFTMetadata memory metadata = _nftMetadata[tokenId];
         return (
-            metadata.earningReason, 
-            metadata.earnedTimestamp, 
-            metadata.imageURI, 
+            metadata.earningReason,
+            metadata.earnedTimestamp,
+            metadata.imageURI,
             metadata.additionalData,
             metadata.rarity
         );
@@ -207,7 +214,11 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
     }
 
     // Override functions required by inherited contracts
-    function _update(address to, uint256 tokenId, address auth) internal override(ERC721, ERC721Enumerable) returns (address) {
+    function _update(
+        address to,
+        uint256 tokenId,
+        address auth
+    ) internal override(ERC721, ERC721Enumerable) returns (address) {
         return super._update(to, tokenId, auth);
     }
 
@@ -219,7 +230,9 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
         return super.tokenURI(tokenId);
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, ERC721URIStorage) returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721Enumerable, ERC721URIStorage) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

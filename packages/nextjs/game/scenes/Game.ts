@@ -94,12 +94,13 @@ export default class Game extends Scene {
 
     // SystemManager.instance.saveManager.startAutoSave();
 
-    this.events.once("destroy", () => {
+    this.events.once("destroy", async () => {
       console.log("Cleaning up Game scene resources");
       this.aiPopupUI.destroy();
       this.aiHelper.destroy();
 
       // Call the SystemManager's destroy method to clean up all managers
+      await SystemManager.instance.saveManager.saveGameToBlockchain();
       SystemManager.instance.destroy();
 
       // Clean up event listeners from the HUD scene\
