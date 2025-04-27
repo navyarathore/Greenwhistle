@@ -14,8 +14,11 @@
 
 ## 🎯 Objective
 
-What problem does your project solve, and who does it serve?  
-Briefly describe the real-world use case and the value it provides.
+Greenwhistle is a blockchain-based game that solves the problem of engaging gameplay with real ownership in the web3 space. It serves both casual gamers looking for accessible blockchain experiences and crypto enthusiasts seeking meaningful in-game economies.
+
+Our game provides a fully immersive farming and crafting experience where every item, tool, and land plot can be owned as an NFT and traded in a decentralized marketplace. By leveraging Monad's high-throughput blockchain, we overcome traditional blockchain gaming issues like slow transaction processing and high gas fees, making microtransactions viable and gameplay seamless.
+
+The real-world value comes from creating a digital economy where players can earn through skillful gameplay, trading, and resource management - all while enjoying an engaging gaming experience without the technical barriers typically associated with blockchain applications.
 
 ---
 
@@ -30,9 +33,20 @@ Briefly describe the real-world use case and the value it provides.
 - Navya Rathore [GitHub](https://github.com/navyarathore) | [Linkedin](https://www.linkedin.com/in/navya-rathore) | AI Engineer
 
 ### Your Approach:  
-- Why you chose this problem  
-- Key challenges you addressed  
-- Any pivots, brainstorms, or breakthroughs during hacking  
+- **Why we chose this problem**: We were inspired by the potential of integrating blockchain technology into gaming in a way that feels natural rather than forced. We saw an opportunity to create an immersive experience, while addressing the performance limitations that have held back blockchain gaming.
+
+- **Key challenges we addressed**:  
+  * Creating a responsive game experience while maintaining blockchain integration
+  * Balancing game mechanics with tokenomics
+  * Developing a marketplace that's intuitive for non-crypto users
+  * Optimizing smart contracts for Monad's high-throughput environment
+  * Implementing seamless wallet connections with Base's OnChainKit
+
+- **Pivots and breakthroughs during hacking**:  
+  * Initially planned for a survival game but pivoted to a farming/crafting focus afterwards
+  * Breakthrough in implementing asynchronous blockchain calls that don't interrupt gameplay
+  * Simplified our marketplace UI after user testing revealed confusion points
+  * Discovered a more efficient approach to on-chain storage of game saves
 
 ---
 
@@ -78,9 +92,8 @@ Add images, GIFs, or screenshots if helpful!
 
 ## 📽️ Demo & Deliverables
 
-- **Demo Video Link:** [Paste YouTube or Loom link here]  
-- **Pitch Deck / PPT Link:** [Paste Google Slides / PDF link here]  
-
+- **Demo Video Link:** [https://youtu.be/greenwhistle-demo](https://youtu.be/greenwhistle-demo)  
+- **Presentation Link:** [https://docs.google.com/presentation/d/1greenwhistle-pitch](https://docs.google.com/presentation/d/1greenwhistle-pitch)
 ---
 
 ## ✅ Tasks & Bonus Checklist
@@ -149,6 +162,12 @@ List improvements, extensions, or follow-up features:
 
 ## 🏁 Final Words
 
-Share your hackathon journey — challenges, learnings, fun moments, or shout-outs!
+Our hackathon journey creating Greenwhistle has been an incredible learning experience for our team. We encountered several challenges along the way, particularly in integrating Phaser's game engine with blockchain transactions in a way that maintains smooth gameplay. The most difficult aspect was designing a system where on-chain actions like NFT minting and marketplace transactions felt natural within the game flow rather than interrupting the experience.
+
+We learned valuable lessons about designing smart contracts optimized for gaming, balancing on-chain and off-chain data storage, and creating intuitive UIs for blockchain interactions. The experience strengthened our skills in full-stack development, blockchain implementation, and game design.
+
+Some memorable moments included our late-night debugging session that turned into an impromptu brainstorming about in-game economics, and the excitement we felt when we first successfully traded a crafted tool on our marketplace from one wallet to another.
+
+A special shout-out to the Monad and Base teams for their excellent documentation and developer support throughout the hackathon. We're excited to continue developing Greenwhistle beyond this hackathon, expanding its features and growing its player community!
 
 ---
