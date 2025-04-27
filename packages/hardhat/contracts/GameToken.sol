@@ -1,200 +1,114 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 
-contract GameToken is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
-    // Game specific events
-    event ItemListed(address indexed seller, uint256 indexed itemId, uint256 price, string itemName);
-    event ItemSold(address indexed seller, address indexed buyer, uint256 indexed itemId, uint256 price);
-    event ItemDelisted(address indexed seller, uint256 indexed itemId);
-    event RewardEarned(address indexed player, uint256 amount, string reason);
-    event TokensStaked(address indexed player, uint256 amount);
-    event TokensUnstaked(address indexed player, uint256 amount, uint256 reward);
-    event PlayerLevelUp(address indexed player, uint256 newLevel);
-    event QuestCompleted(address indexed player, string questId, uint256 reward);
-
-    // Staking related variables
-    mapping(address => uint256) public stakedBalance;
-    mapping(address => uint256) public stakingStartTime;
+/**
+ * @title GameToken
+ * @dev Implements a basic ERC20 token for use in a game with enhanced balance tracking
+ */
+contract GameToken is ERC20, Ownable {
+    uint8 private immutable _decimals;
     
-    // Player stats
-    mapping(address => uint256) public playerLevel;
-    mapping(address => uint256) public playerExperience;
-    
-    // Marketplace items
-    struct MarketItem {
-        uint256 id;
-        address seller;
-        uint256 price;
-        string name;
-        bool isActive;
+    // Additional user data structure
+    struct UserData {
+        uint256 totalEarned;
+        uint256 totalSpent;
+        uint256 lastUpdateTime;
     }
     
-    mapping(uint256 => MarketItem) public marketItems;
-    uint256 private nextItemId = 1;
+    // Mapping to track additional user data
+    mapping(address => UserData) private _userData;
+
+    /**
+     * @dev Constructor that gives the msg.sender all initial tokens.
+     * @param initialSupply Initial supply of tokens
+     * @param name_ Name of the token
+     * @param symbol_ Symbol of the token
+     * @param decimals_ Number of decimals for the token
+     */
+    constructor(
+        uint256 initialSupply,
+        string memory name_,
+        string memory symbol_,
+        uint8 decimals_
+    ) ERC20(name_, symbol_) Ownable(msg.sender) {
+        _decimals = decimals_;
+        _mint(msg.sender, initialSupply);
+        
+        // Initialize user data for the initial holder
+        _userData[msg.sender].totalEarned = initialSupply;
+        _userData[msg.sender].lastUpdateTime = block.timestamp;
+    }
+
+    /**
+     * @dev Returns the number of decimals used for token.
+     */
+    function decimals() public view virtual override returns (uint8) {
+        return _decimals;
+    }
+
+    /**
+     * @dev Mints new tokens to an address and updates user stats.
+     * @param to The address that will receive the minted tokens
+     * @param amount The amount of tokens to mint
+     */
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
+        _userData[to].totalEarned += amount;
+        _userData[to].lastUpdateTime = block.timestamp;
+    }
+
+    /**
+     * @dev Burns tokens from an address and updates user stats.
+     * @param from The address from which to burn tokens
+     * @param amount The amount of tokens to burn
+     */
+    function burn(address from, uint256 amount) external {
+        require(
+            from == msg.sender || owner() == msg.sender,
+            "GameToken: Caller must be owner or burning own tokens"
+        );
+        _burn(from, amount);
+        _userData[from].totalSpent += amount;
+        _userData[from].lastUpdateTime = block.timestamp;
+    }
     
-    // Constants
-    uint256 public constant STAKING_PERIOD = 7 days;
-    uint256 public constant STAKING_REWARD_RATE = 5; // 5% APR
-    uint256 public constant XP_PER_LEVEL = 1000;
-    uint256 public constant INITIAL_SUPPLY = 1000000 * 10**18; // 1 million tokens
-
-    constructor() ERC20("GreenWhistle", "GWT") Ownable(msg.sender) ERC20Permit("GreenWhistle") {
-        _mint(msg.sender, INITIAL_SUPPLY);
+    /**
+     * @dev Returns detailed user balance data
+     * @param user The address of the user
+     * @return currentBalance The current token balance
+     * @return totalEarned Total tokens earned/received
+     * @return totalSpent Total tokens spent/burned
+     * @return lastUpdateTime Last time user data was updated
+     */
+    function getUserData(address user) external view returns (
+        uint256 currentBalance,
+        uint256 totalEarned,
+        uint256 totalSpent,
+        uint256 lastUpdateTime
+    ) {
+        return (
+            balanceOf(user),
+            _userData[user].totalEarned,
+            _userData[user].totalSpent,
+            _userData[user].lastUpdateTime
+        );
     }
-
-    // Marketplace Functions
-    function listItem(string memory itemName, uint256 price) external whenNotPaused returns (uint256) {
-        require(price > 0, "Price must be greater than 0");
-        require(bytes(itemName).length > 0, "Item name cannot be empty");
+    
+    /**
+     * @dev Override the _update function to track user stats on transfers
+     */
+    function _update(address from, address to, uint256 amount) internal override {
+        super._update(from, to, amount);
         
-        uint256 itemId = nextItemId++;
-        marketItems[itemId] = MarketItem({
-            id: itemId,
-            seller: msg.sender,
-            price: price,
-            name: itemName,
-            isActive: true
-        });
-        
-        emit ItemListed(msg.sender, itemId, price, itemName);
-        return itemId;
-    }
-
-    function buyItem(uint256 itemId) external whenNotPaused {
-        MarketItem storage item = marketItems[itemId];
-        require(item.isActive, "Item not available");
-        require(msg.sender != item.seller, "Cannot buy your own item");
-        require(balanceOf(msg.sender) >= item.price, "Insufficient balance");
-
-        // Transfer tokens
-        _transfer(msg.sender, item.seller, item.price);
-        
-        // Update item status
-        item.isActive = false;
-        
-        emit ItemSold(item.seller, msg.sender, itemId, item.price);
-    }
-
-    function delistItem(uint256 itemId) external {
-        MarketItem storage item = marketItems[itemId];
-        require(item.seller == msg.sender, "Not the seller");
-        require(item.isActive, "Item not active");
-        
-        item.isActive = false;
-        emit ItemDelisted(msg.sender, itemId);
-    }
-
-    // Staking Functions
-    function stake(uint256 amount) external whenNotPaused {
-        require(amount > 0, "Cannot stake 0 tokens");
-        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
-
-        // If already staking, claim rewards first
-        if (stakedBalance[msg.sender] > 0) {
-            uint256 reward = calculateStakingReward(msg.sender);
-            if (reward > 0) {
-                _mint(msg.sender, reward);
-                emit RewardEarned(msg.sender, reward, "Staking Reward");
-            }
+        // Skip minting and burning as they're handled in their respective functions
+        if (from != address(0) && to != address(0)) {
+            _userData[to].totalEarned += amount;
+            _userData[from].totalSpent += amount;
+            _userData[to].lastUpdateTime = block.timestamp;
+            _userData[from].lastUpdateTime = block.timestamp;
         }
-
-        _transfer(msg.sender, address(this), amount);
-        stakedBalance[msg.sender] += amount;
-        stakingStartTime[msg.sender] = block.timestamp;
-        
-        emit TokensStaked(msg.sender, amount);
-    }
-
-    function unstake() external whenNotPaused {
-        uint256 stakedAmount = stakedBalance[msg.sender];
-        require(stakedAmount > 0, "No tokens staked");
-        
-        uint256 stakingDuration = block.timestamp - stakingStartTime[msg.sender];
-        require(stakingDuration >= STAKING_PERIOD, "Staking period not completed");
-
-        uint256 reward = calculateStakingReward(msg.sender);
-        uint256 totalAmount = stakedAmount + reward;
-
-        stakedBalance[msg.sender] = 0;
-        stakingStartTime[msg.sender] = 0;
-
-        _mint(msg.sender, reward);
-        _transfer(address(this), msg.sender, stakedAmount);
-        
-        emit TokensUnstaked(msg.sender, stakedAmount, reward);
-    }
-
-    function calculateStakingReward(address player) public view returns (uint256) {
-        if (stakedBalance[player] == 0) return 0;
-        
-        uint256 stakingDuration = block.timestamp - stakingStartTime[player];
-        return (stakedBalance[player] * STAKING_REWARD_RATE * stakingDuration) / (365 days * 100);
-    }
-
-    // Game Progress Functions
-    function awardExperience(address player, uint256 xpAmount) external onlyOwner {
-        require(player != address(0), "Invalid player address");
-        require(xpAmount > 0, "XP amount must be greater than 0");
-        
-        playerExperience[player] += xpAmount;
-        
-        // Check for level up
-        uint256 newLevel = (playerExperience[player] / XP_PER_LEVEL) + 1;
-        if (newLevel > playerLevel[player]) {
-            playerLevel[player] = newLevel;
-            emit PlayerLevelUp(player, newLevel);
-        }
-    }
-
-    function completeQuest(address player, string memory questId, uint256 reward) external onlyOwner {
-        require(player != address(0), "Invalid player address");
-        require(bytes(questId).length > 0, "Quest ID cannot be empty");
-        
-        _mint(player, reward);
-        emit QuestCompleted(player, questId, reward);
-        emit RewardEarned(player, reward, "Quest Completion");
-    }
-
-    function awardGameReward(address player, uint256 amount, string memory reason) external onlyOwner {
-        require(player != address(0), "Invalid player address");
-        require(amount > 0, "Reward amount must be greater than 0");
-        
-        _mint(player, amount);
-        emit RewardEarned(player, amount, reason);
-    }
-
-    // Player stats view functions
-    function getPlayerStats(address player) external view returns (uint256 level, uint256 experience) {
-        return (playerLevel[player], playerExperience[player]);
-    }
-
-    function getStakingInfo(address player) external view returns (uint256 staked, uint256 stakingTime, uint256 pendingReward) {
-        return (stakedBalance[player], stakingStartTime[player], calculateStakingReward(player));
-    }
-
-    // Admin Functions
-    function pause() public onlyOwner {
-        _pause();
-    }
-
-    function unpause() public onlyOwner {
-        _unpause();
-    }
-
-    // Emergency function to recover stuck tokens
-    function recoverERC20(address tokenAddress, uint256 amount) external onlyOwner {
-        require(tokenAddress != address(this), "Cannot recover game tokens");
-        IERC20(tokenAddress).transfer(owner(), amount);
-    }
-
-    // Override required functions
-    function _update(address from, address to, uint256 value) internal virtual override(ERC20) whenNotPaused {
-        super._update(from, to, value);
     }
 }

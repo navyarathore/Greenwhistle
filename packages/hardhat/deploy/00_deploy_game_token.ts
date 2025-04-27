@@ -11,10 +11,16 @@ const deployGameToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  // Deploy GameToken contract
+  // Set initial values for the GameToken contract
+  const initialSupply = hre.ethers.parseEther("1000000"); // 1 million tokens with 18 decimals
+  const name = "Green Whistle Token";
+  const symbol = "GWT";
+  const decimals = 18; // Standard ERC20 decimals
+
+  // Deploy GameToken contract with constructor arguments
   const gameTokenDeployment = await deploy("GameToken", {
     from: deployer,
-    args: [], // GameToken constructor doesn't require any arguments
+    args: [initialSupply, name, symbol, decimals],
     log: true,
     autoMine: true,
   });
@@ -27,6 +33,7 @@ const deployGameToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   // Now we can access the contract functions correctly
   console.log(`GameToken name: ${await gameToken.name()}`);
   console.log(`GameToken symbol: ${await gameToken.symbol()}`);
+  console.log(`GameToken decimals: ${await gameToken.decimals()}`);
   console.log(`GameToken totalSupply: ${await gameToken.totalSupply()}`);
 };
 
