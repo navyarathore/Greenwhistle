@@ -10,6 +10,7 @@ import { useScaffoldContract, useScaffoldWriteContract } from "~~/hooks/scaffold
 
 interface InventoryItem {
   id: string;
+  slotIndex: number;
   name: string;
   imageUrl: string;
   quantity: number;
@@ -63,6 +64,7 @@ export default function InventoryPage() {
           if (resourceItem) {
             loadedItems.push({
               id: item.itemId,
+              slotIndex: Number(item.slotIndex),
               name: resourceItem.name,
               imageUrl: `/assets/icons${resourceItem.icon.path}`,
               quantity: Number(item.quantity),
@@ -192,7 +194,7 @@ export default function InventoryPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {sortedItems.map(item => (
             <div
-              key={item.id}
+              key={`${item.id}-${item.slotIndex}`}
               className="bg-gradient-to-b from-gray-800/70 to-gray-900/70 rounded-xl overflow-hidden shadow-lg hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105 border border-gray-700/50"
               onClick={() => setSelectedItem(item)}
             >
@@ -304,7 +306,7 @@ export default function InventoryPage() {
                   max={selectedItem.quantity}
                   value={listingQuantity}
                   onChange={handleQuantityChange}
-                  className="w-20 px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 text-center"
+                  className="w-20 px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
                 />
                 <button
                   onClick={() => setListingQuantity(Math.min(selectedItem.quantity, listingQuantity + 1))}

@@ -30,14 +30,13 @@ export default function MarketplacePage() {
     const loadItems = async () => {
       try {
         // Get all unique items with their prices
-        const [gameItems, prices] = await marketplaceContract.read.getAllUniqueItemsWithPrices();
+        const [gameItems, quantities, prices] = await marketplaceContract.read.getAllUniqueItemsWithPrices();
 
         const loadedItems: Item[] = [];
 
         // Process game items
         for (let i = 0; i < gameItems.length; i++) {
           const gameItemId = gameItems[i];
-          const [, , , , , , quantity] = await marketplaceContract.read.gameItemStats([gameItemId]);
           const resource = Resources.items[gameItemId as keyof typeof Resources.items];
           if (!resource) continue;
 
@@ -45,7 +44,7 @@ export default function MarketplacePage() {
             id: gameItemId,
             name: resource.name,
             imageUrl: `/assets/icons${resource.icon.path}`,
-            quantity: Number(quantity),
+            quantity: Number(quantities[i]),
             price: Number(formatEther(prices[i])),
             slug: gameItemId,
             // rarity: resource.rarity || "",
@@ -128,7 +127,7 @@ export default function MarketplacePage() {
               <h1 className="text-3xl font-['PixelHeading'] text-[#c6c607] mb-2">Marketplace</h1>
             </div>
             <Link
-              href="/sell"
+              href="/inventory"
               className="bg-[#c6c607] hover:bg-[#a3a305] text-[#1a1c2c] px-6 py-3 rounded-md font-bold transition-all duration-200 flex items-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

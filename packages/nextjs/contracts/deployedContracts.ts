@@ -3636,7 +3636,7 @@ const deployedContracts = {
       },
     },
     GameSave: {
-      address: "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
+      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
       abi: [
         {
           inputs: [],
@@ -4203,7 +4203,7 @@ const deployedContracts = {
       },
     },
     VolatileMarketplace: {
-      address: "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
+      address: "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
       abi: [
         {
           inputs: [

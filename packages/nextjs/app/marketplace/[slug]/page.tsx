@@ -25,6 +25,11 @@ interface Item {
   description?: string;
 }
 
+// Add new interfaces
+interface WishlistItem extends Item {
+  addedAt: number;
+}
+
 interface MarketStats {
   totalVolume: bigint;
   highestPrice: bigint;
@@ -46,12 +51,37 @@ interface Listing {
   active: boolean;
 }
 
+interface RecentSale {
+  buyer: string;
+  price: bigint;
+  timestamp: number;
+  quantity: number;
+}
+
+// Add this after the other interfaces
+interface SaleEvent {
+  buyer: string;
+  seller: string;
+  gameItemId: string;
+  quantity: bigint;
+  price: bigint;
+  timestamp: number;
+}
+
+interface PriceHistoryRecord {
+  timestamp: bigint;
+  price: bigint;
+  quantity: bigint;
+}
+
 export default function ItemDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [item, setItem] = useState<Item | null>(null);
+  const [isInWishlist, setIsInWishlist] = useState(false);
   const [marketStats, setMarketStats] = useState<MarketStats | null>(null);
   const [listings, setListings] = useState<Listing[]>([]);
+  const [recentSales, setRecentSales] = useState<SaleEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("details");
@@ -135,14 +165,18 @@ export default function ItemDetailPage() {
         }
       }
 
-      await writeContractAsync({
+      const tx = await writeContractAsync({
         functionName: "buyGameItems",
         args: [toPurcahse, purchaseQuantities],
         value: price,
       });
 
+      // Wait for transaction to be confirmed
       setShowQuantityPopup(false);
       setQuantity(1);
+
+      // Redirect to inventory page
+      router.push("/inventory");
     } catch (error: any) {
       console.error("Error minting item:", error);
       if (error.message?.includes("Cannot buy your own listing")) {
@@ -152,6 +186,36 @@ export default function ItemDetailPage() {
       }
     }
   };
+
+  // Add wishlist management functions
+  const toggleWishlist = useCallback(() => {
+    if (!item) return;
+
+    const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]") as WishlistItem[];
+    const itemIndex = wishlist.findIndex(i => i.id === item.id);
+
+    if (itemIndex > -1) {
+      // Remove from wishlist
+      wishlist.splice(itemIndex, 1);
+      setIsInWishlist(false);
+    } else {
+      // Add to wishlist
+      wishlist.push({
+        ...item,
+        addedAt: Date.now(),
+      });
+      setIsInWishlist(true);
+    }
+
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  }, [item]);
+
+  // Check if item is in wishlist on load
+  useEffect(() => {
+    if (!item) return;
+    const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]") as WishlistItem[];
+    setIsInWishlist(wishlist.some(i => i.id === item.id));
+  }, [item]);
 
   // Load items from contract
   useEffect(() => {
@@ -195,7 +259,7 @@ export default function ItemDetailPage() {
             id: itemId,
             name: resource.name,
             imageUrl: `/assets/icons${resource.icon.path}`,
-            quantity: Number(currentListings),
+            quantity: Number(listings.reduce((acc, val) => acc + Number(val[3]), 0)),
             price: Number(formatEther(listingPrice)),
             slug: itemId,
             rarity: resource.rarity || "common",
@@ -239,6 +303,8 @@ export default function ItemDetailPage() {
         }
       }
     };
+    // console.log("highest price",marketStats?.highestPrice || 0);
+    // console.log("highest price",marketStats?.lastSoldPrice || 0);
 
     loadItems();
 
@@ -246,6 +312,34 @@ export default function ItemDetailPage() {
       isMounted = false;
     };
   }, [marketplaceContract?.address, itemId]);
+
+  // Add this new useEffect
+  useEffect(() => {
+    if (!marketplaceContract) return;
+
+    const loadRecentSales = async () => {
+      try {
+        // Get past events using viem contract instance
+        const events = await marketplaceContract.read.getGameItemPriceHistory([itemId, BigInt(10)]); // Limit to last 10 sales
+
+        const sales = events.map((event: PriceHistoryRecord) => ({
+          buyer: "0x0", // These are not available in price history
+          seller: "0x0",
+          gameItemId: itemId,
+          quantity: event.quantity,
+          price: event.price,
+          timestamp: Number(event.timestamp), // Convert bigint to number for Date operations
+          active: true,
+        }));
+
+        setRecentSales(sales.sort((a, b) => b.timestamp - a.timestamp));
+      } catch (err) {
+        console.error("Error loading recent sales:", err);
+      }
+    };
+
+    loadRecentSales();
+  }, [marketplaceContract, itemId]);
 
   // Function to determine rarity color schemes
   const getRarityStyles = (rarity: string | undefined) => {
@@ -449,8 +543,20 @@ export default function ItemDetailPage() {
                   </svg>
                   Mint Now
                 </button>
-                <button className="bg-[#13151f] hover:bg-[#1f2335] text-amber-400 font-bold py-3 px-6 rounded-lg shadow transition-all duration-150 border border-amber-700 flex-1 flex items-center justify-center">
-                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <button
+                  onClick={toggleWishlist}
+                  className={`${
+                    isInWishlist
+                      ? "bg-amber-600 hover:bg-amber-700 text-white"
+                      : "bg-[#13151f] hover:bg-[#1f2335] text-amber-400"
+                  } font-bold py-3 px-6 rounded-lg shadow transition-all duration-150 border border-amber-700 flex-1 flex items-center justify-center`}
+                >
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    viewBox="0 0 24 24"
+                    fill={isInWishlist ? "currentColor" : "none"}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       d="M19 21L12 17L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
                       stroke="currentColor"
@@ -459,7 +565,7 @@ export default function ItemDetailPage() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  Add to Wishlist
+                  {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
                 </button>
               </div>
             </div>
@@ -620,7 +726,7 @@ export default function ItemDetailPage() {
                         <div className="bg-[#13151f] p-4 rounded-lg shadow-inner border border-amber-900/50">
                           <p className="text-amber-500 text-sm mb-1">Highest Price</p>
                           <p className="text-amber-300 font-bold">
-                            {marketStats ? formatPrice(Number(formatEther(marketStats.highestPrice))) : "0.00"} MON
+                            {marketStats ? formatPrice(Number(formatEther(marketStats?.highestPrice))) : "0.00"} MON
                           </p>
                         </div>
                         <div className="bg-[#13151f] p-4 rounded-lg shadow-inner border border-amber-900/50">
@@ -698,32 +804,29 @@ export default function ItemDetailPage() {
                             </tr>
                           </thead>
                           <tbody className="text-amber-200">
-                            <tr className="border-b border-amber-900/30 hover:bg-[#1f2335]">
-                              <td className="p-3">Apr 30, 2025</td>
-                              <td className="p-3 text-amber-300">Pixel_Hero</td>
-                              <td className="p-3 text-right text-green-400">{formatPrice(item.price * 0.98)} MON</td>
-                            </tr>
-                            <tr className="border-b border-amber-900/30 hover:bg-[#1f2335]">
-                              <td className="p-3">Apr 28, 2025</td>
-                              <td className="p-3 text-amber-300">DragonSlayer</td>
-                              <td className="p-3 text-right text-green-400">{formatPrice(item.price * 1.02)} MON</td>
-                            </tr>
-                            <tr className="border-b border-amber-900/30 hover:bg-[#1f2335]">
-                              <td className="p-3">Apr 25, 2025</td>
-                              <td className="p-3 text-amber-300">QuestMaster</td>
-                              <td className="p-3 text-right text-green-400">{formatPrice(item.price * 0.99)} MON</td>
-                            </tr>
-                            <tr className="hover:bg-[#1f2335]">
-                              <td className="p-3">Apr 22, 2025</td>
-                              <td className="p-3 text-amber-300">EpicTrader</td>
-                              <td className="p-3 text-right text-green-400">{formatPrice(item.price * 1.05)} MON</td>
-                            </tr>
+                            {recentSales.length === 0 ? (
+                              <tr>
+                                <td colSpan={3} className="p-3 text-center text-amber-300">
+                                  No recent sales
+                                </td>
+                              </tr>
+                            ) : (
+                              recentSales.slice(0, 4).map((sale, index) => (
+                                <tr key={index} className="border-b border-amber-900/30 hover:bg-[#1f2335]">
+                                  <td className="p-3">{new Date(sale.timestamp * 1000).toLocaleDateString()}</td>
+                                  <td className="p-3 text-amber-300">{`${sale.buyer.slice(0, 4)}...${sale.buyer.slice(-4)}`}</td>
+                                  <td className="p-3 text-right text-green-400">
+                                    {formatPrice(Number(formatEther(sale.price)))} MON
+                                  </td>
+                                </tr>
+                              ))
+                            )}
                           </tbody>
                         </table>
                       </div>
 
                       <h3 className="text-xl font-bold mt-6 mb-4 text-amber-400 border-b border-amber-700/50 pb-2">
-                        Current Listings
+                        Current Listings ({listings.length})
                       </h3>
                       <div className="bg-[#13151f] rounded-lg shadow-inner border border-amber-900/50 overflow-hidden">
                         <table className="w-full font-mono text-sm">
@@ -735,21 +838,26 @@ export default function ItemDetailPage() {
                             </tr>
                           </thead>
                           <tbody className="text-amber-200">
-                            <tr className="border-b border-amber-900/30 hover:bg-[#1f2335]">
-                              <td className="p-3 text-amber-300">CryptoWizard</td>
-                              <td className="p-3">3</td>
-                              <td className="p-3 text-right text-green-400">{formatPrice(item.price)} MON</td>
-                            </tr>
-                            <tr className="border-b border-amber-900/30 hover:bg-[#1f2335]">
-                              <td className="p-3 text-amber-300">MoonTrader</td>
-                              <td className="p-3">1</td>
-                              <td className="p-3 text-right text-green-400">{formatPrice(item.price * 1.05)} MON</td>
-                            </tr>
-                            <tr className="hover:bg-[#1f2335]">
-                              <td className="p-3 text-amber-300">PixelKing</td>
-                              <td className="p-3">5</td>
-                              <td className="p-3 text-right text-green-400">{formatPrice(item.price * 1.1)} MON</td>
-                            </tr>
+                            {listings.length === 0 ? (
+                              <tr>
+                                <td colSpan={3} className="p-3 text-center text-amber-300">
+                                  No active listings
+                                </td>
+                              </tr>
+                            ) : (
+                              listings.map(listing => (
+                                <tr
+                                  key={String(listing.listingId)}
+                                  className="border-b border-amber-900/30 hover:bg-[#1f2335]"
+                                >
+                                  <td className="p-3 text-amber-300">{listing.seller.slice(0, 6)}...</td>
+                                  <td className="p-3">{listing.quantity}</td>
+                                  <td className="p-3 text-right text-green-400">
+                                    {formatPrice(Number(formatEther(listing.price)))} MON
+                                  </td>
+                                </tr>
+                              ))
+                            )}
                           </tbody>
                         </table>
                       </div>
