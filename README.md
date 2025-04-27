@@ -56,8 +56,8 @@ Briefly describe the real-world use case and the value it provides.
     1. Vercel
 
 ### Sponsor Technologies Used (if any):
-- [✅] **Monad:** _Your blockchain implementation_ 
-- [✅] **Base:** _AgentKit / OnchainKit / Smart Wallet usage_  
+- ✅ **Monad:** _Your blockchain implementation_ 
+- ✅ **Base:** _AgentKit / OnchainKit / Smart Wallet usage_  
 - [ ] **Fluvio:** _Real-time data handling_  
 - [ ] **Groq:** _How you used Groq_  
 - [ ] **Screenpipe:** _Screen-based analytics or workflows_  
@@ -70,7 +70,7 @@ Briefly describe the real-world use case and the value it provides.
 - ✅ **Decentralized Marketplace:** Players can trade resources, tools, and NFTs in a decentralized marketplace powered by smart contracts
 - ✅ **High-Performance Gaming on Monad:** Utilizing Monad's high-throughput blockchain to enable smoother gameplay  
 - ✅ **Simplified Onboarding with Base Integration:** Using Bases's OnChainKit for seamless wallet connection and management
-- [:white_check_mark:] **Resource Gathering & Crafting:** Implementing a comprehensive system where players can gather resources in the game world and craft tools, items, and structures
+- ✅ **Resource Gathering & Crafting:** Implementing a comprehensive system where players can gather resources in the game world and craft tools, items, and structures
 
 Add images, GIFs, or screenshots if helpful!
 
@@ -85,9 +85,9 @@ Add images, GIFs, or screenshots if helpful!
 
 ## ✅ Tasks & Bonus Checklist
 
-- [✅] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form** (Details in Participant Manual)  
-- [:white_check_mark:] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**  (Details in Participant Manual)
-- [:white_check_mark:] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**  (Details in Participant Manual)
+- ✅ **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form** (Details in Participant Manual)  
+- ✅ **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**  (Details in Participant Manual)
+- ✅ **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**  (Details in Participant Manual)
 
 ---
 
