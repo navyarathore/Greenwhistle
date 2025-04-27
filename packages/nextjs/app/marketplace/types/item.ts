@@ -1,7 +1,6 @@
 export interface Item {
   id: string;
   name: string;
-  game: string;
   imageUrl: string;
   quantity: number;
   price: {
@@ -25,7 +24,6 @@ export const mockItems: Item[] = [
   {
     id: "1",
     name: "Iron Axe",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/tools/axe.png",
     quantity: 78,
     price: {
@@ -47,7 +45,6 @@ export const mockItems: Item[] = [
   {
     id: "2",
     name: "Stone Pickaxe",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/tools/pickaxe.png",
     quantity: 125,
     price: {
@@ -69,7 +66,6 @@ export const mockItems: Item[] = [
   {
     id: "3",
     name: "Iron Hoe",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/tools/hoe.png",
     quantity: 92,
     price: {
@@ -91,7 +87,6 @@ export const mockItems: Item[] = [
   {
     id: "4",
     name: "Diamond Ore",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/items/pickup/diamond_ore.png",
     quantity: 42,
     price: {
@@ -109,7 +104,6 @@ export const mockItems: Item[] = [
   {
     id: "5",
     name: "Diamond Bar",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/items/pickup/diamond_bar.png",
     quantity: 31,
     price: {
@@ -127,7 +121,6 @@ export const mockItems: Item[] = [
   {
     id: "6",
     name: "Iron Ore",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/items/pickup/iron_ore.png",
     quantity: 215,
     price: {
@@ -145,7 +138,6 @@ export const mockItems: Item[] = [
   {
     id: "7",
     name: "Iron Bar",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/items/pickup/iron_bar.png",
     quantity: 173,
     price: {
@@ -163,7 +155,6 @@ export const mockItems: Item[] = [
   {
     id: "8",
     name: "Wooden Chest",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/items/placeable/wooden_chest.png",
     quantity: 62,
     price: {
@@ -185,7 +176,6 @@ export const mockItems: Item[] = [
   {
     id: "9",
     name: "Iron Sword",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/tools/sword.png",
     quantity: 54,
     price: {
@@ -207,7 +197,6 @@ export const mockItems: Item[] = [
   {
     id: "10",
     name: "Workbench",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/items/placeable/workbench.png",
     quantity: 38,
     price: {
@@ -229,7 +218,6 @@ export const mockItems: Item[] = [
   {
     id: "11",
     name: "Wheat Seeds",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/items/pickup/wheat_seed.png",
     quantity: 320,
     price: {
@@ -247,7 +235,6 @@ export const mockItems: Item[] = [
   {
     id: "12",
     name: "Stone Bar",
-    game: "Green Whistle",
     imageUrl: "/assets/icons/items/pickup/stone_bar.png",
     quantity: 195,
     price: {
@@ -273,10 +260,6 @@ export const getItems = () => {
 // Helper function to get item by slug
 export const getItemBySlug = (slug: string): Item | undefined => {
   return mockItems.find(item => item.slug === slug);
-};
-
-export const getItemsByGame = (game: string): Item[] => {
-  return mockItems.filter(item => item.game === game);
 };
 
 export const getItemsByCategory = (category: string): Item[] => {

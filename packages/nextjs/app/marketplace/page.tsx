@@ -1,13 +1,99 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ProtectedRoute } from "../wallet/ProtectedRoute";
-import { Item, getItems } from "./types/item";
+import { Item } from "./types/item";
+import Resources from "~~/game/resources/resource.json";
+import { useScaffoldContract } from "~~/hooks/scaffold-eth";
 
 export default function MarketplacePage() {
-  const items = getItems();
+  const [items, setItems] = useState<Item[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get contract instance
+  const { data: marketplaceContract } = useScaffoldContract({
+    contractName: "VolatileMarketplace",
+  });
+
+  // Load items from contract
+  useEffect(() => {
+    if (!marketplaceContract) return;
+
+    let isMounted = true;
+    setIsLoading(true);
+    setError(null);
+
+    const loadItems = async () => {
+      try {
+        const ids = await marketplaceContract.read.getActiveItems();
+
+        if (!isMounted) return;
+
+        if (!ids || ids.length === 0) {
+          setItems([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // Create an array of promises for fetching all items
+        const itemPromises = ids.map(id => {
+          return marketplaceContract.read.getItemDetails([id]);
+        });
+
+        // Wait for all promises to resolve
+        const itemsData = await Promise.all(itemPromises);
+
+        if (!isMounted) return;
+
+        // Process the results
+        const loadedItems: Item[] = itemsData
+          .filter(Boolean)
+          .map(itemData => {
+            const resource = Resources.items[itemData[2] as keyof typeof Resources.items];
+            if (!resource) return null; // Skip if item not found in resources
+
+            return {
+              id: itemData[1],
+              name: resource.name,
+              imageUrl: `/assets/icons${resource.icon.path}`,
+              quantity: Number(itemData[10]),
+              price: {
+                amount: Number(itemData[6]) / 1e18, // Assuming price is in wei, convert to eth
+                currency: "MON",
+              },
+              slug: itemData[1],
+              rarity: "",
+              category: resource.type || "other",
+              type: resource.type || "other",
+              levelRequired: 0,
+              weight: 1,
+            };
+          })
+          .filter(Boolean) as Item[];
+
+        setItems(loadedItems);
+      } catch (error) {
+        console.error("Error loading marketplace items:", error);
+        if (isMounted) {
+          setError("Failed to load marketplace items. Please try again later.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadItems();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [marketplaceContract?.address]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -16,11 +102,7 @@ export default function MarketplacePage() {
 
   // Filter items based on search term and active category
   const filteredItems = items.filter(
-    item =>
-      (searchTerm === "" ||
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.game.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (activeCategory === null || item.category === activeCategory),
+    item => searchTerm === "" || item.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Pagination logic
@@ -202,46 +284,87 @@ export default function MarketplacePage() {
                 <div className="col-span-3 text-right">PRICE</div>
               </div>
 
-              {/* Items List */}
-              <div className="overflow-hidden">
-                {currentItems.length > 0 ? (
-                  currentItems.map((item, index) => (
-                    <Link href={`/marketplace/${item.slug}`} key={item.id} className="block">
-                      <div
-                        className={`grid grid-cols-12 bg-[#1a1c2c] hover:bg-[#c6c607] p-4 transition-colors group ${index !== currentItems.length - 1 ? "" : ""}`}
-                      >
-                        <div className="col-span-6 md:col-span-7 flex items-center">
-                          <div className="h-16 w-16 relative mr-20 overflow-hidden">
-                            <Image src={item.imageUrl} alt={item.name} fill objectFit="contain" />
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-[#c6c607] group-hover:text-[#1a1c2c]">{item.name}</h3>
-                            <p className="text-white text-xs capitalize group-hover:text-[#1a1c2c]">{item.category}</p>
-                          </div>
-                        </div>
-                        <div className="col-span-3 md:col-span-2 text-right flex items-center justify-end">
-                          <span className="font-medium text-white group-hover:text-[#1a1c2c]">
-                            {item.quantity.toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="col-span-3 text-right flex flex-col items-end justify-center">
-                          <div className="text-xs text-amber-700 group-hover:text-[#1a1c2c]">Starting at:</div>
-                          <div className="font-bold text-white group-hover:text-[#1a1c2c]">
-                            ${item.price.amount.toFixed(2)} {item.price.currency}
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <div className="p-8 text-center text-amber-700 bg-amber-200">
-                    No items found matching your search. Try different keywords or filters.
+              {/* Loading State */}
+              {isLoading && (
+                <div className="p-8 text-center bg-[#1a1c2c]">
+                  <div className="flex justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#c6c607]"></div>
                   </div>
-                )}
-              </div>
+                  <p className="mt-4 text-white">Loading marketplace items...</p>
+                </div>
+              )}
+
+              {/* Error State */}
+              {error && (
+                <div className="p-8 text-center bg-red-900 text-white">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-12 w-12 mx-auto"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <p className="mt-4">{error}</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="mt-4 px-4 py-2 bg-white text-red-900 font-bold rounded hover:bg-gray-200 transition-colors"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              )}
+
+              {/* Items List */}
+              {!isLoading && !error && (
+                <div className="overflow-hidden">
+                  {currentItems.length > 0 ? (
+                    currentItems.map((item, index) => (
+                      <Link href={`/marketplace/${item.slug}`} key={item.id} className="block">
+                        <div
+                          className={`grid grid-cols-12 bg-[#1a1c2c] hover:bg-[#c6c607] p-4 transition-colors group ${index !== currentItems.length - 1 ? "" : ""}`}
+                        >
+                          <div className="col-span-6 md:col-span-7 flex items-center">
+                            <div className="h-16 w-16 relative mr-20 overflow-hidden">
+                              <Image src={item.imageUrl} alt={item.name} fill objectFit="contain" />
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-[#c6c607] group-hover:text-[#1a1c2c]">{item.name}</h3>
+                              <p className="text-white text-xs capitalize group-hover:text-[#1a1c2c]">
+                                {item.category}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="col-span-3 md:col-span-2 text-right flex items-center justify-end">
+                            <span className="font-medium text-white group-hover:text-[#1a1c2c]">
+                              {item.quantity.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="col-span-3 text-right flex flex-col items-end justify-center">
+                            <div className="text-xs text-amber-700 group-hover:text-[#1a1c2c]">Starting at:</div>
+                            <div className="font-bold text-white group-hover:text-[#1a1c2c]">
+                              ${item.price.amount.toFixed(2)} {item.price.currency}
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center text-amber-700 bg-amber-200">
+                      No items found matching your search. Try different keywords or filters.
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Pagination Controls */}
-              {filteredItems.length > 0 && (
+              {!isLoading && !error && filteredItems.length > 0 && (
                 <div className="mt-6 flex justify-between items-center">
                   <div className="text-white ">
                     Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredItems.length)} of{" "}

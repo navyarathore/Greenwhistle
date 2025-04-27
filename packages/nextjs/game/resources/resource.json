@@ -11,23 +11,23 @@
       "name": "Wheat seed",
       "type": "seed",
       "icon": {
-      "path": "/items/pickup/wheat_seed.png"
+        "path": "/items/pickup/wheat_seed.png"
       },
       "cropId": "wheat"
     },
     "tomato_seed": {
-      "name": "Tomato seed", 
+      "name": "Tomato seed",
       "type": "seed",
       "icon": {
-      "path": "/items/pickup/tomato_seed.png"
+        "path": "/items/pickup/tomato_seed.png"
       },
       "cropId": "tomato"
     },
     "carrot_seed": {
       "name": "Carrot seed",
-      "type": "seed", 
+      "type": "seed",
       "icon": {
-      "path": "/items/pickup/carrot_seed.png"
+        "path": "/items/pickup/carrot_seed.png"
       },
       "cropId": "carrot"
     },
@@ -287,7 +287,7 @@
       },
       "placeable": true
     },
-    "chest": { 
+    "chest": {
       "name": "Chest",
       "type": "other",
       "icon": {

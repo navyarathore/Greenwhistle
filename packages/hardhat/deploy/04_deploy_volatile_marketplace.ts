@@ -1,60 +1,57 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { GameNfts, GameSave, GameToken, VolatileMarketplace } from "../typechain-types";
 
 /**
- * Deploys the VolatileMarketplace contract using the deployer account
- *
- * @param hre HardhatRuntimeEnvironment object.
+ * Deploys the VolatileMarketplace contract
+ * @param hre HardhatRuntimeEnvironment object
  */
 const deployVolatileMarketplace: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  // Get the necessary values from the HRE
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  // Get deployed contract instances that are dependencies
-  const gameToken = await hre.ethers.getContract<GameToken>("GameToken", deployer);
-  const gameNfts = await hre.ethers.getContract<GameNfts>("GameNfts", deployer);
-  const gameSave = await hre.ethers.getContract<GameSave>("GameSave", deployer);
+  console.log(`\n\n 📡 Deploying VolatileMarketplace...`);
+  console.log(`\n\n 👤 Deployer: ${deployer}`);
 
-  console.log(`Using GameToken at: ${gameToken.target}`);
-  console.log(`Using GameNfts at: ${gameNfts.target}`);
-  console.log(`Using GameSave at: ${gameSave.target}`);
+  // Get the deployed token contracts that VolatileMarketplace depends on
+  const gameToken = await hre.ethers.getContract("GameToken", deployer);
+  const gameNfts = await hre.ethers.getContract("GameNfts", deployer);
+  const gameSave = await hre.ethers.getContract("GameSave", deployer);
 
-  // Set treasury address (using deployer address for testing purposes)
-  const treasuryAddress = deployer;
+  console.log(`\n 📦 Using GameToken at ${gameToken.target}`);
+  console.log(`\n 🖼️ Using GameNfts at ${gameNfts.target}`);
+  console.log(`\n 💾 Using GameSave at ${gameSave.target}`);
 
-  // Deploy VolatileMarketplace contract
-  const volatileMarketplaceDeployment = await deploy("VolatileMarketplace", {
+  // Deploy the VolatileMarketplace contract
+  const volatileMarketplace = await deploy("VolatileMarketplace", {
     from: deployer,
-    args: [gameToken.target, gameNfts.target, gameSave.target, treasuryAddress],
+    args: [gameToken.target, gameNfts.target, gameSave.target],
     log: true,
     autoMine: true,
   });
 
-  console.log(`VolatileMarketplace deployed at: ${volatileMarketplaceDeployment.address}`);
+  console.log(`\n ✅ VolatileMarketplace deployed at ${volatileMarketplace.address}`);
 
-  // Get the deployed contract with proper typing
-  const volatileMarketplace = await hre.ethers.getContract<VolatileMarketplace>("VolatileMarketplace", deployer);
-
-  // Initialize marketplace with default settings
-  const volatilityEnabled = true;
-  await volatileMarketplace.setVolatilityEnabled(volatilityEnabled);
-  console.log(`Set volatility enabled: ${volatilityEnabled}`);
-
-  const updateInterval = 24 * 60 * 60; // 24 hours in seconds
-  await volatileMarketplace.setPriceUpdateInterval(updateInterval);
-  console.log(`Set price update interval: ${updateInterval} seconds`);
-
-  // Log treasury address
-  console.log(`Treasury address set to: ${treasuryAddress}`);
-
-  console.log(`VolatileMarketplace setup complete!`);
+  // Verify the contract on block explorer if not on a local network
+  const networkName = hre.network.name;
+  if (networkName !== "localhost" && networkName !== "hardhat") {
+    try {
+      console.log(`\n 🔍 Verifying contract on block explorer...`);
+      await hre.run("verify:verify", {
+        address: volatileMarketplace.address,
+        constructorArguments: [gameToken.target, gameNfts.target, gameSave.target],
+        contract: "contracts/VolatileMarketplace.sol:VolatileMarketplace",
+      });
+      console.log(`\n ✅ Contract verified on block explorer`);
+    } catch (error) {
+      console.log(`\n ❌ Error verifying contract: ${error}`);
+    }
+  }
 };
 
 export default deployVolatileMarketplace;
 
-// Tags are useful if you have multiple deploy files and only want to run one of them.
+// Tags help when executing specific deploy scripts
 deployVolatileMarketplace.tags = ["VolatileMarketplace"];
-
-// Make sure VolatileMarketplace is deployed after its dependencies
+// Dependencies ensure these contracts are deployed first
 deployVolatileMarketplace.dependencies = ["GameToken", "GameNfts", "GameSave"];

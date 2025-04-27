@@ -58,7 +58,7 @@ const config: HardhatUserConfig = {
       accounts: [deployerPrivateKey],
     },
     monadTestnet: {
-      url: `https://testnet-rpc.monad.xyz/`,
+      url: `https://monad-testnet.g.alchemy.com/v2/${providerApiKey}`,
       accounts: [deployerPrivateKey],
     },
     sepolia: {

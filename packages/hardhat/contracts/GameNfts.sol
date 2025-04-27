@@ -17,6 +17,7 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
         uint256 earnedTimestamp;
         string imageURI;         // Direct URI to the NFT image
         string additionalData;   // JSON string for any additional data
+        string rarity;           // Rarity level (common, uncommon, rare, epic, legendary, unique)
     }
 
     // Mapping from token ID to metadata
@@ -40,7 +41,8 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory tokenURI,
         string memory imageURI,
         string memory reason,
-        string memory additionalData
+        string memory additionalData,
+        string memory rarity
     ) public onlyOwner returns (uint256) {
         _tokenIds.increment();
         uint256 newTokenId = _tokenIds.current();
@@ -52,7 +54,8 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
             earningReason: reason,
             earnedTimestamp: block.timestamp,
             imageURI: imageURI,
-            additionalData: additionalData
+            additionalData: additionalData,
+            rarity: rarity
         });
 
         emit NFTMinted(recipient, newTokenId, reason, imageURI);
@@ -66,7 +69,8 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
         string[] memory tokenURIs,
         string[] memory imageURIs,
         string memory reason,
-        string memory additionalData
+        string memory additionalData,
+        string memory rarity
     ) public onlyOwner returns (uint256[] memory) {
         require(tokenURIs.length > 0, "Must mint at least one NFT");
         require(tokenURIs.length == imageURIs.length, "Token and image arrays must have same length");
@@ -74,7 +78,7 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
         uint256[] memory tokenIds = new uint256[](tokenURIs.length);
 
         for (uint256 i = 0; i < tokenURIs.length; i++) {
-            tokenIds[i] = mintNFT(recipient, tokenURIs[i], imageURIs[i], reason, additionalData);
+            tokenIds[i] = mintNFT(recipient, tokenURIs[i], imageURIs[i], reason, additionalData, rarity);
         }
 
         return tokenIds;
@@ -149,11 +153,18 @@ contract GameNfts is ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory earningReason,
         uint256 earnedTimestamp,
         string memory imageURI,
-        string memory additionalData
+        string memory additionalData,
+        string memory rarity
     ) {
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
         NFTMetadata memory metadata = _nftMetadata[tokenId];
-        return (metadata.earningReason, metadata.earnedTimestamp, metadata.imageURI, metadata.additionalData);
+        return (
+            metadata.earningReason, 
+            metadata.earnedTimestamp, 
+            metadata.imageURI, 
+            metadata.additionalData,
+            metadata.rarity
+        );
     }
 
     // Get image URI
