@@ -453,8 +453,9 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         )
     {
         // Get all unique game items;
-        gameItemQuantity = new uint256[](uniqueGameItemIds.length);
-        gameItemPrices = new uint256[](uniqueGameItemIds.length);
+        gameItems = uniqueGameItemIds;
+        gameItemQuantity = new uint256[](gameItems.length);
+        gameItemPrices = new uint256[](gameItems.length);
 
         // Get lowest price for each game item
         for (uint256 i = 0; i < gameItems.length; i++) {
