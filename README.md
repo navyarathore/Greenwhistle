@@ -61,6 +61,8 @@ The real-world value comes from creating a digital economy where players can ear
     1. Solidity
     2. Ether.js
     3. Monad Blockchain Network
+- API:
+    1. Groq
 - Game Development:
     1. Phaser
     2. Grid Engine
@@ -71,9 +73,9 @@ The real-world value comes from creating a digital economy where players can ear
 
 ### Sponsor Technologies Used (if any):
 - ✅ **Monad:** _Your blockchain implementation_ 
-- ✅ **Base:** _AgentKit / OnchainKit / Smart Wallet usage_  
+- ✅ **Base:** _AgentKit / OnchainKit / Smart Wallet usage_
+- ✅ **Groq:** _How you used Groq_  
 - [ ] **Fluvio:** _Real-time data handling_  
-- [ ] **Groq:** _How you used Groq_  
 - [ ] **Screenpipe:** _Screen-based analytics or workflows_  
 - [ ] **Stellar:** _Payments, identity, or token usage_
 ---
@@ -85,6 +87,7 @@ The real-world value comes from creating a digital economy where players can ear
 - ✅ **High-Performance Gaming on Monad:** Utilizing Monad's high-throughput blockchain to enable smoother gameplay  
 - ✅ **Simplified Onboarding with Base Integration:** Using Bases's OnChainKit for seamless wallet connection and management
 - ✅ **Resource Gathering & Crafting:** Implementing a comprehensive system where players can gather resources in the game world and craft tools, items, and structures
+- ✅ **Firendly Groq Agent:** Implemented an agent powered by Groq 
 
 Add images, GIFs, or screenshots if helpful!
 
@@ -92,8 +95,8 @@ Add images, GIFs, or screenshots if helpful!
 
 ## 📽️ Demo & Deliverables
 
-- **Demo Video Link:** [https://youtu.be/greenwhistle-demo](https://youtu.be/greenwhistle-demo)  
-- **Presentation Link:** [https://docs.google.com/presentation/d/1greenwhistle-pitch](https://docs.google.com/presentation/d/1greenwhistle-pitch)
+- **Demo Video Link:** [https://youtu.be/4AXkOjrZsaI](https://youtu.be/4AXkOjrZsaI) 
+- **Presentation Link:** [https://docs.google.com/presentation/d/16BX80mXnos6qpALj0ywZ0K4ja3XVEvLq/edit?usp=sharing&ouid=110902097743495051254&rtpof=true&sd=true](https://docs.google.com/presentation/d/16BX80mXnos6qpALj0ywZ0K4ja3XVEvLq/edit?usp=sharing&ouid=110902097743495051254&rtpof=true&sd=true)
 ---
 
 ## ✅ Tasks & Bonus Checklist
@@ -141,9 +144,7 @@ Navigate to https://localhost:3000 in your browser
 
 List improvements, extensions, or follow-up features:
 
-- 📈 More integrations  
-- 🛡️ Security enhancements  
-- 🌐 Localization / broader accessibility  
+
 
 ---
 
@@ -167,7 +168,5 @@ Our hackathon journey creating Greenwhistle has been an incredible learning expe
 We learned valuable lessons about designing smart contracts optimized for gaming, balancing on-chain and off-chain data storage, and creating intuitive UIs for blockchain interactions. The experience strengthened our skills in full-stack development, blockchain implementation, and game design.
 
 Some memorable moments included our late-night debugging session that turned into an impromptu brainstorming about in-game economics, and the excitement we felt when we first successfully traded a crafted tool on our marketplace from one wallet to another.
-
-A special shout-out to the Monad and Base teams for their excellent documentation and developer support throughout the hackathon. We're excited to continue developing Greenwhistle beyond this hackathon, expanding its features and growing its player community!
 
 ---
