@@ -183,7 +183,7 @@ export default function Home() {
           </div>
 
           {/* Game Controls Section - Prominent Version */}
-          <div className="bg-[#2a2a2a] py-16 px-4 mt-16 border-t-2 border-b-2 border-[#c6c607]">
+          <div className="bg-[#1b1b1b] py-16 px-4 mt-16 border-t-2 border-b-2 border-[#c6c607]">
             <div className="max-w-7xl mx-auto">
               <h2 className="text-4xl font-[PixelHeading] text-[#c6c607] text-center mb-12">Game Controls</h2>
 

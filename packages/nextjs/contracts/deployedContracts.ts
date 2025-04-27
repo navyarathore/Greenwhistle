@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     GameNfts: {
-      address: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       abi: [
         {
           inputs: [
@@ -1081,42 +1081,28 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {
-        approve:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        balanceOf:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        getApproved:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        isApprovedForAll:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        approve: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        balanceOf: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        getApproved: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        isApprovedForAll: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
         name: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        ownerOf:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        safeTransferFrom:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        setApprovalForAll:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        supportsInterface:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        symbol:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        tokenByIndex:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
-        tokenOfOwnerByIndex:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
-        tokenURI:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        totalSupply:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
-        transferFrom:
-          "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        ownerOf: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        safeTransferFrom: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        setApprovalForAll: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        supportsInterface: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        symbol: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        tokenByIndex: "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
+        tokenOfOwnerByIndex: "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
+        tokenURI: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        totalSupply: "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
+        transferFrom: "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
         owner: "@openzeppelin/contracts/access/Ownable.sol",
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
     },
     GameSave: {
-      address: "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
       abi: [
         {
           inputs: [],
@@ -1238,14 +1224,26 @@ const deployedContracts = {
           type: "event",
         },
         {
-          inputs: [],
+          inputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+          ],
           name: "deleteSaveData",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
         {
-          inputs: [],
+          inputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+          ],
           name: "hasSaveData",
           outputs: [
             {
@@ -1258,7 +1256,32 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
+          inputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+          ],
+          name: "isMarketplaceApproved",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+          ],
           name: "loadGame",
           outputs: [
             {
@@ -1431,6 +1454,11 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
               internalType: "uint256",
               name: "_version",
               type: "uint256",
@@ -1563,6 +1591,24 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              internalType: "bool",
+              name: "approved",
+              type: "bool",
+            },
+          ],
+          name: "setMarketplaceApproval",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
               name: "newOwner",
               type: "address",
             },
@@ -1579,6 +1625,41 @@ const deployedContracts = {
           stateMutability: "nonpayable",
           type: "function",
         },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "slotIndex",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "itemId",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "quantity",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct GameSave.InventoryItem[]",
+              name: "_inventory",
+              type: "tuple[]",
+            },
+          ],
+          name: "updateInventory",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
       ],
       inheritedFunctions: {
         owner: "@openzeppelin/contracts/access/Ownable.sol",
@@ -1587,518 +1668,11 @@ const deployedContracts = {
         paused: "@openzeppelin/contracts/utils/Pausable.sol",
       },
     },
-    GameToken: {
-      address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
-      abi: [
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "initialSupply",
-              type: "uint256",
-            },
-            {
-              internalType: "string",
-              name: "name_",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "symbol_",
-              type: "string",
-            },
-            {
-              internalType: "uint8",
-              name: "decimals_",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "allowance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "balance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "approver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidApprover",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "receiver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidReceiver",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSender",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSpender",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-          ],
-          name: "OwnableInvalidOwner",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "OwnableUnauthorizedAccount",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Approval",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "previousOwner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "OwnershipTransferred",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Transfer",
-          type: "event",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "allowance",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "approve",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "balanceOf",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "burn",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "decimals",
-          outputs: [
-            {
-              internalType: "uint8",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "user",
-              type: "address",
-            },
-          ],
-          name: "getUserData",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "currentBalance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "totalEarned",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "totalSpent",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "lastUpdateTime",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "mint",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "name",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "owner",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "renounceOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "symbol",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalSupply",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "transfer",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "transferFrom",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "transferOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ],
-      inheritedFunctions: {
-        allowance: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        approve: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        balanceOf: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        decimals: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        name: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        symbol: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        totalSupply: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        transfer: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        transferFrom: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        owner: "@openzeppelin/contracts/access/Ownable.sol",
-        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-      },
-    },
     VolatileMarketplace: {
-      address: "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+      address: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
       abi: [
         {
           inputs: [
-            {
-              internalType: "address",
-              name: "_gameToken",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_gameNfts",
-              type: "address",
-            },
             {
               internalType: "address",
               name: "_gameSave",
@@ -2191,12 +1765,6 @@ const deployedContracts = {
               name: "quantity",
               type: "uint256",
             },
-            {
-              indexed: false,
-              internalType: "enum VolatileMarketplace.ItemType",
-              name: "itemType",
-              type: "uint8",
-            },
           ],
           name: "ItemListed",
           type: "event",
@@ -2281,80 +1849,6 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "listingId",
-              type: "uint256",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "seller",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "uint256",
-              name: "nftId",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "price",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "enum VolatileMarketplace.ItemType",
-              name: "itemType",
-              type: "uint8",
-            },
-          ],
-          name: "NftListed",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "uint256",
-              name: "listingId",
-              type: "uint256",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "seller",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "buyer",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "nftId",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "price",
-              type: "uint256",
-            },
-          ],
-          name: "NftSold",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
               internalType: "address",
               name: "previousOwner",
               type: "address",
@@ -2423,32 +1917,19 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "listingId",
-              type: "uint256",
+              internalType: "uint256[]",
+              name: "listingIds",
+              type: "uint256[]",
             },
             {
-              internalType: "uint256",
-              name: "quantity",
-              type: "uint256",
+              internalType: "uint256[]",
+              name: "quantities",
+              type: "uint256[]",
             },
           ],
-          name: "buyGameItem",
+          name: "buyGameItems",
           outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "listingId",
-              type: "uint256",
-            },
-          ],
-          name: "buyNft",
-          outputs: [],
-          stateMutability: "nonpayable",
+          stateMutability: "payable",
           type: "function",
         },
         {
@@ -2584,45 +2065,6 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "gameNfts",
-          outputs: [
-            {
-              internalType: "contract GameNfts",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "gameSave",
-          outputs: [
-            {
-              internalType: "contract GameSave",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "gameToken",
-          outputs: [
-            {
-              internalType: "contract GameToken",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
             {
               internalType: "string",
@@ -2631,25 +2073,6 @@ const deployedContracts = {
             },
           ],
           name: "getActiveGameItemListings",
-          outputs: [
-            {
-              internalType: "uint256[]",
-              name: "",
-              type: "uint256[]",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "nftId",
-              type: "uint256",
-            },
-          ],
-          name: "getActiveNftListings",
           outputs: [
             {
               internalType: "uint256[]",
@@ -2687,28 +2110,29 @@ const deployedContracts = {
               name: "gameItemPrices",
               type: "uint256[]",
             },
-            {
-              internalType: "uint256[]",
-              name: "nftIds",
-              type: "uint256[]",
-            },
-            {
-              internalType: "uint256[]",
-              name: "nftPrices",
-              type: "uint256[]",
-            },
           ],
           stateMutability: "view",
           type: "function",
         },
         {
-          inputs: [],
-          name: "getAllUniqueNfts",
+          inputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "gameItemId",
+              type: "string",
+            },
+          ],
+          name: "getGameItemEscrowBalance",
           outputs: [
             {
-              internalType: "uint256[]",
+              internalType: "uint256",
               name: "",
-              type: "uint256[]",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -2784,11 +2208,6 @@ const deployedContracts = {
                 },
                 {
                   internalType: "uint256",
-                  name: "nftId",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
                   name: "quantity",
                   type: "uint256",
                 },
@@ -2806,11 +2225,6 @@ const deployedContracts = {
                   internalType: "bool",
                   name: "active",
                   type: "bool",
-                },
-                {
-                  internalType: "enum VolatileMarketplace.ItemType",
-                  name: "itemType",
-                  type: "uint8",
                 },
               ],
               internalType: "struct VolatileMarketplace.Listing",
@@ -2840,71 +2254,6 @@ const deployedContracts = {
               internalType: "uint256",
               name: "price",
               type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "nftId",
-              type: "uint256",
-            },
-          ],
-          name: "getLowestPriceListingForNft",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "listingId",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "price",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "nftId",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "limit",
-              type: "uint256",
-            },
-          ],
-          name: "getNftPriceHistory",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "uint256",
-                  name: "timestamp",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "price",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "quantity",
-                  type: "uint256",
-                },
-              ],
-              internalType: "struct VolatileMarketplace.SaleRecord[]",
-              name: "",
-              type: "tuple[]",
             },
           ],
           stateMutability: "view",
@@ -2955,49 +2304,12 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "nftId",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "price",
-              type: "uint256",
-            },
-          ],
-          name: "listNft",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
               internalType: "string",
               name: "",
               type: "string",
             },
           ],
           name: "listedGameItems",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "listedNfts",
           outputs: [
             {
               internalType: "bool",
@@ -3035,11 +2347,6 @@ const deployedContracts = {
             },
             {
               internalType: "uint256",
-              name: "nftId",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
               name: "quantity",
               type: "uint256",
             },
@@ -3057,11 +2364,6 @@ const deployedContracts = {
               internalType: "bool",
               name: "active",
               type: "bool",
-            },
-            {
-              internalType: "enum VolatileMarketplace.ItemType",
-              name: "itemType",
-              type: "uint8",
             },
           ],
           stateMutability: "view",
@@ -3087,119 +2389,12 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "lowestPriceListingForNft",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [],
           name: "marketplaceFeePercentage",
           outputs: [
             {
               internalType: "uint256",
               name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "nftSaleHistory",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "timestamp",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "price",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "quantity",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "nftStats",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "totalVolume",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "highestPrice",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "lowestPrice",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "lastSoldPrice",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "numberOfSales",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "totalListings",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "currentListings",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "avgSoldPrice",
               type: "uint256",
             },
           ],
@@ -3323,25 +2518,6 @@ const deployedContracts = {
               internalType: "string",
               name: "",
               type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "uniqueNftIds",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
             },
           ],
           stateMutability: "view",

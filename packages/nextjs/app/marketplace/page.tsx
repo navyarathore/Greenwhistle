@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ProtectedRoute } from "../wallet/ProtectedRoute";
 import { Item } from "./types/item";
+import { formatEther, parseEther } from "ethers";
 import Resources from "~~/game/resources/resource.json";
 import { useScaffoldContract } from "~~/hooks/scaffold-eth";
 
@@ -13,7 +14,7 @@ export default function MarketplacePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get contract instance
+  // Get contract instances
   const { data: marketplaceContract } = useScaffoldContract({
     contractName: "VolatileMarketplace",
   });
@@ -28,53 +29,33 @@ export default function MarketplacePage() {
 
     const loadItems = async () => {
       try {
-        const ids = await marketplaceContract.read.getActiveItems();
+        // Get all unique items with their prices
+        const [gameItems, prices] = await marketplaceContract.read.getAllUniqueItemsWithPrices();
 
-        if (!isMounted) return;
+        const loadedItems: Item[] = [];
 
-        if (!ids || ids.length === 0) {
-          setItems([]);
-          setIsLoading(false);
-          return;
+        // Process game items
+        for (let i = 0; i < gameItems.length; i++) {
+          const gameItemId = gameItems[i];
+          const [, , , , , , quantity] = await marketplaceContract.read.gameItemStats([gameItemId]);
+          const resource = Resources.items[gameItemId as keyof typeof Resources.items];
+          if (!resource) continue;
+
+          loadedItems.push({
+            id: gameItemId,
+            name: resource.name,
+            imageUrl: `/assets/icons${resource.icon.path}`,
+            quantity: Number(quantity),
+            price: Number(formatEther(prices[i])),
+            slug: gameItemId,
+            // rarity: resource.rarity || "",
+            category: resource.type || "other",
+          });
         }
 
-        // Create an array of promises for fetching all items
-        const itemPromises = ids.map(id => {
-          return marketplaceContract.read.getItemDetails([id]);
-        });
-
-        // Wait for all promises to resolve
-        const itemsData = await Promise.all(itemPromises);
-
-        if (!isMounted) return;
-
-        // Process the results
-        const loadedItems: Item[] = itemsData
-          .filter(Boolean)
-          .map(itemData => {
-            const resource = Resources.items[itemData[2] as keyof typeof Resources.items];
-            if (!resource) return null; // Skip if item not found in resources
-
-            return {
-              id: itemData[1],
-              name: resource.name,
-              imageUrl: `/assets/icons${resource.icon.path}`,
-              quantity: Number(itemData[10]),
-              price: {
-                amount: Number(itemData[6]) / 1e18, // Assuming price is in wei, convert to eth
-                currency: "MON",
-              },
-              slug: itemData[1],
-              rarity: "",
-              category: resource.type || "other",
-              type: resource.type || "other",
-              levelRequired: 0,
-              weight: 1,
-            };
-          })
-          .filter(Boolean) as Item[];
-
-        setItems(loadedItems);
+        if (isMounted) {
+          setItems(loadedItems);
+        }
       } catch (error) {
         console.error("Error loading marketplace items:", error);
         if (isMounted) {
@@ -348,9 +329,7 @@ export default function MarketplacePage() {
                           </div>
                           <div className="col-span-3 text-right flex flex-col items-end justify-center">
                             <div className="text-xs text-amber-700 group-hover:text-[#1a1c2c]">Starting at:</div>
-                            <div className="font-bold text-white group-hover:text-[#1a1c2c]">
-                              ${item.price.amount.toFixed(2)} {item.price.currency}
-                            </div>
+                            <div className="font-bold text-white group-hover:text-[#1a1c2c]">{item.price} MON</div>
                           </div>
                         </div>
                       </Link>

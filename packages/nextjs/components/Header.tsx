@@ -4,10 +4,9 @@ import React, { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderOpenDot } from "lucide-react";
 import { hardhat } from "viem/chains";
 import { useAccount } from "wagmi";
-import { HomeIcon, ShoppingCartIcon, TrophyIcon } from "@heroicons/react/24/outline";
+import { BookOpenIcon, BuildingStorefrontIcon, CubeIcon, HomeIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, OnchainKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
 
@@ -31,20 +30,26 @@ export const menuLinks: HeaderMenuLink[] = [
   {
     label: "Game",
     href: "/game",
-    icon: <TrophyIcon className="h-5 w-5" />,
+    icon: <PuzzlePieceIcon className="h-5 w-5" />,
     protected: true,
-    suppressToast: true, // Don't show toast for game
+    suppressToast: true,
   },
   {
     label: "MarketPlace",
     href: "/marketplace",
-    icon: <ShoppingCartIcon className="h-5 w-5" />,
+    icon: <BuildingStorefrontIcon className="h-5 w-5" />,
+    protected: true,
+  },
+  {
+    label: "Inventory",
+    href: "/inventory",
+    icon: <CubeIcon className="h-5 w-5" />,
     protected: true,
   },
   {
     label: "Recipes",
     href: "/recipes",
-    icon: <FolderOpenDot className="h-5 w-5" />,
+    icon: <BookOpenIcon className="h-5 w-5" />,
     protected: true,
   },
 ];
