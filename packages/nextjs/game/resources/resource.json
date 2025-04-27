@@ -11,29 +11,190 @@
       "name": "Wheat seed",
       "type": "seed",
       "icon": {
-        "path": "/items/pickup/wheat_seed.png"
+      "path": "/items/pickup/wheat_seed.png"
       },
       "cropId": "wheat"
     },
+    "tomato_seed": {
+      "name": "Tomato seed", 
+      "type": "seed",
+      "icon": {
+      "path": "/items/pickup/tomato_seed.png"
+      },
+      "cropId": "tomato"
+    },
+    "carrot_seed": {
+      "name": "Carrot seed",
+      "type": "seed", 
+      "icon": {
+      "path": "/items/pickup/carrot_seed.png"
+      },
+      "cropId": "carrot"
+    },
+    "capsicum_seed": {
+      "name": "Capsicum seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/capsicum_seed.png"
+      },
+      "cropId": "capsicum"
+    },
+    "celery_seed": {
+      "name": "Celery seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/celery_seed.png"
+      },
+      "cropId": "celery"
+    },
+    "chilli_seed": {
+      "name": "Chilli seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/chilli_seed.png"
+      },
+      "cropId": "chilli"
+    },
+    "corn_seed": {
+      "name": "Corn seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/corn_seed.png"
+      },
+      "cropId": "corn"
+    },
+    "cucumber_seed": {
+      "name": "Cucumber seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/cucumber_seed.png"
+      },
+      "cropId": "cucumber"
+    },
+    "garlic_seed": {
+      "name": "Garlic seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/garlic_seed.png"
+      },
+      "cropId": "garlic"
+    },
+    "grape_seed": {
+      "name": "Grape seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/grape_seed.png"
+      },
+      "cropId": "grape"
+    },
+    "lettuce_seed": {
+      "name": "Lettuce seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/lettuce_seed.png"
+      },
+      "cropId": "lettuce"
+    },
+    "onion_seed": {
+      "name": "Onion seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/onion_seed.png"
+      },
+      "cropId": "onion"
+    },
+    "potato_seed": {
+      "name": "Potato seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/potato_seed.png"
+      },
+      "cropId": "potato"
+    },
+    "pumpkin_seed": {
+      "name": "Pumpkin seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/pumpkin_seed.png"
+      },
+      "cropId": "pumpkin"
+    },
+    "radish_seed": {
+      "name": "Radish seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/radish_seed.png"
+      },
+      "cropId": "radish"
+    },
+    "red_capsicum_seed": {
+      "name": "Red Capsicum seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/red_capsicum_seed.png"
+      },
+      "cropId": "red_capsicum"
+    },
+    "red_radish_seed": {
+      "name": "Red Radish seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/red_radish_seed.png"
+      },
+      "cropId": "red_radish"
+    },
+    "sunflower_seed": {
+      "name": "Sunflower seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/sunflower_seed.png"
+      },
+      "cropId": "sunflower"
+    },
+    "turnip_seed": {
+      "name": "Turnip seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/turnip_seed.png"
+      },
+      "cropId": "turnip"
+    },
+    "watermelon_seed": {
+      "name": "Watermelon seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/watermelon_seed.png"
+      },
+      "cropId": "watermelon"
+    },
+    "watermelon_radish_seed": {
+      "name": "Watermelon Radish seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/watermelon_radish_seed.png"
+      },
+      "cropId": "watermelon_radish"
+    },
+    "yellow_capsicum_seed": {
+      "name": "Yellow Capsicum seed",
+      "type": "seed",
+      "icon": {
+        "path": "/items/pickup/yellow_capsicum_seed.png"
+      },
+      "cropId": "yellow_capsicum"
+    },
     "blueberry": {
       "name": "Blueberry",
-      "type": "crop",
+      "type": "consumable",
       "icon": {
         "path": "/items/pickup/blueberry.png"
       }
     },
     "strawberry": {
       "name": "Strawberry",
-      "type": "crop",
+      "type": "consumable",
       "icon": {
         "path": "/items/pickup/strawberry.png"
-      }
-    },
-    "wheat": {
-      "name": "Wheat",
-      "type": "crop",
-      "icon": {
-          "path": "/items/pickup/wheat.png"
       }
     },
     "iron_ore": {
@@ -120,7 +281,7 @@
     },
     "anvil": {
       "name": "Anvil",
-      "type": "furniture",
+      "type": "other",
       "icon": {
         "path": "/items/placeable/anvil.png"
       },
@@ -128,7 +289,7 @@
     },
     "chest": { 
       "name": "Chest",
-      "type": "furniture",
+      "type": "other",
       "icon": {
         "path": "/items/placeable/chest.png"
       },
@@ -136,7 +297,7 @@
     },
     "workbench": {
       "name": "Workbench",
-      "type": "furniture",
+      "type": "other",
       "icon": {
         "path": "/items/placeable/workbench.png"
       },
@@ -164,6 +325,132 @@
       "name": "Wheat",
       "seed": "wheat_seed",
       "tileIndex": 86,
+      "growthTime": 1
+    },
+    "tomato": {
+      "name": "Tomato",
+      "seed": "tomato_seed",
+      "tileIndex": 186,
+      "growthTime": 1
+    },
+    "carrot": {
+      "name": "Carrot",
+      "seed": "carrot_seed",
+      "tileIndex": 286,
+      "growthTime": 1
+    },
+    "capsicum": {
+      "name": "Capsicum",
+      "seed": "capsicum_seed",
+      "tileIndex": 1286,
+      "growthTime": 1
+    },
+    "celery": {
+      "name": "Celery",
+      "seed": "celery_seed",
+      "tileIndex": 2086,
+      "growthTime": 1
+    },
+    "chilli": {
+      "name": "Chilli",
+      "seed": "chilli_seed",
+      "tileIndex": 986,
+      "growthTime": 1
+    },
+    "corn": {
+      "name": "Corn",
+      "seed": "corn_seed",
+      "tileIndex": 486,
+      "growthTime": 1
+    },
+    "cucumber": {
+      "name": "Cucumber",
+      "seed": "cucumber_seed",
+      "tileIndex": 886,
+      "growthTime": 1
+    },
+    "garlic": {
+      "name": "Garlic",
+      "seed": "garlic_seed",
+      "tileIndex": 1986,
+      "growthTime": 1
+    },
+    "grape": {
+      "name": "Grape",
+      "seed": "grape_seed",
+      "tileIndex": 2136,
+      "growthTime": 1
+    },
+    "lettuce": {
+      "name": "Lettuce",
+      "seed": "lettuce_seed",
+      "tileIndex": 786,
+      "growthTime": 1
+    },
+    "onion": {
+      "name": "Onion",
+      "seed": "onion_seed",
+      "tileIndex": 1586,
+      "growthTime": 1
+    },
+    "potato": {
+      "name": "Potato",
+      "seed": "potato_seed",
+      "tileIndex": 1686,
+      "growthTime": 1
+    },
+    "pumpkin": {
+      "name": "Pumpkin",
+      "seed": "pumpkin_seed",
+      "tileIndex": 586,
+      "growthTime": 1
+    },
+    "radish": {
+      "name": "Radish",
+      "seed": "radish_seed",
+      "tileIndex": 686,
+      "growthTime": 1
+    },
+    "red_capsicum": {
+      "name": "Red Capsicum",
+      "seed": "red_capsicum_seed",
+      "tileIndex": 1086,
+      "growthTime": 1
+    },
+    "red_radish": {
+      "name": "Red Radish",
+      "seed": "red_radish_seed",
+      "tileIndex": 1886,
+      "growthTime": 1
+    },
+    "sunflower": {
+      "name": "Sunflower",
+      "seed": "sunflower_seed",
+      "tileIndex": 1486,
+      "growthTime": 1
+    },
+    "turnip": {
+      "name": "Turnip",
+      "seed": "turnip_seed",
+      "tileIndex": 386,
+      "growthTime": 1
+    },
+    "watermelon": {
+      "name": "Watermelon",
+      "seed": "watermelon_seed",
+      "tileIndex": 1386,
+      "growthTime": 1
+    },
+    "watermelon_radish": {
+      "name": "Watermelon Radish",
+      "seed": "watermelon_radish_seed",
+      "tileIndex": 1786,
+      "growthTime": 1
+    },
+    "yellow_capsicum": {
+      "name": "Yellow Capsicum",
+      "seed": "yellow_capsicum_seed",
+      "tileIndex": 1186,
       "growthTime": 1
     }
   }

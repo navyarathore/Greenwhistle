@@ -19,6 +19,90 @@
         {
           "id": "wheat_seed",
           "amount": 1
+        },
+        {
+          "id": "tomato_seed",
+          "amount": 1
+        },
+        {
+          "id": "carrot_seed",
+          "amount": 1
+        },
+        {
+          "id": "capsicum_seed",
+          "amount": 1
+        },
+        {
+          "id": "celery_seed",
+          "amount": 1
+        },
+        {
+          "id": "chilli_seed",
+          "amount": 1
+        },
+        {
+          "id": "corn_seed",
+          "amount": 1
+        },
+        {
+          "id": "cucumber_seed",
+          "amount": 1
+        },
+        {
+          "id": "garlic_seed",
+          "amount": 1
+        },
+        {
+          "id": "grape_seed",
+          "amount": 1
+        },
+        {
+          "id": "lettuce_seed",
+          "amount": 1
+        },
+        {
+          "id": "onion_seed",
+          "amount": 1
+        },
+        {
+          "id": "potato_seed",
+          "amount": 1
+        },
+        {
+          "id": "pumpkin_seed",
+          "amount": 1
+        },
+        {
+          "id": "radish_seed",
+          "amount": 1
+        },
+        {
+          "id": "red_capsicum_seed",
+          "amount": 1
+        },
+        {
+          "id": "red_radish_seed",
+          "amount": 1
+        },
+        {
+          "id": "sunflower_seed",
+          "amount": 1
+        },
+        {
+          "id": "watermelon_radish_seed",
+          "amount": 1
+        },
+        {
+          "id": "yellow_capsicum_seed",
+          "amount": 1
+        },
+        {
+          "id": "turnip_seed",
+          "amount": 1
+        },
+        {
+          "id": "watermelon_seed",
+          "amount": 1
         }
       ]
     },
@@ -43,39 +127,6 @@
           "amount": 1
         }
       ]
-    },
-    {
-      "layer": "Height 1",
-      "id": [1492],
-      "method": "direct",
-      "result": [
-        {
-          "id": "iron_ore",
-          "amount": 1
-        }
-      ]
-    },
-    {
-      "layer": "Height 1",
-      "id": [1592],
-      "method": "direct",
-      "result": [
-        {
-          "id": "diamond_ore",
-          "amount": 1
-        }
-      ]
-    },
-    {
-      "layer": "Height 1",
-      "id": [646, 647, 648, 649, 746, 747, 748, 749],
-      "method": "direct",
-      "result": [
-        {
-          "id": "rock",
-          "amount": 2
-        }
-      ]
     }
   ],
   "tools": {
@@ -93,7 +144,287 @@
         ]
       }
     ],
-    "pickaxe": [],
-    "hoe": []
+    "pickaxe": [
+      {
+        "layer": "Height 1",
+        "id": [1492],
+        "crackCount": 3,
+        "method": "direct",
+        "result": [
+          {
+            "id": "iron_ore",
+            "amount": 1
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1592],
+        "crackCount": 3,
+        "method": "direct",
+        "result": [
+          {
+            "id": "diamond_ore",
+            "amount": 1
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [646, 647, 648, 649, 746, 747, 748, 749],
+        "crackCount": 3,
+        "method": "direct",
+        "result": [
+          {
+            "id": "rock",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "hoe": [
+      {
+        "layer": "Height 1",
+        "id": [89],
+        "method": "direct",
+        "result": [
+          {
+            "id": "wheat",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [189],
+        "method": "direct",
+        "result": [
+          {
+            "id": "carrot",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [289],
+        "method": "direct",
+        "result": [
+          {
+            "id": "tomato",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1239, 1289],
+        "method": "direct",
+        "result": [
+          {
+            "id": "capsicum",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [2039, 2089],
+        "method": "direct",
+        "result": [
+          {
+            "id": "celery",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [939, 989],
+        "method": "direct",
+        "result": [
+          {
+            "id": "chilli",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [439, 489],
+        "method": "direct",
+        "result": [
+          {
+            "id": "corn",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [839, 889],
+        "method": "direct",
+        "result": [
+          {
+            "id": "cucumber",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1939, 1989],
+        "method": "direct",
+        "result": [
+          {
+            "id": "garlic",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [2139, 2189],
+        "method": "direct",
+        "result": [
+          {
+            "id": "grape",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [789],
+        "method": "direct",
+        "result": [
+          {
+            "id": "lettuce",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1539, 1589],
+        "method": "direct",
+        "result": [
+          {
+            "id": "onion",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1639, 1689],
+        "method": "direct",
+        "result": [
+          {
+            "id": "potato",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [539, 589],
+        "method": "direct",
+        "result": [
+          {
+            "id": "pumpkin",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [689],
+        "method": "direct",
+        "result": [
+          {
+            "id": "radish",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1039, 1089],
+        "method": "direct",
+        "result": [
+          {
+            "id": "red_capsicum",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1839, 1889],
+        "method": "direct",
+        "result": [
+          {
+            "id": "red_radish",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1439, 1489],
+        "method": "direct",
+        "result": [
+          {
+            "id": "sunflower",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [339, 389],
+        "method": "direct",
+        "result": [
+          {
+            "id": "turnip",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1339, 1389],
+        "method": "direct",
+        "result": [
+          {
+            "id": "watermelon",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1789],
+        "method": "direct",
+        "result": [
+          {
+            "id": "watermelon_radish",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "layer": "Height 1",
+        "id": [1139, 1189],
+        "method": "direct",
+        "result": [
+          {
+            "id": "yellow_capsicum",
+            "amount": 5
+          }
+        ]
+      }
+    ]
   }
 }
