@@ -95,7 +95,10 @@ The real-world value comes from creating a digital economy where players can ear
 ![Alt Text](./packages/nextjs/public/5.png)
 ![Alt Text](./packages/nextjs/public/1.gif)
 ![Alt Text](./packages/nextjs/public/3.gif)
-[![Alt Text](./packages/nextjs/public/2.png)](https://youtu.be/4AXkOjrZsaI)
+
+# Green Whistle Playthrough
+
+[![Alt Text](./packages/nextjs/public/2.png)](https://www.youtube.com/watch?v=MTDZzDe7_Gc)
 
 ---
 
