@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FolderOpenDot } from "lucide-react";
 import { hardhat } from "viem/chains";
 import { useAccount } from "wagmi";
-import { Bars3Icon, ChevronDownIcon, HomeIcon, ShoppingCartIcon, TrophyIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, ShoppingCartIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, OnchainKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
@@ -17,6 +17,7 @@ type HeaderMenuLink = {
   href: string;
   icon?: React.ReactNode;
   protected: boolean;
+  suppressToast?: boolean;
 };
 
 export const menuLinks: HeaderMenuLink[] = [
@@ -24,25 +25,26 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "Home",
     href: "/",
     icon: <HomeIcon className="h-5 w-5" />,
-    protected: false, // Home page is accessible to everyone
+    protected: false,
   },
   {
     label: "Game",
     href: "/game",
     icon: <TrophyIcon className="h-5 w-5" />,
-    protected: true, // Requires wallet connection
+    protected: true,
+    suppressToast: true, // Don't show toast for game
   },
   {
     label: "MarketPlace",
     href: "/marketplace",
     icon: <ShoppingCartIcon className="h-5 w-5" />,
-    protected: true, // Requires wallet connection
+    protected: true,
   },
   {
     label: "Recipes",
     href: "/recipes",
     icon: <FolderOpenDot className="h-5 w-5" />,
-    protected: true, // Requires wallet connection
+    protected: true,
   },
 ];
 
@@ -65,13 +67,17 @@ export const Header = () => {
   const handleNavigation = (e: React.MouseEvent, link: HeaderMenuLink) => {
     if (link.protected && !isConnected) {
       e.preventDefault();
-      notification.warning(
-        <div className="flex flex-col gap-1">
-          <p className="my-0 font-bold">Wallet Not Connected</p>
-          <p className="my-0">Please connect your wallet to access {link.label}</p>
-        </div>,
-        { duration: 5000 },
-      );
+
+      // Only show notification if not suppressed
+      if (!link.suppressToast) {
+        notification.warning(
+          <div className="flex flex-col gap-1">
+            <p className="my-0 font-bold">Wallet Not Connected</p>
+            <p className="my-0">Please connect your wallet to access {link.label}</p>
+          </div>,
+          { duration: 5000 },
+        );
+      }
     }
   };
 
