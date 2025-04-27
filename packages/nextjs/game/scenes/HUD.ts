@@ -31,34 +31,61 @@ export class HUD extends Scene {
   }
 
   create() {
-    // Subscribe to player-created event to get player data
+    // Initialize if player is already available
     if (this.player) {
       this.createHealthDisplay();
       this.createHotbar();
       this.setupInteractionFeedback();
     } else {
-      EventBus.once("player-created", (event: PlayerCreatedEvent) => {
-        this.player = event.player;
-        this.createHealthDisplay();
-        this.createHotbar();
-        this.setupInteractionFeedback();
-      });
+      EventBus.once("player-created", this.handlePlayerCreated, this);
     }
 
-    // Subscribe to player health changes
-    EventBus.on("player-health-changed", _ => {
-      this.updateHealthDisplay();
-    });
-
-    // Subscribe to hotbar selection changes
-    EventBus.on("hotbar-selection-changed", _ => {
-      if (this.selectedSlotIndicator) {
-        this.updateHotbarSelection();
-      }
-    });
+    // Set up event listeners
+    this.setupEventListeners();
 
     // Let the game scene know HUD is ready
     EventBus.emit("current-scene-ready", { scene: this });
+  }
+
+  private setupEventListeners(): void {
+    // Health changes event
+    EventBus.on("player-health-changed", this.handlePlayerHealthChanged, this);
+
+    // Hotbar selection changes
+    EventBus.on("hotbar-selection-changed", this.handleHotbarSelectionChanged, this);
+
+    // Hotbar item changes
+    EventBus.on("hotbar-item-changed", this.handleHotbarItemChanged, this);
+
+    // Inventory updates
+    EventBus.on("inventory-updated", this.handleInventoryUpdated, this);
+  }
+
+  private handlePlayerCreated(event: PlayerCreatedEvent): void {
+    this.player = event.player;
+    this.createHealthDisplay();
+    this.createHotbar();
+    this.setupInteractionFeedback();
+  }
+
+  private handlePlayerHealthChanged(): void {
+    this.updateHealthDisplay();
+  }
+
+  private handleHotbarSelectionChanged(): void {
+    if (this.selectedSlotIndicator) {
+      this.updateHotbarSelection();
+    }
+  }
+
+  private handleHotbarItemChanged(event: HotbarItemChangedEvent): void {
+    this.updateHotbarItemAtIndex(event.slotIndex, event.item);
+  }
+
+  private handleInventoryUpdated(event: InventoryUpdatedEvent): void {
+    if (event.inventoryId === PLAYER_INVENTORY) {
+      this.updateHotbarItems();
+    }
   }
 
   private createHealthDisplay() {
@@ -128,17 +155,6 @@ export class HUD extends Scene {
 
     // Initialize hotbar items from inventory
     this.updateHotbarItems();
-
-    // Listen for inventory and hotbar updates
-    EventBus.on("hotbar-item-changed", (event: HotbarItemChangedEvent) => {
-      this.updateHotbarItemAtIndex(event.slotIndex, event.item);
-    });
-
-    EventBus.on("inventory-updated", (event: InventoryUpdatedEvent) => {
-      if (event.inventoryId === PLAYER_INVENTORY) {
-        this.updateHotbarItems();
-      }
-    });
   }
 
   private updateHotbarSelection() {
@@ -182,14 +198,11 @@ export class HUD extends Scene {
   private updateHotbarItems(): void {
     if (!this.inventoryManager) return;
 
-    // Get all items in the hotbar from the inventory
-    const hotbarItems = this.inventoryManager.getAllHotbarItems();
-
-    // Update each hotbar slot with its corresponding item
-    hotbarItems.forEach((item, index) => {
-      // Cast the numeric index to HotbarIndex type
-      this.updateHotbarItemAtIndex(index as HotbarIndex, item);
-    });
+    // Get all items in the hotbar
+    for (let i = 0; i < HOTBAR_SIZE; i++) {
+      const hotbarItem = this.inventoryManager.getHotbarItem(i as HotbarIndex);
+      this.updateHotbarItemAtIndex(i as HotbarIndex, hotbarItem);
+    }
   }
 
   /**
@@ -253,10 +266,8 @@ export class HUD extends Scene {
    * Set up event listeners for interaction feedback in the UI
    */
   private setupInteractionFeedback(): void {
-    // Listen for interaction messages to display them
-    // EventBus.on("show-interaction-message", (data: { message: string; color?: string }) => {
-    //   this.showTemporaryMessage(data.message, data.color || "#ffffff");
-    // });
+    // For future interaction messages
+    // EventBus.on("show-interaction-message", this.handleInteractionMessage, this);
   }
 
   /**
@@ -287,5 +298,43 @@ export class HUD extends Scene {
         messageText.destroy();
       },
     });
+  }
+
+  /**
+   * Custom method to handle resource cleanup when the scene is stopped
+   * Should be called when the scene is stopped or destroyed
+   */
+  cleanupResources(): void {
+    console.log("Cleaning up HUD resources");
+
+    // Remove event listeners
+    EventBus.off("player-created", this.handlePlayerCreated, this);
+    EventBus.off("player-health-changed", this.handlePlayerHealthChanged, this);
+    EventBus.off("hotbar-selection-changed", this.handleHotbarSelectionChanged, this);
+    EventBus.off("hotbar-item-changed", this.handleHotbarItemChanged, this);
+    EventBus.off("inventory-updated", this.handleInventoryUpdated, this);
+
+    // Destroy all game objects
+    this.healthIcons.forEach(icon => {
+      if (icon) icon.destroy();
+    });
+    this.healthIcons = [];
+
+    this.hotbarItems.forEach(item => {
+      // Remove associated quantity text
+      const quantityText = item.getData("quantityText") as Phaser.GameObjects.Text;
+      if (quantityText) quantityText.destroy();
+
+      // Destroy the item image
+      if (item) item.destroy();
+    });
+    this.hotbarItems = [];
+
+    if (this.hotbarImage) this.hotbarImage.destroy();
+    if (this.selectedSlotIndicator) this.selectedSlotIndicator.destroy();
+  }
+
+  shutdown(): void {
+    this.cleanupResources();
   }
 }

@@ -252,4 +252,12 @@ export default class FarmingManager {
 
     return true;
   }
+
+  /**
+   * Clean up resources when the manager is destroyed
+   */
+  destroy(): void {
+    this.crops.clear();
+    this.plantedCrops.clear();
+  }
 }

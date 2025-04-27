@@ -98,4 +98,38 @@ export default class SystemManager {
     // Emit a system update event for any systems that need to respond
     // EventBus.emit("system-update", { time, delta });
   }
+
+  /**
+   * Clean up all systems and resources
+   * Called when the game is destroyed
+   */
+  public destroy(): void {
+    console.log("Cleaning up SystemManager resources");
+
+    // Clean up all managers in reverse order of creation
+    if (this._saveManager) {
+      this._saveManager.destroy();
+    }
+
+    if (this._interactionManager) {
+      this._interactionManager.destroy();
+    }
+
+    if (this._controlsManager) {
+      this._controlsManager.destroy();
+    }
+
+    if (this._farmingManager) {
+      this._farmingManager.destroy();
+    }
+
+    // Clean up core systems
+    this.craftingManager.destroy();
+    this.mapStateTracker.destroy();
+    this.materialManager.destroy();
+    this.inventoryManager.destroy();
+
+    // Reset the singleton instance to null instead of undefined to avoid type issues
+    SystemManager._instance = null as unknown as SystemManager;
+  }
 }

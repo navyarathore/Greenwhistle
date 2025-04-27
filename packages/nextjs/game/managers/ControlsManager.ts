@@ -188,4 +188,28 @@ export default class ControlsManager {
       }
     }
   }
+
+  /**
+   * Clean up resources when the manager is destroyed
+   */
+  destroy(): void {
+    // Clean up event listeners bound to input keys
+    if (this.inputComponent.inventoryKey) {
+      this.inputComponent.inventoryKey.removeAllListeners();
+    }
+
+    if (this.inputComponent.actionKey) {
+      this.inputComponent.actionKey.removeAllListeners();
+    }
+
+    // Clean up hotbar keys
+    this.inputComponent.hotbarKeys.forEach(key => {
+      if (key) key.removeAllListeners();
+    });
+
+    // Clean up any other input keys
+    if (this.inputComponent.itemUseKey) {
+      this.inputComponent.itemUseKey.removeAllListeners();
+    }
+  }
 }

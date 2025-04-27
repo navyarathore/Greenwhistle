@@ -30,11 +30,6 @@ export default class InventoryManager {
 
   constructor() {
     this.createInventory(PLAYER_INVENTORY, "Player Inventory", PLAYER_INVENTORY_SIZE);
-
-    // Listen for inventory-related events
-    EventBus.on("item-harvested", this.handleItemHarvested.bind(this));
-    EventBus.on("item-used", this.handleItemUsed.bind(this));
-    EventBus.on("item-dropped", this.handleItemDropped.bind(this));
   }
 
   // Create a new inventory container
@@ -546,48 +541,6 @@ export default class InventoryManager {
     return true;
   }
 
-  // Use an item (reduce quantity) in a specific slot
-  useItemInSlot(slotIndex: number, inventoryId: string = PLAYER_INVENTORY): boolean {
-    const inventory = this.getInventory(inventoryId);
-    if (!inventory || slotIndex < 0 || slotIndex >= inventory.maxSlots) return false;
-
-    const slot = inventory.slots[slotIndex];
-    if (slot.item === null || slot.item.quantity <= 0) return false;
-
-    const item = slot.item;
-
-    // Reduce quantity by 1
-    slot.item.quantity -= 1;
-
-    // If quantity is now 0, clear the slot
-    if (slot.item.quantity <= 0) {
-      slot.item = null;
-    }
-
-    // Emit events
-    EventBus.emit("item-used", {
-      item,
-      inventoryId,
-      slotIndex,
-    });
-
-    // Emit a generic inventory update event
-    EventBus.emit("inventory-updated", {
-      inventoryId,
-      action: "use",
-      items: this.getItems(inventoryId),
-    });
-
-    return true;
-  }
-
-  // Use an item by its ID
-  useItem(item: Item, slotIndex: number, inventoryId: string = PLAYER_INVENTORY): boolean {
-    if (slotIndex === -1) return false;
-
-    return this.useItemInSlot(slotIndex, inventoryId);
-  }
-
   // Check if an inventory has enough of a specific item
   hasEnoughItems(itemId: string, quantity: number, inventoryId: string = PLAYER_INVENTORY): boolean {
     const inventory = this.getInventory(inventoryId);
@@ -704,26 +657,8 @@ export default class InventoryManager {
     return this.hotbarSlots.map(slotIndex => inventory.slots[slotIndex].item);
   }
 
-  // EVENT HANDLERS
-  private handleItemHarvested(event: ItemHarvestedEvent): void {
-    // This is a placeholder - you'll need to implement logic to create an Item
-    // based on your game's data and resource system
-    // TODO get item from item manager
-    // Add the item to the player's inventory
-    // const item = this.game.itemManager.getItemById(data.resourceId);
-    // if (item && this.addItem(item, PLAYER_INVENTORY)) {
-    //   EventBus.emit("show-message", `Added ${data.quantity} ${item.name} to inventory`);
-    // } else {
-    //   EventBus.emit("show-message", `Inventory full! Could not add item`);
-    // }
-  }
-
-  private handleItemUsed(event: ItemUsedEvent): void {
-    this.useItem(event.item, event.slotIndex);
-  }
-
-  private handleItemDropped(event: ItemDroppedEvent): void {
-    // Remove the item from the player's inventory
-    this.removeItemFromSlot(event.slotIndex);
+  public destroy(): void {
+    // Clear all inventories
+    this.inventories.clear();
   }
 }

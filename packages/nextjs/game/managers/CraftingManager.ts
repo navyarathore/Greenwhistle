@@ -81,4 +81,12 @@ export default class CraftingManager {
 
     return true;
   }
+
+  /**
+   * Clean up resources when the manager is destroyed
+   */
+  destroy(): void {
+    // Clear all recipes
+    this.recipes.clear();
+  }
 }

@@ -75,6 +75,43 @@ export default class Game extends Scene {
 
     SystemManager.instance.saveManager.startAutoSave();
 
+    this.events.once("destroy", () => {
+      console.log("Cleaning up Game scene resources");
+
+      // Call the SystemManager's destroy method to clean up all managers
+      SystemManager.instance.destroy();
+
+      // Clean up event listeners from the HUD scene
+      EventBus.removeAllListeners("player-health-changed");
+      EventBus.removeAllListeners("hotbar-selection-changed");
+      EventBus.removeAllListeners("hotbar-item-changed");
+      EventBus.removeAllListeners("inventory-updated");
+      EventBus.removeAllListeners("player-created");
+      EventBus.removeAllListeners("current-scene-ready");
+
+      // Clean up and stop active scenes
+      if (this.scene.isActive("HUD")) {
+        // Call custom cleanup method on the HUD scene
+        const hudScene = this.scene.get("HUD") as any;
+        if (hudScene && typeof hudScene.cleanupResources === "function") {
+          hudScene.cleanupResources();
+        }
+        this.scene.stop("HUD");
+      }
+
+      if (this.scene.isActive("InventoryMenu")) {
+        // Call custom cleanup method on the InventoryMenu scene
+        const inventoryMenuScene = this.scene.get("InventoryMenu") as any;
+        if (inventoryMenuScene && typeof inventoryMenuScene.cleanupResources === "function") {
+          inventoryMenuScene.cleanupResources();
+        }
+        this.scene.stop("InventoryMenu");
+      }
+
+      // Destroy any remaining game objects
+      this.children.removeAll(true);
+    });
+
     EventBus.emit("current-scene-ready", { scene: this });
   }
 

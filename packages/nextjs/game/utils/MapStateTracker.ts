@@ -56,4 +56,11 @@ export default class MapStateTracker {
   private getChangeKey(layer: string, position: Position): string {
     return `${layer}:${position.x},${position.y}`;
   }
+
+  /**
+   * Clean up resources when the tracker is destroyed
+   */
+  public destroy(): void {
+    this.clearChanges();
+  }
 }

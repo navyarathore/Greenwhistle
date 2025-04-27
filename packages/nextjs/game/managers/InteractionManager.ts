@@ -5,7 +5,7 @@ import { Item, MaterialCategory } from "../resources/Item";
 import Game from "../scenes/Game";
 import GridEngine, { Direction, Position } from "grid-engine";
 import { EventMap } from "~~/game/EventTypes";
-import { HotbarIndex, PLAYER_INVENTORY } from "~~/game/managers/InventoryManager";
+import { HotbarIndex } from "~~/game/managers/InventoryManager";
 import CombinedBlocks from "~~/game/resources/combined-blocks.json";
 import InteractionData from "~~/game/resources/interactable.json";
 import { LayerPosition } from "~~/game/types";
@@ -56,33 +56,12 @@ const COOLDOWN_DURATION = 500;
  */
 export default class InteractionManager {
   private sysManager: SystemManager = SystemManager.instance;
-  private interactionZones: Map<string, Position & { width: number; height: number; type: InteractionType }> =
-    new Map();
-  private interactionVisuals: Map<string, Phaser.GameObjects.GameObject> = new Map();
   private interactionCooldowns: Map<string, number> = new Map();
 
   constructor(
     private game: Game,
     private gridEngine: GridEngine,
-  ) {
-    // this.setupEventListeners();
-  }
-
-  // /**
-  //  * Set up event listeners for interaction events
-  //  */
-  // private setupEventListeners(): void {
-  //   EventBus.on("tool-used", this.handleToolUse.bind(this));
-  //   EventBus.on("item-used", this.handleItemUse.bind(this));
-  //   EventBus.on("item-placed", this.handleItemPlacement.bind(this));
-  //
-  //   // New interaction events
-  //   EventBus.on("player-moved", this.checkForNearbyInteractables.bind(this));
-  //   EventBus.on("hotbar-selection-changed", this.updateToolInteractionPreview.bind(this));
-  //
-  //   // Register custom interaction zones
-  //   this.game.events.on("update", this.updateInteractionEffects, this);
-  // }
+  ) {}
 
   /**
    * Get the position in front of the player based on facing direction
@@ -593,5 +572,13 @@ export default class InteractionManager {
    */
   private createParticleEffect(x: number, y: number, color: number, count: number): void {
     this.createSimpleParticles(x, y, color, count);
+  }
+
+  /**
+   * Clean up resources when the manager is destroyed
+   */
+  destroy(): void {
+    // Clear all stored interaction cooldowns and zones
+    this.interactionCooldowns.clear();
   }
 }

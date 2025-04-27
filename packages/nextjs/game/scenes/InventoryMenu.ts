@@ -310,4 +310,50 @@ export class InventoryMenu extends Phaser.Scene {
       slotIndex: -1,
     };
   }
+
+  /**
+   * Custom method to clean up all resources when the scene is stopped
+   * Should be called when the scene is about to be shut down
+   */
+  cleanupResources(): void {
+    console.log("Cleaning up InventoryMenu resources");
+
+    // Clean up all inventory items
+    this.inventoryItems.forEach(itemData => {
+      if (itemData) {
+        if (itemData.image) itemData.image.destroy();
+        if (itemData.box) itemData.box.destroy();
+        if (itemData.quantityText) itemData.quantityText.destroy();
+      }
+    });
+    this.inventoryItems = [];
+
+    // Clean up all recipe items
+    this.recipeItems.forEach(itemData => {
+      if (itemData.image) itemData.image.destroy();
+      if (itemData.box) itemData.box.destroy();
+      if (itemData.quantityText) itemData.quantityText.destroy();
+    });
+    this.recipeItems = [];
+
+    // Clean up inventory slots
+    this.inventorySlots.forEach(slot => {
+      if (slot) slot.destroy();
+    });
+    this.inventorySlots = [];
+
+    // Clean up the inventory menu background
+    if (this.inventoryMenu) this.inventoryMenu.destroy();
+
+    // Reset drag state
+    this.dragState.item = null;
+  }
+
+  /**
+   * This method is called automatically when the scene is being shut down
+   * Clean up all resources to prevent memory leaks
+   */
+  shutdown(): void {
+    this.cleanupResources();
+  }
 }

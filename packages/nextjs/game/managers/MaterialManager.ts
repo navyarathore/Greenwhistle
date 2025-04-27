@@ -60,4 +60,12 @@ export default class MaterialManager {
   public getMaterialByCategory(type: MaterialCategory): Material[] {
     return this.getAllMaterials().filter(item => item.category === type);
   }
+
+  /**
+   * Clean up resources when the manager is destroyed
+   */
+  public destroy(): void {
+    // Clear all stored materials
+    this.items.clear();
+  }
 }
