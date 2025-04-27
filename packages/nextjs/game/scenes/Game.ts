@@ -3,6 +3,8 @@ import SystemManager from "../SystemManager";
 import Player from "../entities/Player";
 import { GameSave } from "../managers/SaveManager";
 import MapExtension from "../utils/map-extension";
+import AIHelper from "./AIHelper";
+import AIPopupUI from "./AIPopupUI";
 import GridEngine from "grid-engine";
 import { Scene } from "phaser";
 import { LayerName, loadLayerMapping } from "~~/game/utils/layer-utils";
@@ -15,6 +17,8 @@ export default class Game extends Scene {
   player!: Player;
   cursor!: Phaser.Types.Input.Keyboard.CursorKeys;
   gridEngine!: GridEngine;
+  aiHelper!: AIHelper;
+  aiPopupUI!: AIPopupUI;
   private gameData: GameSave | null = null;
 
   constructor() {
@@ -29,6 +33,12 @@ export default class Game extends Scene {
   preload() {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0x00ff00);
+
+    try {
+      this.load.image("ai_assistant_icon", "assets/ai.png");
+    } catch (e) {
+      console.warn("AI assistant icon not found, will use fallback");
+    }
   }
 
   create() {
@@ -46,6 +56,10 @@ export default class Game extends Scene {
     }
 
     SystemManager.instance.setup(this);
+    this.aiHelper = AIHelper.getInstance();
+
+    // Initialize AI popup UI
+    this.aiPopupUI = new AIPopupUI(this);
 
     this.player = new Player(
       {
@@ -78,10 +92,12 @@ export default class Game extends Scene {
       this.gameData = null;
     }
 
-    SystemManager.instance.saveManager.startAutoSave();
+    // SystemManager.instance.saveManager.startAutoSave();
 
     this.events.once("destroy", () => {
       console.log("Cleaning up Game scene resources");
+      this.aiPopupUI.destroy();
+      this.aiHelper.destroy();
 
       // Call the SystemManager's destroy method to clean up all managers
       SystemManager.instance.destroy();

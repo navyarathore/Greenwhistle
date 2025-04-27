@@ -288,6 +288,16 @@ export default class InteractionManager {
     });
   }
 
+  // private usePlaceableItem(item: Item, slotIndex: HotbarIndex, playerPosition: Position, direction: Direction): void {
+  //   if (item.category === MaterialCategory.SEED) {
+  //     if (!this.sysManager.farmingManager.isFarmableTile(playerPosition.x, playerPosition.y)) return;
+  //     this.sysManager.farmingManager.plantSeed(item, playerPosition.x, playerPosition.y);
+  //     this.sysManager.inventoryManager.removeItemFromSlot(
+  //       this.sysManager.inventoryManager.toInventoryIndex(slotIndex),
+  //       1,
+  //     );
+  //   }
+  // }
   private usePlaceableItem(item: Item, slotIndex: HotbarIndex, playerPosition: Position, direction: Direction): void {
     if (item.category === MaterialCategory.SEED) {
       if (!this.sysManager.farmingManager.isFarmableTile(playerPosition.x, playerPosition.y)) return;
@@ -296,6 +306,12 @@ export default class InteractionManager {
         this.sysManager.inventoryManager.toInventoryIndex(slotIndex),
         1,
       );
+
+      // Add this line to emit an event for the AI helper
+      EventBus.emit("seed-planted", {
+        seedId: item.id,
+        position: playerPosition,
+      });
     }
   }
   /**

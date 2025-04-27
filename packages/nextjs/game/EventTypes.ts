@@ -195,8 +195,18 @@ export interface CraftItemEvent {
   recipe: Recipe;
 }
 
+export interface SeedPlantedEvent {
+  seedId: string;
+  position: Position;
+}
+
+export interface AIPopupEvent {
+  itemId: string;
+  content: string;
+  duration: number;
+}
 // Event type mapping
-export interface EventMap {
+export type EventMap = {
   "systems-ready": SystemsReadyEvent;
   "current-scene-ready": CurrentSceneReadyEvent;
   "player-created": PlayerCreatedEvent;
@@ -231,4 +241,7 @@ export interface EventMap {
   "item-transferred": ItemTransferredEvent;
   "item-moved": ItemMovedEvent;
   "item-swapped": ItemSwappedEvent;
-}
+  "seed-planted": SeedPlantedEvent;
+  "show-ai-popup": AIPopupEvent;
+  "ai-helper-toggle": { enabled: boolean };
+};
