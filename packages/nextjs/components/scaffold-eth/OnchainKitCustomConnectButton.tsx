@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { AddressInfoDropdown } from "./RainbowKitCustomConnectButton/AddressInfoDropdown";
 import { AddressQRCodeModal } from "./RainbowKitCustomConnectButton/AddressQRCodeModal";
 import { WrongNetworkDropdown } from "./RainbowKitCustomConnectButton/WrongNetworkDropdown";
@@ -11,6 +11,7 @@ import { useAccount } from "wagmi";
 import { useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
 
 /**
  * Custom OnchainKit Connect Button (watch balance + custom design)
@@ -27,7 +28,18 @@ export const OnchainKitCustomConnectButton = () => {
     ? getBlockExplorerAddressLink(targetNetwork, address as `0x${string}`)
     : undefined;
 
-  // Creating similar behavior to RainbowKit component
+  useEffect(() => {
+    if (!isConnected) {
+      notification.warning(
+        <div className="flex flex-col gap-1">
+          <p className="my-0 font-bold">Wallet Not Connected</p>
+          <p className="my-0">Please connect your wallet to continue</p>
+        </div>,
+        { duration: 5000 },
+      );
+    }
+  }, [isConnected]);
+
   if (!isConnected) {
     return (
       <Wallet>
@@ -67,7 +79,7 @@ export const OnchainKitCustomConnectButton = () => {
   return (
     <Wallet>
       {/* Display balance and network same as original */}
-      <div className="flex text-white items-center gap-1 p-2 ">
+      <div className="flex text-white items-center gap-1 p-2">
         <div className="flex flex-col items-center mr-1 text-white">
           <EthBalance address={address} className="min-h-0 text-white h-auto" />
           <span className="text-xs text-white">{chain.name}</span>
