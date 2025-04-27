@@ -94,6 +94,7 @@ export default class BlockchainSaveManager {
         ...deployedContracts[chainId as keyof typeof deployedContracts].GameSave,
         functionName: "saveGame",
         args: [
+          accountAddress,
           BigInt(Math.floor(saveData.version)),
           BigInt(Math.floor(Date.now() / 1000)), // Use current timestamp to ensure it's always up-to-date
           playerData,
@@ -132,6 +133,7 @@ export default class BlockchainSaveManager {
       const hasSave = await readContract(wagmiConfig, {
         ...deployedContracts[chainId as keyof typeof deployedContracts].GameSave,
         functionName: "hasSaveData",
+        args: [accountAddress],
         account: accountAddress,
       });
 
@@ -144,6 +146,7 @@ export default class BlockchainSaveManager {
       const saveData = await readContract(wagmiConfig, {
         ...deployedContracts[chainId as keyof typeof deployedContracts].GameSave,
         functionName: "loadGame",
+        args: [accountAddress],
         account: accountAddress,
       });
 
@@ -218,6 +221,7 @@ export default class BlockchainSaveManager {
       return (await readContract(wagmiConfig, {
         ...deployedContracts[chainId as keyof typeof deployedContracts].GameSave,
         functionName: "hasSaveData",
+        args: [accountAddress],
         account: accountAddress,
       })) as boolean;
     } catch (error) {
@@ -245,6 +249,7 @@ export default class BlockchainSaveManager {
       const hash = await writeContract(wagmiConfig, {
         ...deployedContracts[chainId as keyof typeof deployedContracts].GameSave,
         functionName: "deleteSaveData",
+        args: [accountAddress],
         account: accountAddress,
       });
 

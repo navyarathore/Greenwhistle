@@ -69,6 +69,7 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
      * @dev Save game data to the blockchain
      */
     function saveGame(
+        address user,
         uint256 _version,
         uint256 _timestamp,
         PlayerData calldata _player,
@@ -76,7 +77,7 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
         FarmingData[] calldata _farming,
         MapChange[] calldata _mapChanges
     ) external whenNotPaused nonReentrant {
-        SaveData storage saveData = gameSaves[msg.sender];
+        SaveData storage saveData = gameSaves[user];
 
         saveData.version = _version;
         saveData.timestamp = _timestamp;
@@ -102,12 +103,12 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
             saveData.mapChanges.push(_mapChanges[i]);
         }
 
-        hasSave[msg.sender] = true;
+        hasSave[user] = true;
 
-        emit GameSaved(msg.sender, _timestamp);
+        emit GameSaved(user, _timestamp);
     }
 
-    function loadGame()
+    function loadGame(address user)
         external
         view
         whenNotPaused
@@ -120,9 +121,9 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
             MapChange[] memory mapChanges
         )
     {
-        require(hasSave[msg.sender], "No save data found for this address");
+        require(hasSave[user], "No save data found for this address");
 
-        SaveData storage saveData = gameSaves[msg.sender];
+        SaveData storage saveData = gameSaves[user];
 
         return (
             saveData.version,
@@ -134,35 +135,24 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
         );
     }
 
-    function getInventory(address user)
-        external
-        view
-        whenNotPaused
-        returns (InventoryItem[] memory inventory)
-    {
-        require(hasSave[user], "No save data found for this address");
-
-        return gameSaves[user].inventory;
-    }
-
     /**
      * @dev Check if the player has a saved game
      * @return Whether the player has a saved game
      */
-    function hasSaveData() external view returns (bool) {
-        return hasSave[msg.sender];
+    function hasSaveData(address user) external view returns (bool) {
+        return hasSave[user];
     }
 
     /**
      * @dev Delete the current save
      */
-    function deleteSaveData() external whenNotPaused nonReentrant {
-        require(hasSave[msg.sender], "No save data found for this address");
+    function deleteSaveData(address user) external whenNotPaused nonReentrant {
+        require(hasSave[user], "No save data found for this address");
 
-        delete gameSaves[msg.sender];
-        hasSave[msg.sender] = false;
+        delete gameSaves[user];
+        hasSave[user] = false;
 
-        emit SaveDeleted(msg.sender);
+        emit SaveDeleted(user);
     }
 
     /**

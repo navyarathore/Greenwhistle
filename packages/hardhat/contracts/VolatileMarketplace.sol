@@ -749,7 +749,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
      */
     function _getUserInventory(address user) internal view returns (GameSave.InventoryItem[] memory) {
         // Check if the user has a save in the GameSave contract
-        bool hasSave = gameSave.hasSaveData();
+        bool hasSave = gameSave.hasSaveData(user);
 
         // If no save exists or the user isn't the caller, return an empty inventory
         if (!hasSave || user != msg.sender) {
@@ -768,7 +768,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
             ,
 
         ) = // map changes (ignored)
-            gameSave.loadGame();
+            gameSave.loadGame(user);
 
         return inventory;
     }
