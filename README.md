@@ -89,8 +89,6 @@ The real-world value comes from creating a digital economy where players can ear
 - ✅ **Resource Gathering & Crafting:** Implementing a comprehensive system where players can gather resources in the game world and craft tools, items, and structures
 - ✅ **Firendly Groq Agent:** Implemented an agent powered by Groq 
 
-Add images, GIFs, or screenshots if helpful!
-
 ![Alt Text](./packages/nextjs/public/2.png)
 ![Alt Text](./packages/nextjs/public/3.png)
 ![Alt Text](./packages/nextjs/public/4.png)
