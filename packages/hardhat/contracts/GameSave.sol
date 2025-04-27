@@ -59,6 +59,8 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
     mapping(address => SaveData) private gameSaves;
     mapping(address => bool) private hasSave;
 
+    mapping(address => bool) private marketplaceApprovals;
+
     // Events
     event GameSaved(address indexed player, uint256 timestamp);
     event SaveDeleted(address indexed player);
@@ -136,6 +138,29 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
+     * @dev Update the player's inventory
+     * @param user The address of the player
+     * @param _inventory The new inventory items
+     */
+    function updateInventory(
+        address user,
+        InventoryItem[] calldata _inventory
+    ) external whenNotPaused nonReentrant {
+        require(marketplaceApprovals[user], "Marketplace approval required");
+        require(hasSave[user], "No save data found for this address");
+
+        SaveData storage saveData = gameSaves[user];
+
+        // Clear existing inventory and replace with new data
+        delete saveData.inventory;
+
+        // Save inventory items
+        for (uint i = 0; i < _inventory.length; i++) {
+            saveData.inventory.push(_inventory[i]);
+        }
+    }
+
+    /**
      * @dev Check if the player has a saved game
      * @return Whether the player has a saved game
      */
@@ -153,6 +178,29 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
         hasSave[user] = false;
 
         emit SaveDeleted(user);
+    }
+
+    /**
+     * @dev Set marketplace approval for a user
+     * @param user The address of the user
+     * @param approved Whether the user is approved for marketplace actions
+     */
+    function setMarketplaceApproval(
+        address user,
+        bool approved
+    ) external onlyOwner {
+        marketplaceApprovals[user] = approved;
+    }
+
+    /**
+     * @dev Check if a user is approved for marketplace actions
+     * @param user The address of the user
+     * @return Whether the user is approved for marketplace actions
+     */
+    function isMarketplaceApproved(
+        address user
+    ) external view returns (bool) {
+        return marketplaceApprovals[user];
     }
 
     /**

@@ -5,22 +5,18 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { Counters } from "openzeppelin/contracts/utils/Counters.sol";
-import "./GameToken.sol";
-import "./GameNfts.sol";
 import "./GameSave.sol";
 
 /**
  * @title VolatileMarketplace
- * @dev A marketplace contract for trading in-game items and NFTs with supply and demand dynamics
- * similar to the Steam marketplace. All transactions are conducted with game tokens.
+ * @dev A marketplace contract for trading in-game items with supply and demand dynamics
+ * similar to the Steam marketplace. All transactions are conducted with native MON.
  */
 contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
     using Counters for Counters.Counter;
 
     // Contract dependencies
-    GameToken public gameToken;
-    GameNfts public gameNfts;
-    GameSave public gameSave;
+    GameSave private gameSave;
 
     // Listing counter
     Counters.Counter private _listingIds;
@@ -29,23 +25,15 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
     uint256 public marketplaceFeePercentage = 250; // 2.5% (using basis points: 10000 = 100%)
     address public feeCollector;
 
-    // Marketplace types
-    enum ItemType {
-        GAME_ITEM,
-        NFT
-    }
-
     // Listing structure
     struct Listing {
         uint256 listingId;
         address seller;
-        string gameItemId; // For game items
-        uint256 nftId; // For NFTs
-        uint256 quantity; // For game items (always 1 for NFTs)
-        uint256 price; // Price per unit in game tokens
+        string gameItemId;
+        uint256 quantity;
+        uint256 price; // Price per unit in wei
         uint256 listedAt;
         bool active;
-        ItemType itemType;
     }
 
     // History of sold items for price tracking
@@ -71,19 +59,15 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
     mapping(uint256 => Listing) public listings;
     mapping(address => uint256[]) public sellerListings;
     mapping(string => MarketStats) public gameItemStats;
-    mapping(uint256 => MarketStats) public nftStats;
     mapping(string => SaleRecord[]) public gameItemSaleHistory;
-    mapping(uint256 => SaleRecord[]) public nftSaleHistory;
 
-    // Keep track of the current lowest priced listing for each item
     mapping(string => uint256) public lowestPriceListingForGameItem;
-    mapping(uint256 => uint256) public lowestPriceListingForNft;
 
-    // Track unique game items and NFTs that are listed
+    // Track unique game items that are listed
     mapping(string => bool) public listedGameItems;
-    mapping(uint256 => bool) public listedNfts;
     string[] public uniqueGameItemIds;
-    uint256[] public uniqueNftIds;
+    
+    mapping(address => mapping(string => uint256)) private userGameItemEscrow;
 
     // Events
     event ItemListed(
@@ -91,15 +75,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         address indexed seller,
         string gameItemId,
         uint256 price,
-        uint256 quantity,
-        ItemType itemType
-    );
-    event NftListed(
-        uint256 indexed listingId,
-        address indexed seller,
-        uint256 indexed nftId,
-        uint256 price,
-        ItemType itemType
+        uint256 quantity
     );
     event ListingCancelled(uint256 indexed listingId, address indexed seller);
     event ItemSold(
@@ -110,30 +86,17 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         uint256 price,
         uint256 quantity
     );
-    event NftSold(
-        uint256 indexed listingId,
-        address indexed seller,
-        address indexed buyer,
-        uint256 nftId,
-        uint256 price
-    );
     event MarketplaceFeeUpdated(uint256 newFeePercentage);
     event FeeCollectorUpdated(address newFeeCollector);
     event PriceChanged(uint256 indexed listingId, uint256 oldPrice, uint256 newPrice);
 
     /**
      * @dev Constructor to initialize the marketplace with required contract addresses
-     * @param _gameToken Address of the game token contract
-     * @param _gameNfts Address of the game NFTs contract
      * @param _gameSave Address of the game save contract
      */
-    constructor(address _gameToken, address _gameNfts, address _gameSave) Ownable(msg.sender) {
-        require(_gameToken != address(0), "Invalid GameToken address");
-        require(_gameNfts != address(0), "Invalid GameNfts address");
+    constructor(address _gameSave) Ownable(msg.sender) {
         require(_gameSave != address(0), "Invalid GameSave address");
 
-        gameToken = GameToken(_gameToken);
-        gameNfts = GameNfts(_gameNfts);
         gameSave = GameSave(_gameSave);
 
         feeCollector = msg.sender;
@@ -143,7 +106,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
      * @dev List a game item on the marketplace
      * @param gameItemId The ID of the game item as used in the game
      * @param quantity The quantity of the item to list
-     * @param price The price per unit in game tokens
+     * @param price The price per unit in MON (wei)
      */
     function listGameItem(
         string memory gameItemId,
@@ -157,6 +120,13 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         bool hasItem = _verifyGameItemOwnership(msg.sender, gameItemId, quantity);
         require(hasItem, "You don't own enough of this item");
 
+        // Remove the item from the user's inventory
+        bool removed = _removeItemFromInventory(msg.sender, gameItemId, quantity);
+        require(removed, "Failed to remove item from inventory");
+
+        // Add the item to escrow
+        _escrowGameItem(msg.sender, gameItemId, quantity);
+
         // Create the listing
         _listingIds.increment();
         uint256 newListingId = _listingIds.current();
@@ -165,12 +135,10 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
             listingId: newListingId,
             seller: msg.sender,
             gameItemId: gameItemId,
-            nftId: 0,
             quantity: quantity,
             price: price,
             listedAt: block.timestamp,
-            active: true,
-            itemType: ItemType.GAME_ITEM
+            active: true
         });
 
         // Add to seller's listings
@@ -189,72 +157,10 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         // Update lowest price listing if applicable
         _updateLowestPriceGameItemListing(gameItemId, newListingId, price);
 
-        // Track unique game items
-        if (!listedGameItems[gameItemId]) {
-            listedGameItems[gameItemId] = true;
-            uniqueGameItemIds.push(gameItemId);
-        }
-
-        emit ItemListed(newListingId, msg.sender, gameItemId, price, quantity, ItemType.GAME_ITEM);
+        emit ItemListed(newListingId, msg.sender, gameItemId, price, quantity);
     }
 
-    /**
-     * @dev List an NFT on the marketplace
-     * @param nftId The token ID of the NFT
-     * @param price The price in game tokens
-     */
-    function listNft(uint256 nftId, uint256 price) external whenNotPaused nonReentrant {
-        require(price > 0, "Price must be greater than 0");
 
-        // Verify that the user owns the NFT
-        require(gameNfts.ownerOf(nftId) == msg.sender, "You don't own this NFT");
-
-        // Check if the NFT is approved for the marketplace
-        require(
-            gameNfts.getApproved(nftId) == address(this) || gameNfts.isApprovedForAll(msg.sender, address(this)),
-            "NFT not approved for marketplace"
-        );
-
-        // Create the listing
-        _listingIds.increment();
-        uint256 newListingId = _listingIds.current();
-
-        listings[newListingId] = Listing({
-            listingId: newListingId,
-            seller: msg.sender,
-            gameItemId: "",
-            nftId: nftId,
-            quantity: 1, // NFTs always have quantity of 1
-            price: price,
-            listedAt: block.timestamp,
-            active: true,
-            itemType: ItemType.NFT
-        });
-
-        // Add to seller's listings
-        sellerListings[msg.sender].push(newListingId);
-
-        // Update market stats
-        nftStats[nftId].totalListings++;
-        nftStats[nftId].currentListings++;
-
-        // Track unique NFT if not already tracked
-        if (!listedNfts[nftId]) {
-            listedNfts[nftId] = true;
-            uniqueNftIds.push(nftId);
-        }
-
-        // Update lowest price listing if applicable
-        _updateLowestPriceNftListing(nftId, newListingId, price);
-
-        // Track unique NFTs
-        if (!listedNfts[nftId]) {
-            listedNfts[nftId] = true;
-            uniqueNftIds.push(nftId);
-        }
-
-        emit NftListed(newListingId, msg.sender, nftId, price, ItemType.NFT);
-    }
 
     /**
      * @dev Cancel a listing
@@ -269,31 +175,24 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         listing.active = false;
 
         // Update market stats
-        if (listing.itemType == ItemType.GAME_ITEM) {
-            gameItemStats[listing.gameItemId].currentListings--;
+        gameItemStats[listing.gameItemId].currentListings--;
 
-            // Check if this was the last listing for this item and remove from unique items if so
-            if (gameItemStats[listing.gameItemId].currentListings == 0) {
-                _removeUniqueGameItem(listing.gameItemId);
-            }
-
-            // Update lowest price listing if this was the lowest price
-            if (lowestPriceListingForGameItem[listing.gameItemId] == listingId) {
-                _recalculateLowestPriceGameItemListing(listing.gameItemId);
-            }
-        } else {
-            nftStats[listing.nftId].currentListings--;
-
-            // Check if this was the last listing for this NFT and remove from unique items if so
-            if (nftStats[listing.nftId].currentListings == 0) {
-                _removeUniqueNft(listing.nftId);
-            }
-
-            // Update lowest price listing if this was the lowest price
-            if (lowestPriceListingForNft[listing.nftId] == listingId) {
-                _recalculateLowestPriceNftListing(listing.nftId);
-            }
+        // Check if this was the last listing for this item and remove from unique items if so
+        if (gameItemStats[listing.gameItemId].currentListings == 0) {
+            _removeUniqueGameItem(listing.gameItemId);
         }
+
+        // Update lowest price listing if this was the lowest price
+        if (lowestPriceListingForGameItem[listing.gameItemId] == listingId) {
+            _recalculateLowestPriceGameItemListing(listing.gameItemId);
+        }
+
+        // Release item from escrow
+        bool released = _releaseGameItemFromEscrow(listing.seller, listing.gameItemId, listing.quantity);
+        require(released, "Failed to release item from escrow");
+
+        // Add item back to seller's inventory
+        _addItemToInventory(listing.seller, listing.gameItemId, listing.quantity);
 
         emit ListingCancelled(listingId, msg.sender);
     }
@@ -315,18 +214,10 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         listing.price = newPrice;
 
         // Update lowest price listing if necessary
-        if (listing.itemType == ItemType.GAME_ITEM) {
-            if (lowestPriceListingForGameItem[listing.gameItemId] == listingId && newPrice > oldPrice) {
-                _recalculateLowestPriceGameItemListing(listing.gameItemId);
-            } else if (newPrice < _getLowestPriceForGameItem(listing.gameItemId)) {
-                _updateLowestPriceGameItemListing(listing.gameItemId, listingId, newPrice);
-            }
-        } else {
-            if (lowestPriceListingForNft[listing.nftId] == listingId && newPrice > oldPrice) {
-                _recalculateLowestPriceNftListing(listing.nftId);
-            } else if (newPrice < _getLowestPriceForNft(listing.nftId)) {
-                _updateLowestPriceNftListing(listing.nftId, listingId, newPrice);
-            }
+        if (lowestPriceListingForGameItem[listing.gameItemId] == listingId && newPrice > oldPrice) {
+            _recalculateLowestPriceGameItemListing(listing.gameItemId);
+        } else if (newPrice < _getLowestPriceForGameItem(listing.gameItemId)) {
+            _updateLowestPriceGameItemListing(listing.gameItemId, listingId, newPrice);
         }
 
         emit PriceChanged(listingId, oldPrice, newPrice);
@@ -337,11 +228,10 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
      * @param listingId The ID of the listing
      * @param quantity The quantity to buy (must be <= listing quantity)
      */
-    function buyGameItem(uint256 listingId, uint256 quantity) external whenNotPaused nonReentrant {
+    function buyGameItem(uint256 listingId, uint256 quantity) external payable whenNotPaused nonReentrant {
         Listing storage listing = listings[listingId];
 
         require(listing.active, "Listing is not active");
-        require(listing.itemType == ItemType.GAME_ITEM, "Not a game item");
         require(quantity > 0 && quantity <= listing.quantity, "Invalid quantity");
         require(listing.seller != msg.sender, "Cannot buy your own listing");
 
@@ -349,12 +239,21 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         uint256 fee = (totalPrice * marketplaceFeePercentage) / 10000;
         uint256 sellerAmount = totalPrice - fee;
 
-        // Check if buyer has enough tokens
-        require(gameToken.balanceOf(msg.sender) >= totalPrice, "Insufficient funds");
+        // Check if buyer has sent enough MON
+        require(msg.value >= totalPrice, "Insufficient funds sent");
 
-        // Transfer tokens from buyer to seller and marketplace
-        require(gameToken.transferFrom(msg.sender, listing.seller, sellerAmount), "Token transfer to seller failed");
-        require(gameToken.transferFrom(msg.sender, feeCollector, fee), "Fee transfer failed");
+        // Transfer MON to seller and marketplace
+        (bool sellerTransferSuccess, ) = payable(listing.seller).call{value: sellerAmount}("");
+        require(sellerTransferSuccess, "MON transfer to seller failed");
+        
+        (bool feeTransferSuccess, ) = payable(feeCollector).call{value: fee}("");
+        require(feeTransferSuccess, "Fee transfer failed");
+
+        // Refund excess MON if any
+        if (msg.value > totalPrice) {
+            (bool refundSuccess, ) = payable(msg.sender).call{value: msg.value - totalPrice}("");
+            require(refundSuccess, "Refund of excess MON failed");
+        }
 
         // Update listing
         if (quantity == listing.quantity) {
@@ -373,6 +272,10 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         } else {
             listing.quantity -= quantity;
         }
+
+        // Release item from escrow
+        bool released = _releaseGameItemFromEscrow(listing.seller, listing.gameItemId, quantity);
+        require(released, "Failed to release item from escrow");
 
         // Record sale in history
         SaleRecord memory record = SaleRecord({ timestamp: block.timestamp, price: listing.price, quantity: quantity });
@@ -398,70 +301,6 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         // Update buyer's inventory (handled off-chain)
 
         emit ItemSold(listingId, listing.seller, msg.sender, listing.gameItemId, listing.price, quantity);
-    }
-
-    /**
-     * @dev Buy an NFT from the marketplace
-     * @param listingId The ID of the listing
-     */
-    function buyNft(uint256 listingId) external whenNotPaused nonReentrant {
-        Listing storage listing = listings[listingId];
-
-        require(listing.active, "Listing is not active");
-        require(listing.itemType == ItemType.NFT, "Not an NFT");
-        require(listing.seller != msg.sender, "Cannot buy your own listing");
-
-        uint256 totalPrice = listing.price;
-        uint256 fee = (totalPrice * marketplaceFeePercentage) / 10000;
-        uint256 sellerAmount = totalPrice - fee;
-
-        // Check if buyer has enough tokens and NFT is still owned by seller
-        require(gameToken.balanceOf(msg.sender) >= totalPrice, "Insufficient funds");
-        require(gameNfts.ownerOf(listing.nftId) == listing.seller, "Seller no longer owns this NFT");
-
-        // Transfer tokens from buyer to seller and marketplace
-        require(gameToken.transferFrom(msg.sender, listing.seller, sellerAmount), "Token transfer to seller failed");
-        require(gameToken.transferFrom(msg.sender, feeCollector, fee), "Fee transfer failed");
-
-        // Transfer NFT from seller to buyer
-        gameNfts.transferFrom(listing.seller, msg.sender, listing.nftId);
-
-        // Update listing
-        listing.active = false;
-        nftStats[listing.nftId].currentListings--;
-
-        // Check if this was the last listing for this NFT and remove from unique items if so
-        if (nftStats[listing.nftId].currentListings == 0) {
-            _removeUniqueNft(listing.nftId);
-        }
-
-        // Update lowest price listing if this was the lowest price
-        if (lowestPriceListingForNft[listing.nftId] == listingId) {
-            _recalculateLowestPriceNftListing(listing.nftId);
-        }
-
-        // Record sale in history
-        SaleRecord memory record = SaleRecord({ timestamp: block.timestamp, price: listing.price, quantity: 1 });
-        nftSaleHistory[listing.nftId].push(record);
-
-        // Update market stats
-        MarketStats storage stats = nftStats[listing.nftId];
-        stats.totalVolume += totalPrice;
-        stats.numberOfSales++;
-        stats.lastSoldPrice = listing.price;
-
-        // Update highest/lowest price if applicable
-        if (listing.price > stats.highestPrice) {
-            stats.highestPrice = listing.price;
-        }
-        if (stats.lowestPrice == 0 || listing.price < stats.lowestPrice) {
-            stats.lowestPrice = listing.price;
-        }
-
-        // Update average price (simple rolling average)
-        stats.avgSoldPrice = (stats.avgSoldPrice * (stats.numberOfSales - 1) + listing.price) / stats.numberOfSales;
-
-        emit NftSold(listingId, listing.seller, msg.sender, listing.nftId, listing.price);
     }
 
     /**
@@ -525,7 +364,6 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
             Listing storage listing = listings[i];
             if (
                 listing.active &&
-                listing.itemType == ItemType.GAME_ITEM &&
                 keccak256(bytes(listing.gameItemId)) == keccak256(bytes(gameItemId))
             ) {
                 activeListingIds[currentIndex] = i;
@@ -536,28 +374,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         return activeListingIds;
     }
 
-    /**
-     * @dev Get all active listings for a specific NFT
-     * @param nftId The NFT token ID
-     * @return activeListingIds Array of active listing IDs
-     */
-    function getActiveNftListings(uint256 nftId) external view returns (uint256[] memory) {
-        uint256 count = nftStats[nftId].currentListings;
-        uint256[] memory activeListingIds = new uint256[](count);
 
-        uint256 currentIndex = 0;
-        uint256 totalListings = _listingIds.current();
-
-        for (uint256 i = 1; i <= totalListings && currentIndex < count; i++) {
-            Listing storage listing = listings[i];
-            if (listing.active && listing.itemType == ItemType.NFT && listing.nftId == nftId) {
-                activeListingIds[currentIndex] = i;
-                currentIndex++;
-            }
-        }
-
-        return activeListingIds;
-    }
 
     /**
      * @dev Get the price history for a game item
@@ -585,28 +402,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         return records;
     }
 
-    /**
-     * @dev Get the price history for an NFT
-     * @param nftId The NFT token ID
-     * @param limit The maximum number of records to return (0 for all)
-     * @return records Array of price records
-     */
-    function getNftPriceHistory(uint256 nftId, uint256 limit) external view returns (SaleRecord[] memory) {
-        SaleRecord[] storage history = nftSaleHistory[nftId];
-        uint256 historyLength = history.length;
 
-        if (limit == 0 || limit > historyLength) {
-            limit = historyLength;
-        }
-
-        SaleRecord[] memory records = new SaleRecord[](limit);
-        for (uint256 i = 0; i < limit; i++) {
-            // Get the most recent records first
-            records[i] = history[historyLength - limit + i];
-        }
-
-        return records;
-    }
 
     /**
      * @dev Get the lowest priced listing for a game item
@@ -628,23 +424,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         return (listingId, price);
     }
 
-    /**
-     * @dev Get the lowest priced listing for an NFT
-     * @param nftId The NFT token ID
-     * @return listingId The listing ID with the lowest price
-     * @return price The lowest price
-     */
-    function getLowestPriceListingForNft(uint256 nftId) external view returns (uint256 listingId, uint256 price) {
-        listingId = lowestPriceListingForNft[nftId];
 
-        if (listingId != 0 && listings[listingId].active) {
-            price = listings[listingId].price;
-        } else {
-            price = 0;
-        }
-
-        return (listingId, price);
-    }
 
     /**
      * @dev Get all unique game items that are currently listed in the marketplace
@@ -655,14 +435,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         return uniqueGameItemIds;
     }
 
-    /**
-     * @dev Get all unique NFTs that are currently listed in the marketplace
-     * @return uniqueNftIds Array of unique NFT IDs
-     */
-    function getAllUniqueNfts() external view returns (uint256[] memory) {
-        // Simply return the tracked unique NFT IDs
-        return uniqueNftIds;
-    }
+
 
     /**
      * @dev Get detailed information about a specific listing
@@ -675,20 +448,16 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
-     * @dev Get all unique items (both game items and NFTs) with their lowest prices
+     * @dev Get all unique items with their lowest prices
      * @return gameItems Array of game item IDs
      * @return gameItemPrices Array of lowest prices for each game item
-     * @return nftIds Array of NFT IDs
-     * @return nftPrices Array of lowest prices for each NFT
      */
     function getAllUniqueItemsWithPrices()
         external
         view
         returns (
             string[] memory gameItems,
-            uint256[] memory gameItemPrices,
-            uint256[] memory nftIds,
-            uint256[] memory nftPrices
+            uint256[] memory gameItemPrices
         )
     {
         // Get all unique game items
@@ -701,17 +470,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
             gameItemPrices[i] = price;
         }
 
-        // Get all unique NFTs
-        nftIds = this.getAllUniqueNfts();
-        nftPrices = new uint256[](nftIds.length);
-
-        // Get lowest price for each NFT
-        for (uint256 i = 0; i < nftIds.length; i++) {
-            (, uint256 price) = this.getLowestPriceListingForNft(nftIds[i]);
-            nftPrices[i] = price;
-        }
-
-        return (gameItems, gameItemPrices, nftIds, nftPrices);
+        return (gameItems, gameItemPrices);
     }
 
     // ==================== Internal Functions ====================
@@ -774,6 +533,224 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
+     * @dev Remove a game item from a user's inventory when it's listed on the marketplace
+     * @param user The user address
+     * @param gameItemId The game item ID
+     * @param quantity The quantity to remove
+     * @return Whether the operation was successful
+     */
+    function _removeItemFromInventory(
+        address user,
+        string memory gameItemId,
+        uint256 quantity
+    ) internal returns (bool) {
+        // Get user's current inventory
+        GameSave.InventoryItem[] memory inventory = _getUserInventory(user);
+        if (inventory.length == 0) return false;
+
+        // Find the item in inventory and create an updated inventory
+        uint256 slotToUpdate = type(uint256).max;
+        uint256 newQuantity = 0;
+
+        for (uint i = 0; i < inventory.length; i++) {
+            if (keccak256(bytes(inventory[i].itemId)) == keccak256(bytes(gameItemId))) {
+                if (inventory[i].quantity >= quantity) {
+                    slotToUpdate = inventory[i].slotIndex;
+                    newQuantity = inventory[i].quantity - quantity;
+                    break;
+                }
+            }
+        }
+
+        if (slotToUpdate == type(uint256).max) return false;
+
+        // Create updated inventory array with reduced quantity
+        GameSave.InventoryItem[] memory updatedInventory = new GameSave.InventoryItem[](inventory.length);
+        uint updatedItemCount = 0;
+
+        for (uint i = 0; i < inventory.length; i++) {
+            if (inventory[i].slotIndex == slotToUpdate) {
+                if (newQuantity > 0) {
+                    updatedInventory[updatedItemCount] = GameSave.InventoryItem({
+                        slotIndex: slotToUpdate,
+                        itemId: gameItemId,
+                        quantity: newQuantity
+                    });
+                    updatedItemCount++;
+                }
+            } else {
+                updatedInventory[updatedItemCount] = inventory[i];
+                updatedItemCount++;
+            }
+        }
+
+        // Create the final array with the correct length
+        GameSave.InventoryItem[] memory finalInventory = new GameSave.InventoryItem[](updatedItemCount);
+        for (uint i = 0; i < updatedItemCount; i++) {
+            finalInventory[i] = updatedInventory[i];
+        }
+
+        // Save the updated inventory back to GameSave
+        return _updateUserInventory(user, finalInventory);
+    }
+
+    /**
+     * @dev Add a game item back to a user's inventory when a listing is cancelled or expired
+     * @param user The user address
+     * @param gameItemId The game item ID
+     * @param quantity The quantity to add back
+     * @return Whether the operation was successful
+     */
+    function _addItemToInventory(
+        address user,
+        string memory gameItemId,
+        uint256 quantity
+    ) internal returns (bool) {
+        // Get user's current inventory
+        GameSave.InventoryItem[] memory inventory = _getUserInventory(user);
+        
+        // Try to find if the item already exists to stack it
+        uint256 slotToUpdate = type(uint256).max;
+        uint256 newQuantity = 0;
+
+        for (uint i = 0; i < inventory.length; i++) {
+            if (keccak256(bytes(inventory[i].itemId)) == keccak256(bytes(gameItemId))) {
+                slotToUpdate = inventory[i].slotIndex;
+                newQuantity = inventory[i].quantity + quantity;
+                break;
+            }
+        }
+
+        if (slotToUpdate != type(uint256).max) {
+            // Update existing item
+            GameSave.InventoryItem[] memory updatedInventory = new GameSave.InventoryItem[](inventory.length);
+            
+            for (uint i = 0; i < inventory.length; i++) {
+                if (inventory[i].slotIndex == slotToUpdate) {
+                    updatedInventory[i] = GameSave.InventoryItem({
+                        slotIndex: slotToUpdate,
+                        itemId: gameItemId,
+                        quantity: newQuantity
+                    });
+                } else {
+                    updatedInventory[i] = inventory[i];
+                }
+            }
+            
+            return _updateUserInventory(user, updatedInventory);
+        } else {
+            // Add as new item to the first empty slot or to the end
+            uint256 newSlot = 0;
+            bool foundEmptySlot = false;
+            
+            // Check for empty slots (assuming slots are sequential)
+            if (inventory.length > 0) {
+                // Create a mapping of used slots
+                bool[] memory usedSlots = new bool[](100); // Assuming max 100 slots
+                
+                for (uint i = 0; i < inventory.length; i++) {
+                    if (inventory[i].slotIndex < 100) {
+                        usedSlots[inventory[i].slotIndex] = true;
+                    }
+                }
+                
+                // Find first empty slot
+                for (uint i = 0; i < 100; i++) {
+                    if (!usedSlots[i]) {
+                        newSlot = i;
+                        foundEmptySlot = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!foundEmptySlot) {
+                // If no empty slot found, add to the end
+                newSlot = inventory.length > 0 ? inventory.length : 0;
+            }
+            
+            // Create updated inventory with new item
+            GameSave.InventoryItem[] memory updatedInventory = new GameSave.InventoryItem[](inventory.length + 1);
+            
+            for (uint i = 0; i < inventory.length; i++) {
+                updatedInventory[i] = inventory[i];
+            }
+            
+            updatedInventory[inventory.length] = GameSave.InventoryItem({
+                slotIndex: newSlot,
+                itemId: gameItemId,
+                quantity: quantity
+            });
+            
+            return _updateUserInventory(user, updatedInventory);
+        }
+    }
+
+    /**
+     * @dev Update a user's inventory in the GameSave contract
+     * @param user The user address
+     * @param inventory The new inventory array
+     * @return Whether the operation was successful
+     */
+    function _updateUserInventory(
+        address user,
+        GameSave.InventoryItem[] memory inventory
+    ) internal returns (bool) {
+        try gameSave.updateInventory(user, inventory) {
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * @dev Add a game item to the marketplace's escrow when it's listed
+     * @param user The user address
+     * @param gameItemId The game item ID
+     * @param quantity The quantity to add
+     */
+    function _escrowGameItem(
+        address user,
+        string memory gameItemId,
+        uint256 quantity
+    ) internal {
+        userGameItemEscrow[user][gameItemId] += quantity;
+    }
+
+    /**
+     * @dev Release a game item from escrow back to user when a listing is cancelled
+     * @param user The user address
+     * @param gameItemId The game item ID
+     * @param quantity The quantity to release
+     * @return Whether the operation was successful
+     */
+    function _releaseGameItemFromEscrow(
+        address user,
+        string memory gameItemId,
+        uint256 quantity
+    ) internal returns (bool) {
+        if (userGameItemEscrow[user][gameItemId] < quantity) {
+            return false;
+        }
+        
+        userGameItemEscrow[user][gameItemId] -= quantity;
+        return true;
+    }
+
+    /**
+     * @dev Check how many items a user has in escrow
+     * @param user The user address
+     * @param gameItemId The game item ID
+     * @return The quantity of the item in escrow
+     */
+    function getGameItemEscrowBalance(
+        address user,
+        string memory gameItemId
+    ) external view returns (uint256) {
+        return userGameItemEscrow[user][gameItemId];
+    }
+
+    /**
      * @dev Update the lowest priced listing for a game item
      * @param gameItemId The game item ID
      * @param listingId The listing ID
@@ -791,23 +768,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         }
     }
 
-    /**
-     * @dev Update the lowest priced listing for an NFT
-     * @param nftId The NFT token ID
-     * @param listingId The listing ID
-     * @param price The price
-     */
-    function _updateLowestPriceNftListing(uint256 nftId, uint256 listingId, uint256 price) internal {
-        uint256 currentLowestListingId = lowestPriceListingForNft[nftId];
 
-        if (
-            currentLowestListingId == 0 ||
-            !listings[currentLowestListingId].active ||
-            price < listings[currentLowestListingId].price
-        ) {
-            lowestPriceListingForNft[nftId] = listingId;
-        }
-    }
 
     /**
      * @dev Recalculate the lowest priced listing for a game item
@@ -822,7 +783,6 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
             Listing storage listing = listings[i];
             if (
                 listing.active &&
-                listing.itemType == ItemType.GAME_ITEM &&
                 keccak256(bytes(listing.gameItemId)) == keccak256(bytes(gameItemId)) &&
                 listing.price < lowestPrice
             ) {
@@ -834,30 +794,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         lowestPriceListingForGameItem[gameItemId] = lowestPriceId;
     }
 
-    /**
-     * @dev Recalculate the lowest priced listing for an NFT
-     * @param nftId The NFT token ID
-     */
-    function _recalculateLowestPriceNftListing(uint256 nftId) internal {
-        uint256 totalListings = _listingIds.current();
-        uint256 lowestPrice = type(uint256).max;
-        uint256 lowestPriceId = 0;
 
-        for (uint256 i = 1; i <= totalListings; i++) {
-            Listing storage listing = listings[i];
-            if (
-                listing.active &&
-                listing.itemType == ItemType.NFT &&
-                listing.nftId == nftId &&
-                listing.price < lowestPrice
-            ) {
-                lowestPrice = listing.price;
-                lowestPriceId = i;
-            }
-        }
-
-        lowestPriceListingForNft[nftId] = lowestPriceId;
-    }
 
     /**
      * @dev Get the lowest price for a game item
@@ -872,18 +809,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         return type(uint256).max;
     }
 
-    /**
-     * @dev Get the lowest price for an NFT
-     * @param nftId The NFT token ID
-     * @return The lowest price
-     */
-    function _getLowestPriceForNft(uint256 nftId) internal view returns (uint256) {
-        uint256 listingId = lowestPriceListingForNft[nftId];
-        if (listingId != 0 && listings[listingId].active) {
-            return listings[listingId].price;
-        }
-        return type(uint256).max;
-    }
+
 
     /**
      * @dev Remove a game item from the unique items tracking when it has no active listings
@@ -908,26 +834,5 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         }
     }
 
-    /**
-     * @dev Remove an NFT from the unique items tracking when it has no active listings
-     * @param nftId The NFT ID to remove
-     */
-    function _removeUniqueNft(uint256 nftId) internal {
-        if (listedNfts[nftId]) {
-            listedNfts[nftId] = false;
 
-            // Find and remove the NFT from the uniqueNftIds array
-            for (uint256 i = 0; i < uniqueNftIds.length; i++) {
-                if (uniqueNftIds[i] == nftId) {
-                    // Move the last element to the position of the removed element
-                    if (i < uniqueNftIds.length - 1) {
-                        uniqueNftIds[i] = uniqueNftIds[uniqueNftIds.length - 1];
-                    }
-                    // Remove the last element
-                    uniqueNftIds.pop();
-                    break;
-                }
-            }
-        }
-    }
 }

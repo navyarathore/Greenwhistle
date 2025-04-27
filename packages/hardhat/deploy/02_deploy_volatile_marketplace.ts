@@ -14,23 +14,30 @@ const deployVolatileMarketplace: DeployFunction = async function (hre: HardhatRu
   console.log(`\n\n 👤 Deployer: ${deployer}`);
 
   // Get the deployed token contracts that VolatileMarketplace depends on
-  const gameToken = await hre.ethers.getContract("GameToken", deployer);
-  const gameNfts = await hre.ethers.getContract("GameNfts", deployer);
   const gameSave = await hre.ethers.getContract("GameSave", deployer);
 
-  console.log(`\n 📦 Using GameToken at ${gameToken.target}`);
-  console.log(`\n 🖼️ Using GameNfts at ${gameNfts.target}`);
   console.log(`\n 💾 Using GameSave at ${gameSave.target}`);
 
   // Deploy the VolatileMarketplace contract
   const volatileMarketplace = await deploy("VolatileMarketplace", {
     from: deployer,
-    args: [gameToken.target, gameNfts.target, gameSave.target],
+    args: [gameSave.target],
     log: true,
     autoMine: true,
   });
 
   console.log(`\n ✅ VolatileMarketplace deployed at ${volatileMarketplace.address}`);
+
+  // Approve the marketplace to update user inventories in GameSave
+  try {
+    console.log(`\n 🔐 Setting marketplace approval in GameSave contract...`);
+    const gameSaveContract = await hre.ethers.getContractAt("GameSave", gameSave.target);
+    const tx = await gameSaveContract.setMarketplaceApproval(volatileMarketplace.address, true);
+    await tx.wait();
+    console.log(`\n ✅ VolatileMarketplace approved to manage inventories`);
+  } catch (error) {
+    console.log(`\n ❌ Error setting marketplace approval: ${error}`);
+  }
 
   // Verify the contract on block explorer if not on a local network
   const networkName = hre.network.name;
@@ -39,7 +46,7 @@ const deployVolatileMarketplace: DeployFunction = async function (hre: HardhatRu
       console.log(`\n 🔍 Verifying contract on block explorer...`);
       await hre.run("verify:verify", {
         address: volatileMarketplace.address,
-        constructorArguments: [gameToken.target, gameNfts.target, gameSave.target],
+        constructorArguments: [gameSave.target],
         contract: "contracts/VolatileMarketplace.sol:VolatileMarketplace",
       });
       console.log(`\n ✅ Contract verified on block explorer`);
@@ -54,4 +61,4 @@ export default deployVolatileMarketplace;
 // Tags help when executing specific deploy scripts
 deployVolatileMarketplace.tags = ["VolatileMarketplace"];
 // Dependencies ensure these contracts are deployed first
-deployVolatileMarketplace.dependencies = ["GameToken", "GameNfts", "GameSave"];
+deployVolatileMarketplace.dependencies = ["GameSave"];
