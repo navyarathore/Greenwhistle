@@ -425,7 +425,7 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
      */
     function getLowestPriceListingForGameItem(
         string memory gameItemId
-    ) external view returns (uint256 listingId, uint256 price) {
+    ) public view returns (uint256 listingId, uint256 price) {
         listingId = lowestPriceListingForGameItem[gameItemId];
 
         if (listingId != 0 && listings[listingId].active) {
@@ -435,6 +435,25 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         }
 
         return (listingId, price);
+    }
+
+    function getTotalQuantity(
+        string memory gameItemId
+    ) public view returns (uint256) {
+        uint256 totalQuantity = 0;
+        uint256 totalListings = _listingIds.current();
+
+        for (uint256 i = 1; i <= totalListings; i++) {
+            Listing storage listing = listings[i];
+            if (
+                listing.active &&
+                keccak256(bytes(listing.gameItemId)) == keccak256(bytes(gameItemId))
+            ) {
+                totalQuantity += listing.quantity;
+            }
+        }
+
+        return totalQuantity;
     }
 
     /**
@@ -459,32 +478,12 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
 
         // Get lowest price for each game item
         for (uint256 i = 0; i < gameItems.length; i++) {
-            gameItemQuantity[i] = this.getTotalQuantity(uniqueGameItemIds[i]);
-            (, uint256 price) = this.getLowestPriceListingForGameItem(gameItems[i]);
+            gameItemQuantity[i] = getTotalQuantity(gameItems[i]);
+            (, uint256 price) = getLowestPriceListingForGameItem(gameItems[i]);
             gameItemPrices[i] = price;
-
         }
 
         return (gameItems, gameItemQuantity, gameItemPrices);
-    }
-
-    function getTotalQuantity(
-        string memory gameItemId
-    ) external view returns (uint256) {
-        uint256 totalQuantity = 0;
-        uint256 totalListings = _listingIds.current();
-
-        for (uint256 i = 1; i <= totalListings; i++) {
-            Listing storage listing = listings[i];
-            if (
-                listing.active &&
-                keccak256(bytes(listing.gameItemId)) == keccak256(bytes(gameItemId))
-            ) {
-                totalQuantity += listing.quantity;
-            }
-        }
-
-        return totalQuantity;
     }
 
     // ==================== Internal Functions ====================

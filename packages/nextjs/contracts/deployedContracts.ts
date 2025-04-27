@@ -4203,7 +4203,7 @@ const deployedContracts = {
       },
     },
     VolatileMarketplace: {
-      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+      address: "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
       abi: [
         {
           inputs: [
@@ -4619,25 +4619,17 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "getAllUniqueGameItems",
-          outputs: [
-            {
-              internalType: "string[]",
-              name: "",
-              type: "string[]",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
           name: "getAllUniqueItemsWithPrices",
           outputs: [
             {
               internalType: "string[]",
               name: "gameItems",
               type: "string[]",
+            },
+            {
+              internalType: "uint256[]",
+              name: "gameItemQuantity",
+              type: "uint256[]",
             },
             {
               internalType: "uint256[]",
@@ -4716,62 +4708,6 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "listingId",
-              type: "uint256",
-            },
-          ],
-          name: "getListingById",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "uint256",
-                  name: "listingId",
-                  type: "uint256",
-                },
-                {
-                  internalType: "address",
-                  name: "seller",
-                  type: "address",
-                },
-                {
-                  internalType: "string",
-                  name: "gameItemId",
-                  type: "string",
-                },
-                {
-                  internalType: "uint256",
-                  name: "quantity",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "price",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "listedAt",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "active",
-                  type: "bool",
-                },
-              ],
-              internalType: "struct VolatileMarketplace.Listing",
-              name: "",
-              type: "tuple",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
               internalType: "string",
               name: "gameItemId",
               type: "string",
@@ -4796,17 +4732,17 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
-              name: "seller",
-              type: "address",
+              internalType: "string",
+              name: "gameItemId",
+              type: "string",
             },
           ],
-          name: "getSellerListings",
+          name: "getTotalQuantity",
           outputs: [
             {
-              internalType: "uint256[]",
+              internalType: "uint256",
               name: "",
-              type: "uint256[]",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
