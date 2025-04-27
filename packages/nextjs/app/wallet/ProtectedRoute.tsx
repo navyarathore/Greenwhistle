@@ -1,29 +1,8 @@
-// ~~/components/wallet/ProtectedRoute.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
-
-// ~~/components/wallet/ProtectedRoute.tsx
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isConnected } = useAccount();

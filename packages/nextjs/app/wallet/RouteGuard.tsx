@@ -1,30 +1,9 @@
-// ~~/components/wallet/RouteGuard.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 import { notification } from "~~/utils/scaffold-eth";
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
-
-// ~~/components/wallet/RouteGuard.tsx
 
 const protectedRoutes = ["/game", "/marketplace", "/recipes"];
 

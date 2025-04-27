@@ -1,4 +1,3 @@
-// app/marketplace/[slug]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,66 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Item, getItemBySlug } from "../types/item";
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
-
-// app/marketplace/[slug]/page.tsx
 
 export default function ItemDetailPage() {
   const params = useParams();
