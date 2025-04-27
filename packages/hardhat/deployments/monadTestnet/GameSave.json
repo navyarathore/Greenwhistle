@@ -1,0 +1,1029 @@
+{
+  "address": "0x032b4EcfFB926DF1611224e76812cD870fb8E0Bb",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "EnforcedPause",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ExpectedPause",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ReentrancyGuardReentrantCall",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "GameSaved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Paused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        }
+      ],
+      "name": "SaveDeleted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Unpaused",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "deleteSaveData",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "hasSaveData",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "isMarketplaceApproved",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "loadGame",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "version",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "positionX",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "positionY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "health",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "selectedHotbarSlot",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct GameSave.PlayerData",
+          "name": "player",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "slotIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "quantity",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct GameSave.InventoryItem[]",
+          "name": "inventory",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "positionX",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "positionY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "cropId",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "growthStage",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "plantedTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "lastWateredTime",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct GameSave.FarmingData[]",
+          "name": "farming",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "layer",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "positionX",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "positionY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "int256",
+              "name": "tileIndex",
+              "type": "int256"
+            }
+          ],
+          "internalType": "struct GameSave.MapChange[]",
+          "name": "mapChanges",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "paused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_version",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_timestamp",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "positionX",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "positionY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "health",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "selectedHotbarSlot",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct GameSave.PlayerData",
+          "name": "_player",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "slotIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "quantity",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct GameSave.InventoryItem[]",
+          "name": "_inventory",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "positionX",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "positionY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "cropId",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "growthStage",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "plantedTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "lastWateredTime",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct GameSave.FarmingData[]",
+          "name": "_farming",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "layer",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "positionX",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "positionY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "int256",
+              "name": "tileIndex",
+              "type": "int256"
+            }
+          ],
+          "internalType": "struct GameSave.MapChange[]",
+          "name": "_mapChanges",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "saveGame",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        }
+      ],
+      "name": "setMarketplaceApproval",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unpause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "slotIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "quantity",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct GameSave.InventoryItem[]",
+          "name": "_inventory",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "updateInventory",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xeed9e6be6e77f6a0baa8cea84e6dbfddd1e634caf3f24a23b8598eb57572b7cf",
+  "receipt": {
+    "to": null,
+    "from": "0x19C19ba61e9BC0568198B6873Bd59181D86d79D4",
+    "contractAddress": "0x032b4EcfFB926DF1611224e76812cD870fb8E0Bb",
+    "transactionIndex": 40,
+    "gasUsed": "1381491",
+    "logsBloom": "0x00000400000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080001000000000000000000100000000000000000020000000000100000000800000000000000000000000000000000400000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x81ba872a17d288ae93e433abf8c13561d7f2f56f601d5e505d5c2d94aed1b430",
+    "transactionHash": "0xeed9e6be6e77f6a0baa8cea84e6dbfddd1e634caf3f24a23b8598eb57572b7cf",
+    "logs": [
+      {
+        "transactionIndex": 40,
+        "blockNumber": 14780287,
+        "transactionHash": "0xeed9e6be6e77f6a0baa8cea84e6dbfddd1e634caf3f24a23b8598eb57572b7cf",
+        "address": "0x032b4EcfFB926DF1611224e76812cD870fb8E0Bb",
+        "topics": [
+          "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x00000000000000000000000019c19ba61e9bc0568198b6873bd59181d86d79d4"
+        ],
+        "data": "0x",
+        "logIndex": 12,
+        "blockHash": "0x81ba872a17d288ae93e433abf8c13561d7f2f56f601d5e505d5c2d94aed1b430"
+      }
+    ],
+    "blockNumber": 14780287,
+    "cumulativeGasUsed": "3134476",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "e7a2ba98070e18fbfa9165c28de71968",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"EnforcedPause\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ExpectedPause\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ReentrancyGuardReentrantCall\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"player\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"GameSaved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"Paused\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"player\",\"type\":\"address\"}],\"name\":\"SaveDeleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"Unpaused\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"deleteSaveData\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"hasSaveData\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"isMarketplaceApproved\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"loadGame\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"version\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"positionX\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"positionY\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"health\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"selectedHotbarSlot\",\"type\":\"uint256\"}],\"internalType\":\"struct GameSave.PlayerData\",\"name\":\"player\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"slotIndex\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"itemId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"quantity\",\"type\":\"uint256\"}],\"internalType\":\"struct GameSave.InventoryItem[]\",\"name\":\"inventory\",\"type\":\"tuple[]\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"positionX\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"positionY\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"cropId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"growthStage\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"plantedTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"lastWateredTime\",\"type\":\"uint256\"}],\"internalType\":\"struct GameSave.FarmingData[]\",\"name\":\"farming\",\"type\":\"tuple[]\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"layer\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"positionX\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"positionY\",\"type\":\"uint256\"},{\"internalType\":\"int256\",\"name\":\"tileIndex\",\"type\":\"int256\"}],\"internalType\":\"struct GameSave.MapChange[]\",\"name\":\"mapChanges\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_version\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_timestamp\",\"type\":\"uint256\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"positionX\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"positionY\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"health\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"selectedHotbarSlot\",\"type\":\"uint256\"}],\"internalType\":\"struct GameSave.PlayerData\",\"name\":\"_player\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"slotIndex\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"itemId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"quantity\",\"type\":\"uint256\"}],\"internalType\":\"struct GameSave.InventoryItem[]\",\"name\":\"_inventory\",\"type\":\"tuple[]\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"positionX\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"positionY\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"cropId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"growthStage\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"plantedTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"lastWateredTime\",\"type\":\"uint256\"}],\"internalType\":\"struct GameSave.FarmingData[]\",\"name\":\"_farming\",\"type\":\"tuple[]\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"layer\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"positionX\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"positionY\",\"type\":\"uint256\"},{\"internalType\":\"int256\",\"name\":\"tileIndex\",\"type\":\"int256\"}],\"internalType\":\"struct GameSave.MapChange[]\",\"name\":\"_mapChanges\",\"type\":\"tuple[]\"}],\"name\":\"saveGame\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"setMarketplaceApproval\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"unpause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"slotIndex\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"itemId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"quantity\",\"type\":\"uint256\"}],\"internalType\":\"struct GameSave.InventoryItem[]\",\"name\":\"_inventory\",\"type\":\"tuple[]\"}],\"name\":\"updateInventory\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Contract for saving and loading game data to/from the blockchain\",\"errors\":{\"EnforcedPause()\":[{\"details\":\"The operation failed because the contract is paused.\"}],\"ExpectedPause()\":[{\"details\":\"The operation failed because the contract is not paused.\"}],\"OwnableInvalidOwner(address)\":[{\"details\":\"The owner is not a valid owner account. (eg. `address(0)`)\"}],\"OwnableUnauthorizedAccount(address)\":[{\"details\":\"The caller account is not authorized to perform an operation.\"}],\"ReentrancyGuardReentrantCall()\":[{\"details\":\"Unauthorized reentrant call.\"}]},\"events\":{\"Paused(address)\":{\"details\":\"Emitted when the pause is triggered by `account`.\"},\"Unpaused(address)\":{\"details\":\"Emitted when the pause is lifted by `account`.\"}},\"kind\":\"dev\",\"methods\":{\"deleteSaveData(address)\":{\"details\":\"Delete the current save\"},\"hasSaveData(address)\":{\"details\":\"Check if the player has a saved game\",\"returns\":{\"_0\":\"Whether the player has a saved game\"}},\"isMarketplaceApproved(address)\":{\"details\":\"Check if a user is approved for marketplace actions\",\"params\":{\"user\":\"The address of the user\"},\"returns\":{\"_0\":\"Whether the user is approved for marketplace actions\"}},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"pause()\":{\"details\":\"Pause the contract (only owner)\"},\"paused()\":{\"details\":\"Returns true if the contract is paused, and false otherwise.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner.\"},\"saveGame(address,uint256,uint256,(uint256,uint256,uint256,uint256),(uint256,string,uint256)[],(uint256,uint256,string,uint256,uint256,uint256)[],(string,uint256,uint256,int256)[])\":{\"details\":\"Save game data to the blockchain\"},\"setMarketplaceApproval(address,bool)\":{\"details\":\"Set marketplace approval for a user\",\"params\":{\"approved\":\"Whether the user is approved for marketplace actions\",\"user\":\"The address of the user\"}},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"},\"unpause()\":{\"details\":\"Unpause the contract (only owner)\"},\"updateInventory(address,(uint256,string,uint256)[])\":{\"details\":\"Update the player's inventory\",\"params\":{\"_inventory\":\"The new inventory items\",\"user\":\"The address of the player\"}}},\"title\":\"GameSave\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/GameSave.sol\":\"GameSave\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (access/Ownable.sol)\\n\\npragma solidity ^0.8.20;\\n\\nimport {Context} from \\\"../utils/Context.sol\\\";\\n\\n/**\\n * @dev Contract module which provides a basic access control mechanism, where\\n * there is an account (an owner) that can be granted exclusive access to\\n * specific functions.\\n *\\n * The initial owner is set to the address provided by the deployer. This can\\n * later be changed with {transferOwnership}.\\n *\\n * This module is used through inheritance. It will make available the modifier\\n * `onlyOwner`, which can be applied to your functions to restrict their use to\\n * the owner.\\n */\\nabstract contract Ownable is Context {\\n    address private _owner;\\n\\n    /**\\n     * @dev The caller account is not authorized to perform an operation.\\n     */\\n    error OwnableUnauthorizedAccount(address account);\\n\\n    /**\\n     * @dev The owner is not a valid owner account. (eg. `address(0)`)\\n     */\\n    error OwnableInvalidOwner(address owner);\\n\\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\\n\\n    /**\\n     * @dev Initializes the contract setting the address provided by the deployer as the initial owner.\\n     */\\n    constructor(address initialOwner) {\\n        if (initialOwner == address(0)) {\\n            revert OwnableInvalidOwner(address(0));\\n        }\\n        _transferOwnership(initialOwner);\\n    }\\n\\n    /**\\n     * @dev Throws if called by any account other than the owner.\\n     */\\n    modifier onlyOwner() {\\n        _checkOwner();\\n        _;\\n    }\\n\\n    /**\\n     * @dev Returns the address of the current owner.\\n     */\\n    function owner() public view virtual returns (address) {\\n        return _owner;\\n    }\\n\\n    /**\\n     * @dev Throws if the sender is not the owner.\\n     */\\n    function _checkOwner() internal view virtual {\\n        if (owner() != _msgSender()) {\\n            revert OwnableUnauthorizedAccount(_msgSender());\\n        }\\n    }\\n\\n    /**\\n     * @dev Leaves the contract without owner. It will not be possible to call\\n     * `onlyOwner` functions. Can only be called by the current owner.\\n     *\\n     * NOTE: Renouncing ownership will leave the contract without an owner,\\n     * thereby disabling any functionality that is only available to the owner.\\n     */\\n    function renounceOwnership() public virtual onlyOwner {\\n        _transferOwnership(address(0));\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Can only be called by the current owner.\\n     */\\n    function transferOwnership(address newOwner) public virtual onlyOwner {\\n        if (newOwner == address(0)) {\\n            revert OwnableInvalidOwner(address(0));\\n        }\\n        _transferOwnership(newOwner);\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Internal function without access restriction.\\n     */\\n    function _transferOwnership(address newOwner) internal virtual {\\n        address oldOwner = _owner;\\n        _owner = newOwner;\\n        emit OwnershipTransferred(oldOwner, newOwner);\\n    }\\n}\\n\",\"keccak256\":\"0xff6d0bb2e285473e5311d9d3caacb525ae3538a80758c10649a4d61029b017bb\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Context.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.1) (utils/Context.sol)\\n\\npragma solidity ^0.8.20;\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract Context {\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n\\n    function _contextSuffixLength() internal view virtual returns (uint256) {\\n        return 0;\\n    }\\n}\\n\",\"keccak256\":\"0x493033a8d1b176a037b2cc6a04dad01a5c157722049bbecf632ca876224dd4b2\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Pausable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (utils/Pausable.sol)\\n\\npragma solidity ^0.8.20;\\n\\nimport {Context} from \\\"../utils/Context.sol\\\";\\n\\n/**\\n * @dev Contract module which allows children to implement an emergency stop\\n * mechanism that can be triggered by an authorized account.\\n *\\n * This module is used through inheritance. It will make available the\\n * modifiers `whenNotPaused` and `whenPaused`, which can be applied to\\n * the functions of your contract. Note that they will not be pausable by\\n * simply including this module, only once the modifiers are put in place.\\n */\\nabstract contract Pausable is Context {\\n    bool private _paused;\\n\\n    /**\\n     * @dev Emitted when the pause is triggered by `account`.\\n     */\\n    event Paused(address account);\\n\\n    /**\\n     * @dev Emitted when the pause is lifted by `account`.\\n     */\\n    event Unpaused(address account);\\n\\n    /**\\n     * @dev The operation failed because the contract is paused.\\n     */\\n    error EnforcedPause();\\n\\n    /**\\n     * @dev The operation failed because the contract is not paused.\\n     */\\n    error ExpectedPause();\\n\\n    /**\\n     * @dev Initializes the contract in unpaused state.\\n     */\\n    constructor() {\\n        _paused = false;\\n    }\\n\\n    /**\\n     * @dev Modifier to make a function callable only when the contract is not paused.\\n     *\\n     * Requirements:\\n     *\\n     * - The contract must not be paused.\\n     */\\n    modifier whenNotPaused() {\\n        _requireNotPaused();\\n        _;\\n    }\\n\\n    /**\\n     * @dev Modifier to make a function callable only when the contract is paused.\\n     *\\n     * Requirements:\\n     *\\n     * - The contract must be paused.\\n     */\\n    modifier whenPaused() {\\n        _requirePaused();\\n        _;\\n    }\\n\\n    /**\\n     * @dev Returns true if the contract is paused, and false otherwise.\\n     */\\n    function paused() public view virtual returns (bool) {\\n        return _paused;\\n    }\\n\\n    /**\\n     * @dev Throws if the contract is paused.\\n     */\\n    function _requireNotPaused() internal view virtual {\\n        if (paused()) {\\n            revert EnforcedPause();\\n        }\\n    }\\n\\n    /**\\n     * @dev Throws if the contract is not paused.\\n     */\\n    function _requirePaused() internal view virtual {\\n        if (!paused()) {\\n            revert ExpectedPause();\\n        }\\n    }\\n\\n    /**\\n     * @dev Triggers stopped state.\\n     *\\n     * Requirements:\\n     *\\n     * - The contract must not be paused.\\n     */\\n    function _pause() internal virtual whenNotPaused {\\n        _paused = true;\\n        emit Paused(_msgSender());\\n    }\\n\\n    /**\\n     * @dev Returns to normal state.\\n     *\\n     * Requirements:\\n     *\\n     * - The contract must be paused.\\n     */\\n    function _unpause() internal virtual whenPaused {\\n        _paused = false;\\n        emit Unpaused(_msgSender());\\n    }\\n}\\n\",\"keccak256\":\"0xb2e5f50762c27fb4b123e3619c3c02bdcba5e515309382e5bfb6f7d6486510bd\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/ReentrancyGuard.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (utils/ReentrancyGuard.sol)\\n\\npragma solidity ^0.8.20;\\n\\n/**\\n * @dev Contract module that helps prevent reentrant calls to a function.\\n *\\n * Inheriting from `ReentrancyGuard` will make the {nonReentrant} modifier\\n * available, which can be applied to functions to make sure there are no nested\\n * (reentrant) calls to them.\\n *\\n * Note that because there is a single `nonReentrant` guard, functions marked as\\n * `nonReentrant` may not call one another. This can be worked around by making\\n * those functions `private`, and then adding `external` `nonReentrant` entry\\n * points to them.\\n *\\n * TIP: If you would like to learn more about reentrancy and alternative ways\\n * to protect against it, check out our blog post\\n * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].\\n */\\nabstract contract ReentrancyGuard {\\n    // Booleans are more expensive than uint256 or any type that takes up a full\\n    // word because each write operation emits an extra SLOAD to first read the\\n    // slot's contents, replace the bits taken up by the boolean, and then write\\n    // back. This is the compiler's defense against contract upgrades and\\n    // pointer aliasing, and it cannot be disabled.\\n\\n    // The values being non-zero value makes deployment a bit more expensive,\\n    // but in exchange the refund on every call to nonReentrant will be lower in\\n    // amount. Since refunds are capped to a percentage of the total\\n    // transaction's gas, it is best to keep them low in cases like this one, to\\n    // increase the likelihood of the full refund coming into effect.\\n    uint256 private constant NOT_ENTERED = 1;\\n    uint256 private constant ENTERED = 2;\\n\\n    uint256 private _status;\\n\\n    /**\\n     * @dev Unauthorized reentrant call.\\n     */\\n    error ReentrancyGuardReentrantCall();\\n\\n    constructor() {\\n        _status = NOT_ENTERED;\\n    }\\n\\n    /**\\n     * @dev Prevents a contract from calling itself, directly or indirectly.\\n     * Calling a `nonReentrant` function from another `nonReentrant`\\n     * function is not supported. It is possible to prevent this from happening\\n     * by making the `nonReentrant` function external, and making it call a\\n     * `private` function that does the actual work.\\n     */\\n    modifier nonReentrant() {\\n        _nonReentrantBefore();\\n        _;\\n        _nonReentrantAfter();\\n    }\\n\\n    function _nonReentrantBefore() private {\\n        // On the first call to nonReentrant, _status will be NOT_ENTERED\\n        if (_status == ENTERED) {\\n            revert ReentrancyGuardReentrantCall();\\n        }\\n\\n        // Any calls to nonReentrant after this point will fail\\n        _status = ENTERED;\\n    }\\n\\n    function _nonReentrantAfter() private {\\n        // By storing the original value once again, a refund is triggered (see\\n        // https://eips.ethereum.org/EIPS/eip-2200)\\n        _status = NOT_ENTERED;\\n    }\\n\\n    /**\\n     * @dev Returns true if the reentrancy guard is currently set to \\\"entered\\\", which indicates there is a\\n     * `nonReentrant` function in the call stack.\\n     */\\n    function _reentrancyGuardEntered() internal view returns (bool) {\\n        return _status == ENTERED;\\n    }\\n}\\n\",\"keccak256\":\"0xf980daa263b661ab8ddee7d4fd833c7da7e7995e2c359ff1f17e67e4112f2236\",\"license\":\"MIT\"},\"contracts/GameSave.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\nimport {Ownable} from \\\"@openzeppelin/contracts/access/Ownable.sol\\\";\\nimport {Pausable} from \\\"@openzeppelin/contracts/utils/Pausable.sol\\\";\\nimport {ReentrancyGuard} from \\\"@openzeppelin/contracts/utils/ReentrancyGuard.sol\\\";\\n\\n/**\\n * @title GameSave\\n * @dev Contract for saving and loading game data to/from the blockchain\\n */\\ncontract GameSave is Ownable, ReentrancyGuard, Pausable {\\n    // Game data structure\\n    struct SaveData {\\n        uint256 version;\\n        uint256 timestamp;\\n        // Player data\\n        PlayerData player;\\n        // Arrays for different game elements\\n        InventoryItem[] inventory;\\n        FarmingData[] farming;\\n        MapChange[] mapChanges;\\n    }\\n\\n    // Player data structure\\n    struct PlayerData {\\n        uint256 positionX;\\n        uint256 positionY;\\n        uint256 health;\\n        uint256 selectedHotbarSlot;\\n    }\\n\\n    // Inventory item structure\\n    struct InventoryItem {\\n        uint256 slotIndex;\\n        string itemId;\\n        uint256 quantity;\\n    }\\n\\n    // Farming data structure\\n    struct FarmingData {\\n        uint256 positionX;\\n        uint256 positionY;\\n        string cropId;\\n        uint256 growthStage;\\n        uint256 plantedTime;\\n        uint256 lastWateredTime;\\n    }\\n\\n    // Map change structure\\n    struct MapChange {\\n        string layer;\\n        uint256 positionX;\\n        uint256 positionY;\\n        int256 tileIndex;\\n    }\\n\\n    // Mapping from address to save data\\n    mapping(address => SaveData) private gameSaves;\\n    mapping(address => bool) private hasSave;\\n\\n    mapping(address => bool) private marketplaceApprovals;\\n\\n    // Events\\n    event GameSaved(address indexed player, uint256 timestamp);\\n    event SaveDeleted(address indexed player);\\n\\n    constructor() Ownable(msg.sender) {}\\n\\n    /**\\n     * @dev Save game data to the blockchain\\n     */\\n    function saveGame(\\n        address user,\\n        uint256 _version,\\n        uint256 _timestamp,\\n        PlayerData calldata _player,\\n        InventoryItem[] calldata _inventory,\\n        FarmingData[] calldata _farming,\\n        MapChange[] calldata _mapChanges\\n    ) external whenNotPaused nonReentrant {\\n        SaveData storage saveData = gameSaves[user];\\n\\n        saveData.version = _version;\\n        saveData.timestamp = _timestamp;\\n        saveData.player = _player;\\n\\n        // Clear existing arrays and replace with new data\\n        delete saveData.inventory;\\n        delete saveData.farming;\\n        delete saveData.mapChanges;\\n\\n        // Save inventory items\\n        for (uint i = 0; i < _inventory.length; i++) {\\n            saveData.inventory.push(_inventory[i]);\\n        }\\n\\n        // Save farming data\\n        for (uint i = 0; i < _farming.length; i++) {\\n            saveData.farming.push(_farming[i]);\\n        }\\n\\n        // Save map changes\\n        for (uint i = 0; i < _mapChanges.length; i++) {\\n            saveData.mapChanges.push(_mapChanges[i]);\\n        }\\n\\n        hasSave[user] = true;\\n\\n        emit GameSaved(user, _timestamp);\\n    }\\n\\n    function loadGame(address user)\\n        external\\n        view\\n        whenNotPaused\\n        returns (\\n            uint256 version,\\n            uint256 timestamp,\\n            PlayerData memory player,\\n            InventoryItem[] memory inventory,\\n            FarmingData[] memory farming,\\n            MapChange[] memory mapChanges\\n        )\\n    {\\n        require(hasSave[user], \\\"No save data found for this address\\\");\\n\\n        SaveData storage saveData = gameSaves[user];\\n\\n        return (\\n            saveData.version,\\n            saveData.timestamp,\\n            saveData.player,\\n            saveData.inventory,\\n            saveData.farming,\\n            saveData.mapChanges\\n        );\\n    }\\n\\n    /**\\n     * @dev Update the player's inventory\\n     * @param user The address of the player\\n     * @param _inventory The new inventory items\\n     */\\n    function updateInventory(\\n        address user,\\n        InventoryItem[] calldata _inventory\\n    ) external whenNotPaused nonReentrant {\\n        require(marketplaceApprovals[msg.sender], \\\"Marketplace approval required\\\");\\n        require(hasSave[user], \\\"No save data found for this address\\\");\\n\\n        SaveData storage saveData = gameSaves[user];\\n\\n        // Clear existing inventory and replace with new data\\n        delete saveData.inventory;\\n\\n        // Save inventory items\\n        for (uint i = 0; i < _inventory.length; i++) {\\n            saveData.inventory.push(_inventory[i]);\\n        }\\n    }\\n\\n    /**\\n     * @dev Check if the player has a saved game\\n     * @return Whether the player has a saved game\\n     */\\n    function hasSaveData(address user) external view returns (bool) {\\n        return hasSave[user];\\n    }\\n\\n    /**\\n     * @dev Delete the current save\\n     */\\n    function deleteSaveData(address user) external whenNotPaused nonReentrant {\\n        require(hasSave[user], \\\"No save data found for this address\\\");\\n\\n        delete gameSaves[user];\\n        hasSave[user] = false;\\n\\n        emit SaveDeleted(user);\\n    }\\n\\n    /**\\n     * @dev Set marketplace approval for a user\\n     * @param user The address of the user\\n     * @param approved Whether the user is approved for marketplace actions\\n     */\\n    function setMarketplaceApproval(\\n        address user,\\n        bool approved\\n    ) external onlyOwner {\\n        marketplaceApprovals[user] = approved;\\n    }\\n\\n    /**\\n     * @dev Check if a user is approved for marketplace actions\\n     * @param user The address of the user\\n     * @return Whether the user is approved for marketplace actions\\n     */\\n    function isMarketplaceApproved(\\n        address user\\n    ) external view returns (bool) {\\n        return marketplaceApprovals[user];\\n    }\\n\\n    /**\\n     * @dev Pause the contract (only owner)\\n     */\\n    function pause() external onlyOwner {\\n        _pause();\\n    }\\n\\n    /**\\n     * @dev Unpause the contract (only owner)\\n     */\\n    function unpause() external onlyOwner {\\n        _unpause();\\n    }\\n}\\n\",\"keccak256\":\"0xb2afd3b29a74ddecf540545f0ae581d226192da6890bd3239a2ac6622955e56d\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50338061003757604051631e4fbdf760e01b81526000600482015260240160405180910390fd5b61004081610054565b50600180556002805460ff191690556100a4565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6116eb806100b36000396000f3fe608060405234801561001057600080fd5b50600436106100cf5760003560e01c80635c975abb1161008c5780638456cb59116100665780638456cb59146101a35780638da5cb5b146101ab578063c8ddc77e146101c6578063f2fde38b146101f257600080fd5b80635c975abb1461016b57806360351b1914610176578063715018a61461019b57600080fd5b80632062b874146100d457806326e09112146100e957806331062623146100fc578063322a4fbb1461010f5780633f4ba83a146101505780633fc2227d14610158575b600080fd5b6100e76100e2366004610e2e565b610205565b005b6100e76100f7366004610e9c565b610313565b6100e761010a366004610f7c565b610556565b61013b61011d366004610e2e565b6001600160a01b031660009081526005602052604090205460ff1690565b60405190151581526020015b60405180910390f35b6100e7610589565b6100e7610166366004610fb8565b61059b565b60025460ff1661013b565b610189610184366004610e2e565b6106e3565b60405161014796959493929190611157565b6100e7610aec565b6100e7610afe565b6000546040516001600160a01b039091168152602001610147565b61013b6101d4366004610e2e565b6001600160a01b031660009081526004602052604090205460ff1690565b6100e7610200366004610e2e565b610b0e565b61020d610b49565b610215610b6d565b6001600160a01b03811660009081526004602052604090205460ff166102565760405162461bcd60e51b815260040161024d9061123d565b60405180910390fd5b6001600160a01b0381166000908152600360208190526040822082815560018101839055600281018390559081018290556004810182905560058101829055906102a36006830182610cc6565b6102b1600783016000610ce7565b6102bf600883016000610d08565b50506001600160a01b038116600081815260046020526040808220805460ff19169055517fcd4861bdfa9306be142caf147520434391d8a10ba868641ad817622f322a8db69190a261031060018055565b50565b61031b610b49565b610323610b6d565b6001600160a01b038a1660009081526003602052604090208981556001810189905587600282016103758282813581556020820135600182015560408201356002820155606082013560038201555050565b506103869050600682016000610cc6565b610394600782016000610ce7565b6103a2600882016000610d08565b60005b8681101561040c57816006018888838181106103c3576103c3611280565b90506020028101906103d59190611296565b8154600181018355600092835260209092209091600302016103f782826113b0565b505080806104049061148b565b9150506103a5565b5060005b84811015610477578160070186868381811061042e5761042e611280565b905060200281019061044091906114b2565b81546001810183556000928352602090922090916006020161046282826114c8565b5050808061046f9061148b565b915050610410565b5060005b828110156104e2578160080184848381811061049957610499611280565b90506020028101906104ab91906115c1565b8154600181018355600092835260209092209091600402016104cd82826115d7565b505080806104da9061148b565b91505061047b565b506001600160a01b038b1660008181526004602052604090819020805460ff19166001179055517f3e709529c260221e704acb36210bd74eac8da3d5f4480ee17dfd7240fd10456190610538908c815260200190565b60405180910390a25061054a60018055565b50505050505050505050565b61055e610b97565b6001600160a01b03919091166000908152600560205260409020805460ff1916911515919091179055565b610591610b97565b610599610bc4565b565b6105a3610b49565b6105ab610b6d565b3360009081526005602052604090205460ff1661060a5760405162461bcd60e51b815260206004820152601d60248201527f4d61726b6574706c61636520617070726f76616c207265717569726564000000604482015260640161024d565b6001600160a01b03831660009081526004602052604090205460ff166106425760405162461bcd60e51b815260040161024d9061123d565b6001600160a01b038316600090815260036020526040812090610669906006830190610cc6565b60005b828110156106d3578160060184848381811061068a5761068a611280565b905060200281019061069c9190611296565b8154600181018355600092835260209092209091600302016106be82826113b0565b505080806106cb9061148b565b91505061066c565b50506106de60018055565b505050565b6000806107116040518060800160405280600081526020016000815260200160008152602001600081525090565b606080606061071e610b49565b6001600160a01b03871660009081526004602052604090205460ff166107565760405162461bcd60e51b815260040161024d9061123d565b6001600160a01b03871660009081526003602081815260408084208054600182015483516080810185526002840154815295830154868601526004830154868501526005830154606087015260068301805485518188028101880190965280865293979296919591949093600789019360088a01938692919084015b828210156108aa57838290600052602060002090600302016040518060600160405290816000820154815260200160018201805461080f90611313565b80601f016020809104026020016040519081016040528092919081815260200182805461083b90611313565b80156108885780601f1061085d57610100808354040283529160200191610888565b820191906000526020600020905b81548152906001019060200180831161086b57829003601f168201915b50505050508152602001600282015481525050815260200190600101906107d2565b50505050925081805480602002602001604051908101604052809291908181526020016000905b828210156109c757838290600052602060002090600602016040518060c0016040529081600082015481526020016001820154815260200160028201805461091890611313565b80601f016020809104026020016040519081016040528092919081815260200182805461094490611313565b80156109915780601f1061096657610100808354040283529160200191610991565b820191906000526020600020905b81548152906001019060200180831161097457829003601f168201915b505050505081526020016003820154815260200160048201548152602001600582015481525050815260200190600101906108d1565b50505050915080805480602002602001604051908101604052809291908181526020016000905b82821015610ad05783829060005260206000209060040201604051806080016040529081600082018054610a2190611313565b80601f0160208091040260200160405190810160405280929190818152602001828054610a4d90611313565b8015610a9a5780601f10610a6f57610100808354040283529160200191610a9a565b820191906000526020600020905b815481529060010190602001808311610a7d57829003601f168201915b505050505081526020016001820154815260200160028201548152602001600382015481525050815260200190600101906109ee565b5050505090509650965096509650965096505091939550919395565b610af4610b97565b6105996000610c16565b610b06610b97565b610599610c66565b610b16610b97565b6001600160a01b038116610b4057604051631e4fbdf760e01b81526000600482015260240161024d565b61031081610c16565b60025460ff16156105995760405163d93c066560e01b815260040160405180910390fd5b600260015403610b9057604051633ee5aeb560e01b815260040160405180910390fd5b6002600155565b6000546001600160a01b031633146105995760405163118cdaa760e01b815233600482015260240161024d565b610bcc610ca3565b6002805460ff191690557f5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa335b6040516001600160a01b03909116815260200160405180910390a1565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b610c6e610b49565b6002805460ff191660011790557f62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258610bf93390565b60025460ff1661059957604051638dfc202b60e01b815260040160405180910390fd5b50805460008255600302906000526020600020908101906103109190610d29565b50805460008255600602906000526020600020908101906103109190610d57565b50805460008255600402906000526020600020908101906103109190610d96565b80821115610d53576000808255610d436001830182610dc8565b5060006002820155600301610d29565b5090565b80821115610d5357600080825560018201819055610d786002830182610dc8565b50600060038201819055600482018190556005820155600601610d57565b80821115610d53576000610daa8282610dc8565b50600060018201819055600282018190556003820155600401610d96565b508054610dd490611313565b6000825580601f10610de4575050565b601f01602090049060005260206000209081019061031091905b80821115610d535760008155600101610dfe565b80356001600160a01b0381168114610e2957600080fd5b919050565b600060208284031215610e4057600080fd5b610e4982610e12565b9392505050565b60008083601f840112610e6257600080fd5b50813567ffffffffffffffff811115610e7a57600080fd5b6020830191508360208260051b8501011115610e9557600080fd5b9250929050565b6000806000806000806000806000808a8c03610140811215610ebd57600080fd5b610ec68c610e12565b9a5060208c0135995060408c013598506080605f1982011215610ee857600080fd5b5060608b01965060e08b013567ffffffffffffffff80821115610f0a57600080fd5b610f168e838f01610e50565b90985096506101008d0135915080821115610f3057600080fd5b610f3c8e838f01610e50565b90965094506101208d0135915080821115610f5657600080fd5b50610f638d828e01610e50565b915080935050809150509295989b9194979a5092959850565b60008060408385031215610f8f57600080fd5b610f9883610e12565b915060208301358015158114610fad57600080fd5b809150509250929050565b600080600060408486031215610fcd57600080fd5b610fd684610e12565b9250602084013567ffffffffffffffff811115610ff257600080fd5b610ffe86828701610e50565b9497909650939450505050565b6000815180845260005b8181101561103157602081850181015186830182015201611015565b506000602082860101526020601f19601f83011685010191505092915050565b600081518084526020808501808196508360051b8101915082860160005b858110156110d8578284038952815160c081518652868201518787015260408083015182828901526110a38389018261100b565b606085810151908a0152608080860151908a015260a0948501519490980193909352505050978401979084019060010161106f565b5091979650505050505050565b600081518084526020808501808196508360051b8101915082860160005b858110156110d85782840389528151608081518187526111258288018261100b565b83890151888a015260408085015190890152606093840151939097019290925250509784019790840190600101611103565b6000610120808301898452602089818601526040895181870152818a015160608181890152828c01516080890152808c015160a08901528560c08901528495508a51915081855261014094508488019550848260051b8901019450838b0160005b838110156112025761013f198a88030188528151805188528681015184888a01526111e5858a018261100b565b9187015198870198909852978601979650908501906001016111b8565b50505050505083810360e085015261121a8187611051565b91505082810361010084015261123081856110e5565b9998505050505050505050565b60208082526023908201527f4e6f2073617665206461746120666f756e6420666f722074686973206164647260408201526265737360e81b606082015260800190565b634e487b7160e01b600052603260045260246000fd5b60008235605e198336030181126112ac57600080fd5b9190910192915050565b6000808335601e198436030181126112cd57600080fd5b83018035915067ffffffffffffffff8211156112e857600080fd5b602001915036819003821315610e9557600080fd5b634e487b7160e01b600052604160045260246000fd5b600181811c9082168061132757607f821691505b60208210810361134757634e487b7160e01b600052602260045260246000fd5b50919050565b601f8211156106de57600081815260208120601f850160051c810160208610156113745750805b601f850160051c820191505b8181101561139357828155600101611380565b505050505050565b600019600383901b1c191660019190911b1790565b81358155600180820160206113c7818601866112b6565b67ffffffffffffffff8111156113df576113df6112fd565b6113f3816113ed8654611313565b8661134d565b6000601f821160018114611421576000831561140f5750838201355b611419848261139b565b875550611476565b600086815260209020601f19841690835b8281101561144f5786850135825593870193908901908701611432565b508482101561146c5760001960f88660031b161c19848701351681555b50508683881b0186555b50505050505050604082013560028201555050565b6000600182016114ab57634e487b7160e01b600052601160045260246000fd5b5060010190565b6000823560be198336030181126112ac57600080fd5b81358155600160208084013582840155600283016114e960408601866112b6565b67ffffffffffffffff811115611501576115016112fd565b6115158161150f8554611313565b8561134d565b6000601f82116001811461154357600083156115315750838201355b61153b848261139b565b865550611598565b600085815260209020601f19841690835b828110156115715786850135825593880193908901908801611554565b508482101561158e5760001960f88660031b161c19848701351681555b50508683881b0185555b50505050505050606082013560038201556080820135600482015560a082013560058201555050565b60008235607e198336030181126112ac57600080fd5b6115e182836112b6565b67ffffffffffffffff8111156115f9576115f96112fd565b6116078161150f8554611313565b6000601f82116001811461163557600083156116235750838201355b61162d848261139b565b86555061168f565b600085815260209020601f19841690835b828110156116665786850135825560209485019460019092019101611646565b50848210156116835760001960f88660031b161c19848701351681555b505060018360011b0185555b50505050602082013560018201556040820135600282015560608201356003820155505056fea264697066735822122089c69db0c06f05132f92185a384928c1c42258869dcd066ea3555d2ea4cf0eee64736f6c63430008140033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100cf5760003560e01c80635c975abb1161008c5780638456cb59116100665780638456cb59146101a35780638da5cb5b146101ab578063c8ddc77e146101c6578063f2fde38b146101f257600080fd5b80635c975abb1461016b57806360351b1914610176578063715018a61461019b57600080fd5b80632062b874146100d457806326e09112146100e957806331062623146100fc578063322a4fbb1461010f5780633f4ba83a146101505780633fc2227d14610158575b600080fd5b6100e76100e2366004610e2e565b610205565b005b6100e76100f7366004610e9c565b610313565b6100e761010a366004610f7c565b610556565b61013b61011d366004610e2e565b6001600160a01b031660009081526005602052604090205460ff1690565b60405190151581526020015b60405180910390f35b6100e7610589565b6100e7610166366004610fb8565b61059b565b60025460ff1661013b565b610189610184366004610e2e565b6106e3565b60405161014796959493929190611157565b6100e7610aec565b6100e7610afe565b6000546040516001600160a01b039091168152602001610147565b61013b6101d4366004610e2e565b6001600160a01b031660009081526004602052604090205460ff1690565b6100e7610200366004610e2e565b610b0e565b61020d610b49565b610215610b6d565b6001600160a01b03811660009081526004602052604090205460ff166102565760405162461bcd60e51b815260040161024d9061123d565b60405180910390fd5b6001600160a01b0381166000908152600360208190526040822082815560018101839055600281018390559081018290556004810182905560058101829055906102a36006830182610cc6565b6102b1600783016000610ce7565b6102bf600883016000610d08565b50506001600160a01b038116600081815260046020526040808220805460ff19169055517fcd4861bdfa9306be142caf147520434391d8a10ba868641ad817622f322a8db69190a261031060018055565b50565b61031b610b49565b610323610b6d565b6001600160a01b038a1660009081526003602052604090208981556001810189905587600282016103758282813581556020820135600182015560408201356002820155606082013560038201555050565b506103869050600682016000610cc6565b610394600782016000610ce7565b6103a2600882016000610d08565b60005b8681101561040c57816006018888838181106103c3576103c3611280565b90506020028101906103d59190611296565b8154600181018355600092835260209092209091600302016103f782826113b0565b505080806104049061148b565b9150506103a5565b5060005b84811015610477578160070186868381811061042e5761042e611280565b905060200281019061044091906114b2565b81546001810183556000928352602090922090916006020161046282826114c8565b5050808061046f9061148b565b915050610410565b5060005b828110156104e2578160080184848381811061049957610499611280565b90506020028101906104ab91906115c1565b8154600181018355600092835260209092209091600402016104cd82826115d7565b505080806104da9061148b565b91505061047b565b506001600160a01b038b1660008181526004602052604090819020805460ff19166001179055517f3e709529c260221e704acb36210bd74eac8da3d5f4480ee17dfd7240fd10456190610538908c815260200190565b60405180910390a25061054a60018055565b50505050505050505050565b61055e610b97565b6001600160a01b03919091166000908152600560205260409020805460ff1916911515919091179055565b610591610b97565b610599610bc4565b565b6105a3610b49565b6105ab610b6d565b3360009081526005602052604090205460ff1661060a5760405162461bcd60e51b815260206004820152601d60248201527f4d61726b6574706c61636520617070726f76616c207265717569726564000000604482015260640161024d565b6001600160a01b03831660009081526004602052604090205460ff166106425760405162461bcd60e51b815260040161024d9061123d565b6001600160a01b038316600090815260036020526040812090610669906006830190610cc6565b60005b828110156106d3578160060184848381811061068a5761068a611280565b905060200281019061069c9190611296565b8154600181018355600092835260209092209091600302016106be82826113b0565b505080806106cb9061148b565b91505061066c565b50506106de60018055565b505050565b6000806107116040518060800160405280600081526020016000815260200160008152602001600081525090565b606080606061071e610b49565b6001600160a01b03871660009081526004602052604090205460ff166107565760405162461bcd60e51b815260040161024d9061123d565b6001600160a01b03871660009081526003602081815260408084208054600182015483516080810185526002840154815295830154868601526004830154868501526005830154606087015260068301805485518188028101880190965280865293979296919591949093600789019360088a01938692919084015b828210156108aa57838290600052602060002090600302016040518060600160405290816000820154815260200160018201805461080f90611313565b80601f016020809104026020016040519081016040528092919081815260200182805461083b90611313565b80156108885780601f1061085d57610100808354040283529160200191610888565b820191906000526020600020905b81548152906001019060200180831161086b57829003601f168201915b50505050508152602001600282015481525050815260200190600101906107d2565b50505050925081805480602002602001604051908101604052809291908181526020016000905b828210156109c757838290600052602060002090600602016040518060c0016040529081600082015481526020016001820154815260200160028201805461091890611313565b80601f016020809104026020016040519081016040528092919081815260200182805461094490611313565b80156109915780601f1061096657610100808354040283529160200191610991565b820191906000526020600020905b81548152906001019060200180831161097457829003601f168201915b505050505081526020016003820154815260200160048201548152602001600582015481525050815260200190600101906108d1565b50505050915080805480602002602001604051908101604052809291908181526020016000905b82821015610ad05783829060005260206000209060040201604051806080016040529081600082018054610a2190611313565b80601f0160208091040260200160405190810160405280929190818152602001828054610a4d90611313565b8015610a9a5780601f10610a6f57610100808354040283529160200191610a9a565b820191906000526020600020905b815481529060010190602001808311610a7d57829003601f168201915b505050505081526020016001820154815260200160028201548152602001600382015481525050815260200190600101906109ee565b5050505090509650965096509650965096505091939550919395565b610af4610b97565b6105996000610c16565b610b06610b97565b610599610c66565b610b16610b97565b6001600160a01b038116610b4057604051631e4fbdf760e01b81526000600482015260240161024d565b61031081610c16565b60025460ff16156105995760405163d93c066560e01b815260040160405180910390fd5b600260015403610b9057604051633ee5aeb560e01b815260040160405180910390fd5b6002600155565b6000546001600160a01b031633146105995760405163118cdaa760e01b815233600482015260240161024d565b610bcc610ca3565b6002805460ff191690557f5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa335b6040516001600160a01b03909116815260200160405180910390a1565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b610c6e610b49565b6002805460ff191660011790557f62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258610bf93390565b60025460ff1661059957604051638dfc202b60e01b815260040160405180910390fd5b50805460008255600302906000526020600020908101906103109190610d29565b50805460008255600602906000526020600020908101906103109190610d57565b50805460008255600402906000526020600020908101906103109190610d96565b80821115610d53576000808255610d436001830182610dc8565b5060006002820155600301610d29565b5090565b80821115610d5357600080825560018201819055610d786002830182610dc8565b50600060038201819055600482018190556005820155600601610d57565b80821115610d53576000610daa8282610dc8565b50600060018201819055600282018190556003820155600401610d96565b508054610dd490611313565b6000825580601f10610de4575050565b601f01602090049060005260206000209081019061031091905b80821115610d535760008155600101610dfe565b80356001600160a01b0381168114610e2957600080fd5b919050565b600060208284031215610e4057600080fd5b610e4982610e12565b9392505050565b60008083601f840112610e6257600080fd5b50813567ffffffffffffffff811115610e7a57600080fd5b6020830191508360208260051b8501011115610e9557600080fd5b9250929050565b6000806000806000806000806000808a8c03610140811215610ebd57600080fd5b610ec68c610e12565b9a5060208c0135995060408c013598506080605f1982011215610ee857600080fd5b5060608b01965060e08b013567ffffffffffffffff80821115610f0a57600080fd5b610f168e838f01610e50565b90985096506101008d0135915080821115610f3057600080fd5b610f3c8e838f01610e50565b90965094506101208d0135915080821115610f5657600080fd5b50610f638d828e01610e50565b915080935050809150509295989b9194979a5092959850565b60008060408385031215610f8f57600080fd5b610f9883610e12565b915060208301358015158114610fad57600080fd5b809150509250929050565b600080600060408486031215610fcd57600080fd5b610fd684610e12565b9250602084013567ffffffffffffffff811115610ff257600080fd5b610ffe86828701610e50565b9497909650939450505050565b6000815180845260005b8181101561103157602081850181015186830182015201611015565b506000602082860101526020601f19601f83011685010191505092915050565b600081518084526020808501808196508360051b8101915082860160005b858110156110d8578284038952815160c081518652868201518787015260408083015182828901526110a38389018261100b565b606085810151908a0152608080860151908a015260a0948501519490980193909352505050978401979084019060010161106f565b5091979650505050505050565b600081518084526020808501808196508360051b8101915082860160005b858110156110d85782840389528151608081518187526111258288018261100b565b83890151888a015260408085015190890152606093840151939097019290925250509784019790840190600101611103565b6000610120808301898452602089818601526040895181870152818a015160608181890152828c01516080890152808c015160a08901528560c08901528495508a51915081855261014094508488019550848260051b8901019450838b0160005b838110156112025761013f198a88030188528151805188528681015184888a01526111e5858a018261100b565b9187015198870198909852978601979650908501906001016111b8565b50505050505083810360e085015261121a8187611051565b91505082810361010084015261123081856110e5565b9998505050505050505050565b60208082526023908201527f4e6f2073617665206461746120666f756e6420666f722074686973206164647260408201526265737360e81b606082015260800190565b634e487b7160e01b600052603260045260246000fd5b60008235605e198336030181126112ac57600080fd5b9190910192915050565b6000808335601e198436030181126112cd57600080fd5b83018035915067ffffffffffffffff8211156112e857600080fd5b602001915036819003821315610e9557600080fd5b634e487b7160e01b600052604160045260246000fd5b600181811c9082168061132757607f821691505b60208210810361134757634e487b7160e01b600052602260045260246000fd5b50919050565b601f8211156106de57600081815260208120601f850160051c810160208610156113745750805b601f850160051c820191505b8181101561139357828155600101611380565b505050505050565b600019600383901b1c191660019190911b1790565b81358155600180820160206113c7818601866112b6565b67ffffffffffffffff8111156113df576113df6112fd565b6113f3816113ed8654611313565b8661134d565b6000601f821160018114611421576000831561140f5750838201355b611419848261139b565b875550611476565b600086815260209020601f19841690835b8281101561144f5786850135825593870193908901908701611432565b508482101561146c5760001960f88660031b161c19848701351681555b50508683881b0186555b50505050505050604082013560028201555050565b6000600182016114ab57634e487b7160e01b600052601160045260246000fd5b5060010190565b6000823560be198336030181126112ac57600080fd5b81358155600160208084013582840155600283016114e960408601866112b6565b67ffffffffffffffff811115611501576115016112fd565b6115158161150f8554611313565b8561134d565b6000601f82116001811461154357600083156115315750838201355b61153b848261139b565b865550611598565b600085815260209020601f19841690835b828110156115715786850135825593880193908901908801611554565b508482101561158e5760001960f88660031b161c19848701351681555b50508683881b0185555b50505050505050606082013560038201556080820135600482015560a082013560058201555050565b60008235607e198336030181126112ac57600080fd5b6115e182836112b6565b67ffffffffffffffff8111156115f9576115f96112fd565b6116078161150f8554611313565b6000601f82116001811461163557600083156116235750838201355b61162d848261139b565b86555061168f565b600085815260209020601f19841690835b828110156116665786850135825560209485019460019092019101611646565b50848210156116835760001960f88660031b161c19848701351681555b505060018360011b0185555b50505050602082013560018201556040820135600282015560608201356003820155505056fea264697066735822122089c69db0c06f05132f92185a384928c1c42258869dcd066ea3555d2ea4cf0eee64736f6c63430008140033",
+  "devdoc": {
+    "details": "Contract for saving and loading game data to/from the blockchain",
+    "errors": {
+      "EnforcedPause()": [
+        {
+          "details": "The operation failed because the contract is paused."
+        }
+      ],
+      "ExpectedPause()": [
+        {
+          "details": "The operation failed because the contract is not paused."
+        }
+      ],
+      "OwnableInvalidOwner(address)": [
+        {
+          "details": "The owner is not a valid owner account. (eg. `address(0)`)"
+        }
+      ],
+      "OwnableUnauthorizedAccount(address)": [
+        {
+          "details": "The caller account is not authorized to perform an operation."
+        }
+      ],
+      "ReentrancyGuardReentrantCall()": [
+        {
+          "details": "Unauthorized reentrant call."
+        }
+      ]
+    },
+    "events": {
+      "Paused(address)": {
+        "details": "Emitted when the pause is triggered by `account`."
+      },
+      "Unpaused(address)": {
+        "details": "Emitted when the pause is lifted by `account`."
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "deleteSaveData(address)": {
+        "details": "Delete the current save"
+      },
+      "hasSaveData(address)": {
+        "details": "Check if the player has a saved game",
+        "returns": {
+          "_0": "Whether the player has a saved game"
+        }
+      },
+      "isMarketplaceApproved(address)": {
+        "details": "Check if a user is approved for marketplace actions",
+        "params": {
+          "user": "The address of the user"
+        },
+        "returns": {
+          "_0": "Whether the user is approved for marketplace actions"
+        }
+      },
+      "owner()": {
+        "details": "Returns the address of the current owner."
+      },
+      "pause()": {
+        "details": "Pause the contract (only owner)"
+      },
+      "paused()": {
+        "details": "Returns true if the contract is paused, and false otherwise."
+      },
+      "renounceOwnership()": {
+        "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+      },
+      "saveGame(address,uint256,uint256,(uint256,uint256,uint256,uint256),(uint256,string,uint256)[],(uint256,uint256,string,uint256,uint256,uint256)[],(string,uint256,uint256,int256)[])": {
+        "details": "Save game data to the blockchain"
+      },
+      "setMarketplaceApproval(address,bool)": {
+        "details": "Set marketplace approval for a user",
+        "params": {
+          "approved": "Whether the user is approved for marketplace actions",
+          "user": "The address of the user"
+        }
+      },
+      "transferOwnership(address)": {
+        "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+      },
+      "unpause()": {
+        "details": "Unpause the contract (only owner)"
+      },
+      "updateInventory(address,(uint256,string,uint256)[])": {
+        "details": "Update the player's inventory",
+        "params": {
+          "_inventory": "The new inventory items",
+          "user": "The address of the player"
+        }
+      }
+    },
+    "title": "GameSave",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 8,
+        "contract": "contracts/GameSave.sol:GameSave",
+        "label": "_owner",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 305,
+        "contract": "contracts/GameSave.sol:GameSave",
+        "label": "_status",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 186,
+        "contract": "contracts/GameSave.sol:GameSave",
+        "label": "_paused",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_bool"
+      },
+      {
+        "astId": 441,
+        "contract": "contracts/GameSave.sol:GameSave",
+        "label": "gameSaves",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_mapping(t_address,t_struct(SaveData)398_storage)"
+      },
+      {
+        "astId": 445,
+        "contract": "contracts/GameSave.sol:GameSave",
+        "label": "hasSave",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_mapping(t_address,t_bool)"
+      },
+      {
+        "astId": 449,
+        "contract": "contracts/GameSave.sol:GameSave",
+        "label": "marketplaceApprovals",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_mapping(t_address,t_bool)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_struct(FarmingData)427_storage)dyn_storage": {
+        "base": "t_struct(FarmingData)427_storage",
+        "encoding": "dynamic_array",
+        "label": "struct GameSave.FarmingData[]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_struct(InventoryItem)414_storage)dyn_storage": {
+        "base": "t_struct(InventoryItem)414_storage",
+        "encoding": "dynamic_array",
+        "label": "struct GameSave.InventoryItem[]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_struct(MapChange)436_storage)dyn_storage": {
+        "base": "t_struct(MapChange)436_storage",
+        "encoding": "dynamic_array",
+        "label": "struct GameSave.MapChange[]",
+        "numberOfBytes": "32"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_int256": {
+        "encoding": "inplace",
+        "label": "int256",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_mapping(t_address,t_struct(SaveData)398_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => struct GameSave.SaveData)",
+        "numberOfBytes": "32",
+        "value": "t_struct(SaveData)398_storage"
+      },
+      "t_string_storage": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      },
+      "t_struct(FarmingData)427_storage": {
+        "encoding": "inplace",
+        "label": "struct GameSave.FarmingData",
+        "members": [
+          {
+            "astId": 416,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "positionX",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 418,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "positionY",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 420,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "cropId",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_string_storage"
+          },
+          {
+            "astId": 422,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "growthStage",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 424,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "plantedTime",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 426,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "lastWateredTime",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256"
+          }
+        ],
+        "numberOfBytes": "192"
+      },
+      "t_struct(InventoryItem)414_storage": {
+        "encoding": "inplace",
+        "label": "struct GameSave.InventoryItem",
+        "members": [
+          {
+            "astId": 409,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "slotIndex",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 411,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "itemId",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_string_storage"
+          },
+          {
+            "astId": 413,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "quantity",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256"
+          }
+        ],
+        "numberOfBytes": "96"
+      },
+      "t_struct(MapChange)436_storage": {
+        "encoding": "inplace",
+        "label": "struct GameSave.MapChange",
+        "members": [
+          {
+            "astId": 429,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "layer",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_string_storage"
+          },
+          {
+            "astId": 431,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "positionX",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 433,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "positionY",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 435,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "tileIndex",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_int256"
+          }
+        ],
+        "numberOfBytes": "128"
+      },
+      "t_struct(PlayerData)407_storage": {
+        "encoding": "inplace",
+        "label": "struct GameSave.PlayerData",
+        "members": [
+          {
+            "astId": 400,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "positionX",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 402,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "positionY",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 404,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "health",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 406,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "selectedHotbarSlot",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256"
+          }
+        ],
+        "numberOfBytes": "128"
+      },
+      "t_struct(SaveData)398_storage": {
+        "encoding": "inplace",
+        "label": "struct GameSave.SaveData",
+        "members": [
+          {
+            "astId": 380,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "version",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 382,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "timestamp",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 385,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "player",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_struct(PlayerData)407_storage"
+          },
+          {
+            "astId": 389,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "inventory",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_array(t_struct(InventoryItem)414_storage)dyn_storage"
+          },
+          {
+            "astId": 393,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "farming",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_array(t_struct(FarmingData)427_storage)dyn_storage"
+          },
+          {
+            "astId": 397,
+            "contract": "contracts/GameSave.sol:GameSave",
+            "label": "mapChanges",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_array(t_struct(MapChange)436_storage)dyn_storage"
+          }
+        ],
+        "numberOfBytes": "288"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

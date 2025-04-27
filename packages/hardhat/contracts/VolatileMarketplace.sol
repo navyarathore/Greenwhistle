@@ -363,23 +363,15 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
     // ==================== View Functions ====================
 
     /**
-     * @dev Get all listings for a seller
-     * @param seller The address of the seller
-     * @return listingIds Array of listing IDs
-     */
-    function getSellerListings(address seller) external view returns (uint256[] memory) {
-        return sellerListings[seller];
-    }
-
-    /**
      * @dev Get all active listings for a specific game item
      * @param gameItemId The game item ID
      * @return activeListingIds Array of active listing IDs
      */
     function getActiveGameItemListings(string memory gameItemId) external view returns (uint256[] memory) {
         uint256 count = gameItemStats[gameItemId].currentListings;
+        if (count == 0) return new uint256[](0);
+        
         uint256[] memory activeListingIds = new uint256[](count);
-
         uint256 currentIndex = 0;
         uint256 totalListings = _listingIds.current();
 
@@ -425,8 +417,6 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         return records;
     }
 
-
-
     /**
      * @dev Get the lowest priced listing for a game item
      * @param gameItemId The game item ID
@@ -447,32 +437,10 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         return (listingId, price);
     }
 
-
-
-    /**
-     * @dev Get all unique game items that are currently listed in the marketplace
-     * @return uniqueGameItems Array of unique game item IDs
-     */
-    function getAllUniqueGameItems() external view returns (string[] memory) {
-        // Simply return the tracked unique game items
-        return uniqueGameItemIds;
-    }
-
-
-
-    /**
-     * @dev Get detailed information about a specific listing
-     * @param listingId The ID of the listing to retrieve
-     * @return The complete Listing struct containing all listing details
-     */
-    function getListingById(uint256 listingId) external view returns (Listing memory) {
-        require(listingId > 0 && listingId <= _listingIds.current(), "Invalid listing ID");
-        return listings[listingId];
-    }
-
     /**
      * @dev Get all unique items with their lowest prices
      * @return gameItems Array of game item IDs
+     * @return gameItemQuantity Array of quantities for each game item
      * @return gameItemPrices Array of lowest prices for each game item
      */
     function getAllUniqueItemsWithPrices()
@@ -480,20 +448,42 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         view
         returns (
             string[] memory gameItems,
+            uint256[] memory gameItemQuantity,
             uint256[] memory gameItemPrices
         )
     {
-        // Get all unique game items
-        gameItems = this.getAllUniqueGameItems();
-        gameItemPrices = new uint256[](gameItems.length);
+        // Get all unique game items;
+        gameItemQuantity = new uint256[](uniqueGameItemIds.length);
+        gameItemPrices = new uint256[](uniqueGameItemIds.length);
 
         // Get lowest price for each game item
         for (uint256 i = 0; i < gameItems.length; i++) {
+            gameItemQuantity[i] = this.getTotalQuantity(uniqueGameItemIds[i]);
             (, uint256 price) = this.getLowestPriceListingForGameItem(gameItems[i]);
             gameItemPrices[i] = price;
+
         }
 
-        return (gameItems, gameItemPrices);
+        return (gameItems, gameItemQuantity, gameItemPrices);
+    }
+
+    function getTotalQuantity(
+        string memory gameItemId
+    ) external view returns (uint256) {
+        uint256 totalQuantity = 0;
+        uint256 totalListings = _listingIds.current();
+
+        for (uint256 i = 1; i <= totalListings; i++) {
+            Listing storage listing = listings[i];
+            if (
+                listing.active &&
+                keccak256(bytes(listing.gameItemId)) == keccak256(bytes(gameItemId))
+            ) {
+                totalQuantity += listing.quantity;
+            }
+        }
+
+        return totalQuantity;
     }
 
     // ==================== Internal Functions ====================
@@ -533,8 +523,8 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
         // Check if the user has a save in the GameSave contract
         bool hasSave = gameSave.hasSaveData(user);
 
-        // If no save exists or the user isn't the caller, return an empty inventory
-        if (!hasSave || user != msg.sender) {
+        // If no save exists, return an empty inventory
+        if (!hasSave) {
             return new GameSave.InventoryItem[](0);
         }
 
@@ -816,7 +806,6 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
 
         lowestPriceListingForGameItem[gameItemId] = lowestPriceId;
     }
-
 
 
     /**
