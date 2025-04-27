@@ -288,8 +288,12 @@ contract VolatileMarketplace is Ownable, ReentrancyGuard, Pausable {
             }
             
             // Release item from escrow
-            bool released = _releaseGameItemFromEscrow(listing.seller, listing.gameItemId, quantity);
-            require(released, "Failed to release item from escrow");
+            bool updated = _releaseGameItemFromEscrow(listing.seller, listing.gameItemId, quantity);
+            require(updated, "Failed to release item from escrow");
+            
+            // Add item to buyer's inventory
+            updated = _addItemToInventory(msg.sender, listing.gameItemId, quantity);
+            require(updated, "Failed to add item to buyer's inventory");
             
             // Record sale in history
             SaleRecord memory record = SaleRecord({ timestamp: block.timestamp, price: listing.price, quantity: quantity });
