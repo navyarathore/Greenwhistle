@@ -1,7 +1,9 @@
 import { EventBus } from "./EventBus";
 import InventoryManager from "./managers/InventoryManager";
 import MaterialManager from "./managers/MaterialManager";
+import SaveManager from "./managers/SaveManager";
 import Game from "./scenes/Game";
+import MapStateTracker from "./utils/MapStateTracker";
 import InputComponent from "~~/game/input/InputComponent";
 import ControlsManager from "~~/game/managers/ControlsManager";
 import CraftingManager from "~~/game/managers/CraftingManager";
@@ -18,9 +20,11 @@ export default class SystemManager {
   readonly inventoryManager: InventoryManager;
   readonly materialManager: MaterialManager;
   readonly craftingManager: CraftingManager;
+  readonly mapStateTracker: MapStateTracker;
   private _farmingManager!: FarmingManager;
   private _interactionManager!: InteractionManager;
   private _controlsManager!: ControlsManager;
+  private _saveManager!: SaveManager;
 
   /**
    * Get the singleton instance of SystemManager
@@ -40,6 +44,7 @@ export default class SystemManager {
     this.inventoryManager = new InventoryManager();
     this.materialManager = new MaterialManager();
     this.craftingManager = new CraftingManager(this.inventoryManager);
+    this.mapStateTracker = new MapStateTracker();
   }
 
   loadResources() {
@@ -56,6 +61,9 @@ export default class SystemManager {
     this._interactionManager = new InteractionManager(scene, scene.gridEngine);
     this.controlsManager.setupControls();
 
+    // Initialize the save manager
+    this._saveManager = new SaveManager(scene);
+
     EventBus.emit("systems-ready", { systemManager: this });
   }
 
@@ -69,6 +77,10 @@ export default class SystemManager {
 
   get interactionManager(): InteractionManager {
     return this._interactionManager;
+  }
+
+  get saveManager(): SaveManager {
+    return this._saveManager;
   }
 
   /**

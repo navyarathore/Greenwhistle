@@ -65,7 +65,7 @@ export default class Character extends Phaser.Physics.Arcade.Sprite implements C
   }
 
   set health(value: number) {
-    this._currentHealth = Math.max(0, Math.min(value, this._maxHealth - this._currentHealth));
+    this._currentHealth = Math.max(0, Math.min(value, this._maxHealth));
     if (this._currentHealth <= 0) {
       this.disable();
     }

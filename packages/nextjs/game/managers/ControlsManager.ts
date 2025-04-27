@@ -1,14 +1,11 @@
-import GridEngine, { Direction, Position } from "grid-engine";
-import * as Phaser from "phaser";
+import GridEngine, { Direction } from "grid-engine";
 import { EventBus } from "~~/game/EventBus";
 import { HotbarSelectionChangedEvent } from "~~/game/EventTypes";
 import SystemManager from "~~/game/SystemManager";
 import { SPRITE_ID } from "~~/game/entities/Player";
 import InputComponent from "~~/game/input/InputComponent";
-import { Item, MaterialCategory } from "~~/game/resources/Item";
-import ResourceData from "~~/game/resources/resource.json";
+import { Item } from "~~/game/resources/Item";
 import Game from "~~/game/scenes/Game";
-import { getTileRecursivelyAt } from "~~/game/utils/layer-utils";
 
 export default class ControlsManager {
   private sysManager: SystemManager = SystemManager.instance;

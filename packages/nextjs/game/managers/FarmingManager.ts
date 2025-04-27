@@ -4,14 +4,13 @@ import MaterialManager from "./MaterialManager";
 import { Position } from "grid-engine";
 import Resources from "~~/game/resources/resource.json";
 import Game from "~~/game/scenes/Game";
-import { LayerName, isPositionEmpty } from "~~/game/utils/layer-utils";
+import { LAYER_MAPPING, LayerName, isPositionEmpty } from "~~/game/utils/layer-utils";
 
 export interface Crop {
   name: string;
   seed: Material;
   tileIndex: number;
   growthTime: number;
-  yield: Record<string, number>;
 }
 
 export interface PlantedCrop {
@@ -49,7 +48,7 @@ export default class FarmingManager {
    */
   public loadCrops(): void {
     try {
-      Object.entries(Resources.crops).forEach(([id, cropData]: [string, any]) => {
+      Object.entries(Resources.crops).forEach(([id, cropData]) => {
         const crop: Crop = {
           ...cropData,
           seed: this.materialManager.getMaterial(cropData.seed)!,
@@ -193,5 +192,64 @@ export default class FarmingManager {
         }
       }
     });
+  }
+
+  public clearAllCrops(): void {
+    // Remove all crop tiles from the map
+    this.plantedCrops.forEach(crop => {
+      this.game.map.removeTileAt(crop.position.x, crop.position.y, true, true, "Height 1#8");
+    });
+
+    // Clear the plantedCrops collection
+    this.plantedCrops.clear();
+  }
+
+  public restoreCrop(
+    position: Position,
+    cropId: string,
+    growthStage: number,
+    plantedTime: number,
+    lastWatered: number,
+  ): boolean {
+    // Check if the crop ID is valid
+    const cropData = this.crops.get(cropId);
+    if (!cropData) {
+      console.error(`Cannot restore crop: invalid crop ID ${cropId}`);
+      return false;
+    }
+
+    const { x, y } = position;
+
+    const heightZero = LAYER_MAPPING.get("Height 0")!;
+    const heightOne = LAYER_MAPPING.get("Height 1")!;
+    [
+      LayerName.GROUND_TEXTURE,
+      LayerName.GRASS_TILE,
+      ...Array.from({ length: heightZero.to - heightZero.from }, (_, i) => i + heightZero.from),
+      ...Array.from({ length: heightOne.to - heightOne.from }, (_, i) => i + heightOne.from),
+    ].forEach(layer => {
+      this.game.map.removeTileAt(x, y, true, true, layer);
+    });
+
+    this.game.map.putTileAt(FARMABLE_TILE_ID, x, y, false, LayerName.GROUND);
+
+    // Place the crop tile on the map
+    this.game.map.putTileAt(cropData.tileIndex, position.x, position.y, true, "Height 1#8");
+
+    // Create the planted crop object
+    const key = `${position.x}:${position.y}`;
+    const plantedCrop: PlantedCrop = {
+      id: key,
+      position,
+      cropData,
+      plantedTimestamp: plantedTime,
+      lastWateredTime: lastWatered, // Reset watering time to now
+      growthLevel: growthStage,
+    };
+
+    // Add to the planted crops collection
+    this.plantedCrops.set(key, plantedCrop);
+
+    return true;
   }
 }
