@@ -121,7 +121,7 @@ export default class FarmingManager {
       return false;
     }
 
-    this.game.map.putTileAt(cropData.tileIndex, x, y, true, "Height 1");
+    this.game.map.putTileAt(cropData.tileIndex, x, y, true, "Height 1#8");
 
     const time = new Date().getTime();
     const plantedCrop: PlantedCrop = {
@@ -183,7 +183,7 @@ export default class FarmingManager {
           crop.growthLevel = newGrowthLevel;
 
           const tileIndex = crop.cropData.tileIndex + crop.growthLevel;
-          this.game.map.putTileAt(tileIndex, crop.position.x, crop.position.y, true, "Height 1");
+          this.game.map.putTileAt(tileIndex, crop.position.x, crop.position.y, true, "Height 1#8");
 
           if (crop.growthLevel === 3) {
             EventBus.emit("crop-grown", {
