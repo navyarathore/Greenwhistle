@@ -13,20 +13,27 @@
       "icon": {
         "path": "/items/pickup/wheat_seed.png"
       },
-      "placeable": true
+      "cropId": "wheat"
     },
     "blueberry": {
       "name": "Blueberry",
-      "type": "consumable",
+      "type": "crop",
       "icon": {
         "path": "/items/pickup/blueberry.png"
       }
     },
     "strawberry": {
       "name": "Strawberry",
-      "type": "consumable",
+      "type": "crop",
       "icon": {
         "path": "/items/pickup/strawberry.png"
+      }
+    },
+    "wheat": {
+      "name": "Wheat",
+      "type": "crop",
+      "icon": {
+          "path": "/items/pickup/wheat.png"
       }
     },
     "iron_ore": {
@@ -113,7 +120,7 @@
     },
     "anvil": {
       "name": "Anvil",
-      "type": "other",
+      "type": "furniture",
       "icon": {
         "path": "/items/placeable/anvil.png"
       },
@@ -121,7 +128,7 @@
     },
     "chest": { 
       "name": "Chest",
-      "type": "other",
+      "type": "furniture",
       "icon": {
         "path": "/items/placeable/chest.png"
       },
@@ -129,7 +136,7 @@
     },
     "workbench": {
       "name": "Workbench",
-      "type": "other",
+      "type": "furniture",
       "icon": {
         "path": "/items/placeable/workbench.png"
       },
@@ -150,6 +157,14 @@
         "path": "/placeable/bed_vertical.png"
       },
       "placeable": true
+    }
+  },
+  "crops": {
+    "wheat": {
+      "name": "Wheat",
+      "seed": "wheat_seed",
+      "tileIndex": 86,
+      "growthTime": 1
     }
   }
 }

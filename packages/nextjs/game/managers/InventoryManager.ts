@@ -57,6 +57,10 @@ export default class InventoryManager {
     return inventory;
   }
 
+  toInventoryIndex(hotbarIndex: HotbarIndex): number {
+    return this.hotbarSlots[hotbarIndex];
+  }
+
   // Get an inventory by ID
   getInventory(id: string = PLAYER_INVENTORY): Inventory | undefined {
     return this.inventories.get(id);

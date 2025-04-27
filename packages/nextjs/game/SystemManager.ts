@@ -18,7 +18,7 @@ export default class SystemManager {
   readonly inventoryManager: InventoryManager;
   readonly materialManager: MaterialManager;
   readonly craftingManager: CraftingManager;
-  readonly farmingManager: FarmingManager;
+  private _farmingManager!: FarmingManager;
   private _interactionManager!: InteractionManager;
   private _controlsManager!: ControlsManager;
 
@@ -40,22 +40,27 @@ export default class SystemManager {
     this.inventoryManager = new InventoryManager();
     this.materialManager = new MaterialManager();
     this.craftingManager = new CraftingManager(this.inventoryManager);
-    this.farmingManager = new FarmingManager(this.materialManager);
   }
 
   loadResources() {
     this.materialManager.loadItems();
     this.craftingManager.loadRecipes(this.materialManager);
-    this.farmingManager.loadCrops();
   }
 
   setup(scene: Game): void {
+    this._farmingManager = new FarmingManager(scene, this.materialManager);
+    this.farmingManager.loadCrops();
+
     const inputComponent = new InputComponent(scene.input.keyboard!);
     this._controlsManager = new ControlsManager(scene, inputComponent, scene.gridEngine);
     this._interactionManager = new InteractionManager(scene, scene.gridEngine);
     this.controlsManager.setupControls();
 
     EventBus.emit("systems-ready", { systemManager: this });
+  }
+
+  get farmingManager(): FarmingManager {
+    return this._farmingManager;
   }
 
   get controlsManager(): ControlsManager {
@@ -75,6 +80,8 @@ export default class SystemManager {
 
     // Update interaction manager to handle all interaction effects and animations
     this.interactionManager.update(time, delta);
+
+    this.farmingManager.update(time, delta);
 
     // Emit a system update event for any systems that need to respond
     // EventBus.emit("system-update", { time, delta });

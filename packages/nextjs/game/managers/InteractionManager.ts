@@ -2,20 +2,20 @@ import { EventBus } from "../EventBus";
 import SystemManager from "../SystemManager";
 import { SPRITE_ID } from "../entities/Player";
 import { Item, MaterialCategory } from "../resources/Item";
-import Game, { COLLISION_LAYER } from "../scenes/Game";
+import Game from "../scenes/Game";
 import GridEngine, { Direction, Position } from "grid-engine";
-import {
-  EventMap,
-  HotbarSelectionChangedEvent,
-  ItemPlacedEvent,
-  ItemUsedEvent,
-  PlayerMovedEvent,
-  ToolUsedEvent,
-} from "~~/game/EventTypes";
+import { EventMap } from "~~/game/EventTypes";
+import { HotbarIndex, PLAYER_INVENTORY } from "~~/game/managers/InventoryManager";
 import CombinedBlocks from "~~/game/resources/combined-blocks.json";
 import InteractionData from "~~/game/resources/interactable.json";
 import { LayerPosition } from "~~/game/types";
-import { getMultipleTileRecursivelyAt, getTileRecursivelyAt } from "~~/game/utils/layer-utils";
+import {
+  COLLISION_TILE_IDS,
+  LayerName,
+  getMultipleTileRecursivelyAt,
+  getTileRecursivelyAt,
+  isPositionEmpty,
+} from "~~/game/utils/layer-utils";
 
 export const InteractionType = {
   TOOL_USE: "tool-use",
@@ -29,13 +29,6 @@ export const InteractionType = {
 } as const;
 
 export type InteractionType = (typeof InteractionType)[keyof typeof InteractionType];
-
-export interface InteractionResult {
-  success: boolean;
-  message?: string;
-  consumeItem?: boolean;
-  affectedPosition?: Position;
-}
 
 const DIRECTION_DELTA = [
   [1, 0],
@@ -130,8 +123,8 @@ export default class InteractionManager {
         .map(([key, value]) => [parseInt(key), value as string]),
     );
     // collision tiles
-    for (const tileIds of [1, 2, 3, 51, 52, 53, 101, 102, 151]) {
-      combined.set(tileIds - 1, COLLISION_LAYER);
+    for (const tileIds of COLLISION_TILE_IDS) {
+      combined.set(tileIds - 1, LayerName.COLLISION_LAYER);
     }
     const layers = new Set(combined.values());
 
@@ -155,10 +148,12 @@ export default class InteractionManager {
 
     const remLayers = [...layers];
     remLayers.splice(remLayers.indexOf(layer), 1);
-    const allTiles = getMultipleTileRecursivelyAt({ x, y }, this.game.map, remLayers, false);
+    const allTiles = getMultipleTileRecursivelyAt({ x, y }, this.game.map, remLayers, false).filter(
+      t => combined.get(t.index) === layer,
+    );
     positions.push(...allTiles.map(t => ({ x: t.x, y: t.y, layer: t.layer.name })));
 
-    if (layer === COLLISION_LAYER && !allTiles.length) {
+    if (layer === LayerName.COLLISION_LAYER && !allTiles.length) {
       return positions;
     }
 
@@ -176,9 +171,10 @@ export default class InteractionManager {
     return positions;
   }
 
-  private processItemCollection(
+  private tryInteractTile(
     position: Position,
     interactionData: ResourceInteraction[],
+    removeCollidables = true,
     eventName: keyof EventMap = "item-picked-up",
   ): boolean {
     for (const res of interactionData) {
@@ -187,6 +183,7 @@ export default class InteractionManager {
 
       if (tile && id.includes(tile.index)) {
         const toRemove = this.findObject(tile);
+        const actualTiles = toRemove.filter(value => value.layer !== LayerName.COLLISION_LAYER);
 
         // Handle crack effect for destructible objects
         if (crackCount) {
@@ -197,13 +194,11 @@ export default class InteractionManager {
           }
 
           if (tile.properties.crackCount !== 0) {
-            toRemove.forEach(value => {
+            actualTiles.forEach(value => {
               const targetTile = this.game.map.getTileAt(value.x, value.y, undefined, value.layer);
               if (targetTile) {
                 targetTile.properties.crackCount = tile.properties.crackCount;
-                if (value.layer !== COLLISION_LAYER) {
-                  this.createCrackEffect(targetTile);
-                }
+                this.createCrackEffect(targetTile);
               }
             });
             return true;
@@ -224,7 +219,7 @@ export default class InteractionManager {
         if (!added) return false;
 
         // Remove the objects from the map
-        for (const { x, y, layer } of toRemove) {
+        for (const { x, y, layer } of removeCollidables ? toRemove : actualTiles) {
           this.game.map.removeTileAt(x, y, true, true, layer);
         }
 
@@ -243,11 +238,12 @@ export default class InteractionManager {
 
   pickupItem(): void {
     const playerPosition = this.gridEngine.getPosition(SPRITE_ID);
-    this.processItemCollection(playerPosition, InteractionData.pickup);
+    this.tryInteractTile(playerPosition, InteractionData.pickup);
   }
 
-  useHotbarItem(slotIndex: number, item: Item): void {
+  useHotbarItem(slotIndex: HotbarIndex, item: Item): void {
     if (this.gridEngine.isMoving(SPRITE_ID)) return;
+    if (item.quantity <= 0) return;
 
     // Different behavior based on item type
     const playerPosition = this.gridEngine.getPosition(SPRITE_ID);
@@ -264,8 +260,8 @@ export default class InteractionManager {
       case MaterialCategory.CONSUMABLE:
         // this.useConsumableItem(item);
         break;
-      case MaterialCategory.FURNITURE:
-        // this.usePlaceableItem(item);
+      case MaterialCategory.SEED:
+        this.usePlaceableItem(item, slotIndex, playerPosition, facingDirection);
         break;
       default:
         console.log(`Item ${item.id} cannot be used directly`);
@@ -278,26 +274,32 @@ export default class InteractionManager {
     const targetPosition = this.getPositionInDirection(playerPosition, direction);
     const animations = ["down", "left", "right", "up"];
 
-    if (item.id === "axe") {
-      const animationKey = `ori-axe-${direction}`;
+    const animationKey = `ori-${item.id}-${direction}`;
 
-      const player = this.game.player;
-      player.disableMovement();
-      player.anims.play(animationKey, true);
+    const player = this.game.player;
+    player.disableMovement();
+    player.anims.play(animationKey, true);
 
-      player.once("animationcomplete", () => {
-        this.game.time.delayedCall(200, () => {
-          player.enableMovement();
-          player.setTexture(SPRITE_ID, animations.indexOf(direction) * 3 + 1);
-        });
+    player.once("animationcomplete", () => {
+      this.game.time.delayedCall(200, () => {
+        player.enableMovement();
+        player.setTexture(SPRITE_ID, animations.indexOf(direction) * 3 + 1);
       });
+    });
 
-      this.game.time.delayedCall(150, () => {
+    this.game.time.delayedCall(150, () => {
+      if (item.id === "axe" || item.id === "pickaxe") {
         const processed =
-          this.processItemCollection(playerPosition, InteractionData.tools.axe) ||
-          this.processItemCollection(targetPosition, InteractionData.tools.axe);
-      });
-    }
+          this.tryInteractTile(playerPosition, InteractionData.tools.axe) ||
+          this.tryInteractTile(targetPosition, InteractionData.tools.axe);
+      } else if (item.id === "hoe") {
+        if (!isPositionEmpty(this.game.map, targetPosition.x, targetPosition.y)) {
+          const processed = this.tryInteractTile(playerPosition, InteractionData.tools.hoe);
+          return;
+        }
+        this.sysManager.farmingManager.setFarmableTile(targetPosition.x, targetPosition.y);
+      }
+    });
 
     // If no specific interaction was triggered, emit a generic tool-used event
     EventBus.emit("tool-used", {
@@ -307,670 +309,25 @@ export default class InteractionManager {
     });
   }
 
-  //,
-  // /**
-  //  * Handle tool use (e.g., axe, pickaxe, hoe)
-  //  */
-  // private handleToolUse(event: ToolUsedEvent): void {
-  //   const { toolId, targetPosition } = event;
-  //
-  //   // Check if this tool interaction is on cooldown
-  //   const interactionId = `tool_${toolId}_${targetPosition.x}_${targetPosition.y}`;
-  //   if (this.isInteractionOnCooldown(interactionId)) {
-  //     // Show a "too soon" message
-  //     this.showFloatingText(targetPosition, "Too soon!", 0xff0000);
-  //     return;
-  //   }
-  //
-  //   // Set interaction cooldown to prevent spam clicking
-  //   this.setInteractionCooldown(interactionId);
-  //
-  //   // Create tool use animation/effect
-  //   this.createToolUseEffect(toolId, targetPosition);
-  //
-  //   // Handle the specific tool action
-  //   let result: InteractionResult = { success: false };
-  //
-  //   if (toolId.includes("axe")) {
-  //     result = this.chopTree(targetPosition);
-  //   } else if (toolId.includes("pickaxe")) {
-  //     result = this.mineResource(targetPosition);
-  //   } else if (toolId.includes("hoe")) {
-  //     result = this.tillSoil(targetPosition);
-  //   } else if (toolId.includes("shovel")) {
-  //     result = this.digGround(targetPosition);
-  //   } else if (toolId.includes("water")) {
-  //     result = this.waterCrop(targetPosition);
-  //   }
-  //
-  //   // Handle the result
-  //   if (!result.success) {
-  //     // Show success message
-  //     this.showFloatingText(targetPosition, result.message || "Can't use that here", 0xff0000);
-  //   }
-  // }
-  //
-  // /**
-  //  * Handle general item use
-  //  */
-  // private handleItemUse(event: ItemUsedEvent): void {
-  //   const { item } = event;
-  //   const targetPosition = this.getPositionInFrontOfPlayer();
-  //
-  //   // Check if this item interaction is on cooldown
-  //   const interactionId = `item_${item.id}_${targetPosition.x}_${targetPosition.y}`;
-  //   if (this.isInteractionOnCooldown(interactionId)) {
-  //     this.showFloatingText(targetPosition, "Too soon!", 0xff0000);
-  //     return;
-  //   }
-  //
-  //   // Set interaction cooldown to prevent spam
-  //   this.setInteractionCooldown(interactionId);
-  //
-  //   // Create use animation/effect
-  //   this.createItemUseEffect(item, targetPosition);
-  //
-  //   // Handle the specific item action
-  //   let result: InteractionResult;
-  //
-  //   // Check item category and handle accordingly
-  //   switch (item.type.type) {
-  //     case MaterialCategory.SEED:
-  //       result = this.plantSeed(item, targetPosition);
-  //       break;
-  //     case MaterialCategory.CONSUMABLE:
-  //       result = this.consumeFood(item);
-  //       break;
-  //     case MaterialCategory.FURNITURE:
-  //       result = this.placeItem(item, targetPosition);
-  //       break;
-  //     default:
-  //       console.log(`No specific interaction for item ${item.id}`);
-  //       result = {
-  //         success: false,
-  //         message: `Can't use ${item.name} here`,
-  //       };
-  //       break;
-  //   }
-  //
-  //   // Handle the result
-  //   if (result.success) {
-  //     // Show success message
-  //     this.showFloatingText(targetPosition, result.message || "Success!", 0x00ff00);
-  //
-  //     // Consume the item if needed
-  //     if (result.consumeItem) {
-  //       this.consumeItem(item);
-  //     }
-  //   } else {
-  //     // Show failure message
-  //     this.showFloatingText(targetPosition, result.message || "Can't use that here", 0xff0000);
-  //   }
-  // }
-  //
-  // /**
-  //  * Handle the placement of items in the world
-  //  */
-  // private handleItemPlacement(event: ItemPlacedEvent): void {
-  //   const { item, position } = event;
-  //
-  //   const targetTile = this.game.map.getTileAt(position.x, position.y, false, 0);
-  //
-  //   if (!targetTile || targetTile.index === -1) {
-  //     // Place the item at the specified position
-  //     // This is a placeholder for actual placement logic
-  //     console.log(`Placing ${item.id} at position (${position.x}, ${position.y})`);
-  //
-  //     // In a real implementation, you would:
-  //     // 1. Update the tilemap with the appropriate tile
-  //     // 2. Register the placed object in appropriate systems
-  //     // 3. Update any relevant state
-  //
-  //     EventBus.emit("item-placed-success", {
-  //       item,
-  //       position,
-  //     });
-  //   } else {
-  //     EventBus.emit("item-placed-failed", {
-  //       item,
-  //       position,
-  //       reason: "Position is occupied",
-  //     });
-  //   }
-  // }
-  //
-  // /**
-  //  * Chop a tree at the specified position
-  //  */
-  // private chopTree(position: Position): InteractionResult {
-  //   // Get the tile at the position
-  //   const targetLayer = this.game.map.getLayer(0)?.name || "ground"; // Default to 'ground' if null
-  //   const tile = this.game.map.getTileAt(position.x, position.y, false, targetLayer);
-  //
-  //   if (!tile || !this.isTreeTile(tile.index)) {
-  //     return {
-  //       success: false,
-  //       message: "No tree to chop here",
-  //     };
-  //   }
-  //
-  //   // Your game logic for tree chopping
-  //   // 1. Remove the tree tile
-  //   // 2. Spawn drops
-  //   // 3. Play effects
-  //
-  //   // Placeholder for actual implementation
-  //   const treeItems = [
-  //     { id: "branches", amount: 3 },
-  //     { id: "wood", amount: 2 },
-  //   ];
-  //
-  //   // Create item instances to add to inventory
-  //   const materialManager = this.sysManager.materialManager;
-  //   const itemsToAdd = treeItems
-  //     .map(item => {
-  //       const material = materialManager.getMaterial(item.id);
-  //       return material ? new Item(material, item.amount) : null;
-  //     })
-  //     .filter(item => item !== null);
-  //
-  //   // Add items to inventory
-  //   const addedSuccessfully = this.sysManager.inventoryManager.addItems(itemsToAdd);
-  //
-  //   if (addedSuccessfully) {
-  //     // Remove the tree from the map
-  //     this.game.map.removeTileAt(position.x, position.y, false, true, targetLayer);
-  //
-  //     // Emit event for sound/particles
-  //     EventBus.emit("tree-chopped", {
-  //       position,
-  //       items: itemsToAdd,
-  //     });
-  //
-  //     return {
-  //       success: true,
-  //       message: "You chopped down the tree",
-  //       affectedPosition: position,
-  //     };
-  //   } else {
-  //     return {
-  //       success: false,
-  //       message: "Your inventory is full",
-  //     };
-  //   }
-  // }
-  //
-  // /**
-  //  * Mine a resource at the specified position
-  //  */
-  // private mineResource(position: { x: number; y: number }): InteractionResult {
-  //   // Get the tile at the position
-  //   const targetLayer = this.game.map.getLayer(0)?.name || "ground"; // Default to 'ground' if null
-  //   const tile = this.game.map.getTileAt(position.x, position.y, false, targetLayer);
-  //
-  //   if (!tile || !this.isResourceTile(tile.index)) {
-  //     return {
-  //       success: false,
-  //       message: "No mineable resource here",
-  //     };
-  //   }
-  //
-  //   // Your game logic for resource mining
-  //   // Similar to tree chopping but with ore/stone resources
-  //
-  //   // Placeholder for resource items based on tile type
-  //   let resourceItems: Array<{ id: string; amount: number }> = [];
-  //
-  //   if (this.isOreTile(tile.index)) {
-  //     resourceItems = [{ id: "iron_ore", amount: 1 }];
-  //   } else if (this.isStoneTile(tile.index)) {
-  //     resourceItems = [{ id: "rock", amount: 2 }];
-  //   }
-  //
-  //   // Create and add items to inventory (similar to chopping)
-  //   const materialManager = this.sysManager.materialManager;
-  //   const itemsToAdd = resourceItems
-  //     .map(item => {
-  //       const material = materialManager.getMaterial(item.id);
-  //       return material ? new Item(material, item.amount) : null;
-  //     })
-  //     .filter(item => item !== null) as Item[];
-  //
-  //   const addedSuccessfully = this.sysManager.inventoryManager.addItems(itemsToAdd);
-  //
-  //   if (addedSuccessfully) {
-  //     // Remove the resource from the map
-  //     this.game.map.removeTileAt(position.x, position.y, false, true, targetLayer);
-  //
-  //     // Emit event for sound/particles
-  //     EventBus.emit("resource-mined", {
-  //       position,
-  //       items: itemsToAdd,
-  //     });
-  //
-  //     return {
-  //       success: true,
-  //       message: "You mined the resource",
-  //       affectedPosition: position,
-  //     };
-  //   } else {
-  //     return {
-  //       success: false,
-  //       message: "Your inventory is full",
-  //     };
-  //   }
-  // }
-  //
-  // /**
-  //  * Till soil at the specified position
-  //  */
-  // private tillSoil(position: { x: number; y: number }): InteractionResult {
-  //   // Check if the tile is tillable
-  //   const targetLayer = this.game.map.getLayer(0)?.name || "ground"; // Default to 'ground' if null
-  //   const tile = this.game.map.getTileAt(position.x, position.y, false, targetLayer);
-  //
-  //   if (!tile || !this.isTillableTile(tile.index)) {
-  //     return {
-  //       success: false,
-  //       message: "Can't till this surface",
-  //     };
-  //   }
-  //
-  //   // Replace the regular ground tile with a tilled soil tile
-  //   // You'll need to define the tilled soil tile index in your tileset
-  //   const tilledSoilTileIndex = 123; // Replace with your actual tilled soil tile index
-  //
-  //   this.game.map.putTileAt(tilledSoilTileIndex, position.x, position.y, true, targetLayer);
-  //
-  //   // Register this tile as farmable
-  //   this.sysManager.farmingManager.registerFarmableTile(position.x, position.y);
-  //
-  //   // Emit event for sound/visual effects
-  //   EventBus.emit("soil-tilled", {
-  //     position,
-  //   });
-  //
-  //   return {
-  //     success: true,
-  //     message: "You tilled the soil",
-  //     affectedPosition: position,
-  //   };
-  // }
-  //
-  // /**
-  //  * Dig the ground at the specified position
-  //  */
-  // private digGround(position: { x: number; y: number }): InteractionResult {
-  //   // Implementation depends on your game's digging mechanics
-  //   // This could create holes, find buried items, etc.
-  //
-  //   return {
-  //     success: true,
-  //     message: "You dug the ground",
-  //     affectedPosition: position,
-  //   };
-  // }
-  //
-  // /**
-  //  * Plant a seed at the specified position
-  //  */
-  // private plantSeed(seed: Item, position: { x: number; y: number }): InteractionResult {
-  //   // Check if the farmingManager exists and the tile is farmable
-  //   if (!this.sysManager.farmingManager.isFarmableTile(position.x, position.y)) {
-  //     return {
-  //       success: false,
-  //       message: "This soil isn't prepared for planting",
-  //     };
-  //   }
-  //
-  //   // Attempt to plant the seed
-  //   const plantingResult = this.sysManager.farmingManager.plantSeed(seed, position.x, position.y);
-  //
-  //   if (plantingResult) {
-  //     return {
-  //       success: true,
-  //       message: `You planted ${seed.name}`,
-  //       consumeItem: true,
-  //       affectedPosition: position,
-  //     };
-  //   } else {
-  //     return {
-  //       success: false,
-  //       message: "Couldn't plant the seed here",
-  //     };
-  //   }
-  // }
-  //
-  // /**
-  //  * Water a crop at the specified position
-  //  */
-  // private waterCrop(position: { x: number; y: number }): InteractionResult {
-  //   // Attempt to water the crop using farming manager
-  //   const wateringResult = this.sysManager.farmingManager.waterCrop(position.x, position.y);
-  //
-  //   if (wateringResult) {
-  //     // Emit event for sound/particles
-  //     EventBus.emit("crop-watered", {
-  //       position,
-  //     });
-  //
-  //     return {
-  //       success: true,
-  //       message: "You watered the crop",
-  //       affectedPosition: position,
-  //     };
-  //   } else {
-  //     return {
-  //       success: false,
-  //       message: "No crop to water here",
-  //     };
-  //   }
-  // }
-  //
-  // /**
-  //  * Consume a food item for health or other effects
-  //  */
-  // private consumeFood(item: Item): InteractionResult {
-  //   // Apply food effects (health, buffs, etc.)
-  //   // For this example, we'll just add health
-  //
-  //   // Get health restore value from item properties or use default value
-  //   const healthRestored = item.type["healthRestored"] || 1;
-  //
-  //   // Update player health
-  //   this.game.player.health = Math.min(this.game.player.health + healthRestored, this.game.player.maxHealth);
-  //
-  //   // Emit event for UI/sound
-  //   EventBus.emit("food-consumed", {
-  //     item,
-  //     healthRestored,
-  //   });
-  //
-  //   return {
-  //     success: true,
-  //     message: `You ate ${item.name} and restored ${healthRestored} health`,
-  //     consumeItem: true,
-  //   };
-  // }
-  //
-  // /**
-  //  * Place an item in the world
-  //  */
-  // private placeItem(item: Item, position: { x: number; y: number }): InteractionResult {
-  //   // Check if the position is valid for placement
-  //   const targetLayer = this.game.map.getLayer(0)?.name || "ground"; // Default to 'ground' if null
-  //   const tile = this.game.map.getTileAt(position.x, position.y, false, targetLayer);
-  //
-  //   if (tile && tile.index !== -1) {
-  //     return {
-  //       success: false,
-  //       message: "Can't place item here",
-  //     };
-  //   }
-  //
-  //   // For placeable items, we need to get the corresponding tile index
-  //   // This could come from item properties or a mapping
-  //   const placeableTileIndex = this.getPlaceableTileIndex(item.id);
-  //
-  //   if (placeableTileIndex === -1) {
-  //     return {
-  //       success: false,
-  //       message: `${item.name} can't be placed in the world`,
-  //     };
-  //   }
-  //
-  //   // Place the item in the world
-  //   this.game.map.putTileAt(placeableTileIndex, position.x, position.y, true, targetLayer);
-  //
-  //   // For special placeables like chests, you might want to register them in other systems
-  //   if (item.id.includes("chest")) {
-  //     // Register a new inventory for this chest
-  //     const chestId = `chest_${position.x}_${position.y}`;
-  //     this.sysManager.inventoryManager.createInventory(chestId, "Chest", 9);
-  //   }
-  //
-  //   // Emit event
-  //   EventBus.emit("item-placed-success", {
-  //     item: item,
-  //     position,
-  //   });
-  //
-  //   return {
-  //     success: true,
-  //     message: `You placed ${item.name}`,
-  //     consumeItem: true,
-  //     affectedPosition: position,
-  //   };
-  // }
-  //
-  // /**
-  //  * Helper method to get placeable tile index from item ID
-  //  */
-  // private getPlaceableTileIndex(itemId: string): number {
-  //   // This would map item IDs to tile indices in your tileset
-  //   // In a real implementation, this could come from a config or database
-  //   const placeableMap: Record<string, number> = {
-  //     wooden_chest: 150,
-  //     workbench: 151,
-  //     anvil: 152,
-  //     furnace: 153,
-  //     bed: 154,
-  //   };
-  //
-  //   return placeableMap[itemId] || -1;
-  // }
-  //
-  // /**
-  //  * Check if a tile is a tree
-  //  */
-  // private isTreeTile(tileIndex: number): boolean {
-  //   // This should contain all tree tile indices
-  //   const treeTileIndices = [10, 11, 12, 13, 14]; // Replace with actual tree tile indices
-  //   return treeTileIndices.includes(tileIndex);
-  // }
-  //
-  // /**
-  //  * Check if a tile is a resource (ore/stone)
-  //  */
-  // private isResourceTile(tileIndex: number): boolean {
-  //   return this.isOreTile(tileIndex) || this.isStoneTile(tileIndex);
-  // }
-  //
-  // /**
-  //  * Check if a tile is an ore
-  //  */
-  // private isOreTile(tileIndex: number): boolean {
-  //   const oreTileIndices = [20, 21, 22]; // Replace with actual ore tile indices
-  //   return oreTileIndices.includes(tileIndex);
-  // }
-  //
-  // /**
-  //  * Check if a tile is stone
-  //  */
-  // private isStoneTile(tileIndex: number): boolean {
-  //   const stoneTileIndices = [30, 31, 32]; // Replace with actual stone tile indices
-  //   return stoneTileIndices.includes(tileIndex);
-  // }
-  //
-  // /**
-  //  * Check if a tile is tillable soil
-  //  */
-  // private isTillableTile(tileIndex: number): boolean {
-  //   const tillableTileIndices = [40, 41, 42]; // Replace with actual soil tile indices
-  //   return tillableTileIndices.includes(tileIndex);
-  // }
-  //
-  // /**
-  //  * Update method to be called every frame
-  //  */
+  private usePlaceableItem(item: Item, slotIndex: HotbarIndex, playerPosition: Position, direction: Direction): void {
+    if (item.category === MaterialCategory.SEED) {
+      if (!this.sysManager.farmingManager.isFarmableTile(playerPosition.x, playerPosition.y)) return;
+      this.sysManager.farmingManager.plantSeed(item, playerPosition.x, playerPosition.y);
+      this.sysManager.inventoryManager.removeItemFromSlot(
+        this.sysManager.inventoryManager.toInventoryIndex(slotIndex),
+        1,
+      );
+    }
+  }
+  /**
+   * Update method to be called every frame
+   */
   public update(time: number, delta: number): void {
     // Handle any ongoing interactions or animations here
     // This method is intentionally left mostly empty as most interactions
     // are event-driven rather than requiring continuous updates
   }
-  //
-  // /**
-  //  * Check for nearby interactable objects when the player moves
-  //  * This highlights interactive objects and tiles around the player
-  //  */
-  // private checkForNearbyInteractables(event: PlayerMovedEvent): void {
-  //   const { position } = event;
-  //   // Clear previous highlights
-  //   this.clearInteractionHighlights();
-  //
-  //   // Get a 3x3 area around the player to check for interactable objects
-  //   const range = 1;
-  //   for (let y = position.y - range; y <= position.y + range; y++) {
-  //     for (let x = position.x - range; x <= position.x + range; x++) {
-  //       this.checkTileForInteractions({ x, y });
-  //     }
-  //   }
-  // }
-  //
-  // /**
-  //  * Check if a specific tile has any interactive properties and highlight it if needed
-  //  */
-  // private checkTileForInteractions(position: Position): void {
-  //   const groundLayer = this.game.map.getLayer(0)?.name || "ground";
-  //   const objectLayer = this.game.map.getLayer(1)?.name || "objects";
-  //
-  //   // Check ground layer for interactable tiles (tillable soil, etc.)
-  //   const groundTile = this.game.map.getTileAt(position.x, position.y, false, groundLayer);
-  //   if (groundTile && this.isTillableTile(groundTile.index)) {
-  //     this.highlightInteractableTile(position, InteractionType.PLANT);
-  //   }
-  //
-  //   // Check object layer for interactable objects (trees, rocks, etc.)
-  //   const objectTile = this.game.map.getTileAt(position.x, position.y, false, objectLayer);
-  //   if (objectTile) {
-  //     if (this.isTreeTile(objectTile.index)) {
-  //       this.highlightInteractableTile(position, InteractionType.TOOL_USE);
-  //     } else if (this.isResourceTile(objectTile.index)) {
-  //       this.highlightInteractableTile(position, InteractionType.TOOL_USE);
-  //     }
-  //   }
-  //
-  //   // Check for registered interaction zones
-  //   this.interactionZones.forEach((zone, id) => {
-  //     if (
-  //       position.x >= zone.x &&
-  //       position.x < zone.x + zone.width &&
-  //       position.y >= zone.y &&
-  //       position.y < zone.y + zone.height
-  //     ) {
-  //       this.highlightInteractableTile(position, zone.type);
-  //     }
-  //   });
-  // }
-  //
-  // /**
-  //  * Highlight a tile to indicate it can be interacted with
-  //  */
-  // private highlightInteractableTile(position: { x: number; y: number }, type: InteractionType): void {
-  //   // Create a highlight effect based on interaction type
-  //   let tint = 0xffffff; // Default white
-  //
-  //   switch (type) {
-  //     case InteractionType.TOOL_USE:
-  //       tint = 0xffaa00; // Orange for tool use
-  //       break;
-  //     case InteractionType.PLANT:
-  //       tint = 0x00ff00; // Green for planting
-  //       break;
-  //     case InteractionType.HARVEST:
-  //       tint = 0xffff00; // Yellow for harvesting
-  //       break;
-  //     case InteractionType.TALK:
-  //       tint = 0x00ffff; // Cyan for talking
-  //       break;
-  //   }
-  //
-  //   // Create a rectangle highlight
-  //   const worldX = position.x * 32 + 16; // Convert tile to world coordinates
-  //   const worldY = position.y * 32 + 16; // Assuming 32x32 tiles
-  //
-  //   const highlight = this.game.add
-  //     .rectangle(worldX, worldY, 32, 32, tint, 0.3)
-  //     .setDepth(100)
-  //     .setOrigin(0.5, 0.5)
-  //     .setStrokeStyle(2, tint);
-  //
-  //   // Add subtle animation to the highlight
-  //   this.game.tweens.add({
-  //     targets: highlight,
-  //     alpha: 0.1,
-  //     duration: 800,
-  //     yoyo: true,
-  //     repeat: -1,
-  //   });
-  //
-  //   // Store the highlight for later removal
-  //   const highlightId = `highlight_${position.x}_${position.y}`;
-  //   this.interactionVisuals.set(highlightId, highlight);
-  // }
-  //
-  // /**
-  //  * Clear all interaction highlights
-  //  */
-  // private clearInteractionHighlights(): void {
-  //   this.interactionVisuals.forEach(visual => {
-  //     visual.destroy();
-  //   });
-  //   this.interactionVisuals.clear();
-  // }
-  //
-  // /**
-  //  * Update the interaction preview based on the currently selected tool
-  //  */
-  // private updateToolInteractionPreview(event: HotbarSelectionChangedEvent): void {
-  //   // Clear previous previews
-  //   this.clearInteractionHighlights();
-  //
-  //   // Get the currently selected item
-  //   const selectedItem = this.sysManager.inventoryManager.getHotbarItem(event.slotIndex);
-  //   if (!selectedItem) return;
-  //
-  //   // If it's a tool, show what it can interact with
-  //   if (selectedItem.type.type === MaterialCategory.TOOL) {
-  //     const position = this.getPositionInFrontOfPlayer();
-  //
-  //     if (selectedItem.id.includes("axe")) {
-  //       // Highlight trees in front of player
-  //       const groundLayer = this.game.map.getLayer(0)?.name || "ground";
-  //       const objectLayer = this.game.map.getLayer(1)?.name || "objects";
-  //       const objectTile = this.game.map.getTileAt(position.x, position.y, false, objectLayer);
-  //
-  //       if (objectTile && this.isTreeTile(objectTile.index)) {
-  //         this.highlightInteractableTile(position, InteractionType.TOOL_USE);
-  //       }
-  //     } else if (selectedItem.id.includes("hoe")) {
-  //       // Highlight tillable soil
-  //       const groundLayer = this.game.map.getLayer(0)?.name || "ground";
-  //       const tile = this.game.map.getTileAt(position.x, position.y, false, groundLayer);
-  //
-  //       if (tile && this.isTillableTile(tile.index)) {
-  //         this.highlightInteractableTile(position, InteractionType.PLANT);
-  //       }
-  //     }
-  //   }
-  // }
-  //
-  //
-  // /**
-  //  * Register an interaction zone in the game world
-  //  * Use this to create areas that the player can interact with
-  //  */
-  // public registerInteractionZone(id: string, x: number, y: number, width = 1, height = 1, type: InteractionType): void {
-  //   this.interactionZones.set(id, { x, y, width, height, type });
-  // }
-  //
-  // /**
-  //  * Remove an interaction zone
-  //  */
-  // public removeInteractionZone(id: string): void {
-  //   this.interactionZones.delete(id);
-  // }
-  //
+
   /**
    * Check if an interaction is currently on cooldown
    */
@@ -1090,7 +447,7 @@ export default class InteractionManager {
    * @param item The item being used
    * @param position The position where the item is used
    */
-  private createItemUseEffect(item: Item, position: { x: number; y: number }): void {
+  private createItemUseEffect(item: Item, position: Position): void {
     // Convert tile position to world coordinates
     const worldX = position.x * 32 + 16;
     const worldY = position.y * 32 + 16;
