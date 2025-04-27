@@ -243,7 +243,7 @@ export default function MarketplacePage() {
               {/* Pagination Controls */}
               {filteredItems.length > 0 && (
                 <div className="mt-6 flex justify-between items-center">
-                  <div className="text-amber-800">
+                  <div className="text-white ">
                     Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredItems.length)} of{" "}
                     {filteredItems.length} items
                   </div>
@@ -253,8 +253,8 @@ export default function MarketplacePage() {
                       disabled={currentPage === 1}
                       className={`px-4 py-2 border-2 ${
                         currentPage === 1
-                          ? "bg-[#c6c607] text-white cursor-not-allowed"
-                          : "bg-[#c6c607] text-white hover:bg-amber-400"
+                          ? "bg-[#1a1c2c] text-white cursor-not-allowed"
+                          : "bg-[#1a1c2c] text-white hover:bg-amber-400"
                       }`}
                     >
                       Previous
@@ -264,8 +264,8 @@ export default function MarketplacePage() {
                       disabled={currentPage === totalPages}
                       className={`px-4 py-2 border-2 ${
                         currentPage === totalPages
-                          ? "bg-amber-200 border-amber-300 text-amber-500 cursor-not-allowed"
-                          : "bg-amber-300 border-amber-500 text-amber-900 hover:bg-amber-400"
+                          ? "bg-[#1a1c2c] text-white cursor-not-allowed"
+                          : "bg-[#1a1c2c]  text-white hover:bg-amber-400"
                       }`}
                     >
                       Next

@@ -45,6 +45,12 @@ export class InventoryMenu extends Phaser.Scene {
     slotIndex: -1,
   };
 
+  private tooltip!: {
+    container: Phaser.GameObjects.Container;
+    background: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+  };
+
   constructor() {
     super({ key: "InventoryMenu" });
   }
@@ -72,6 +78,43 @@ export class InventoryMenu extends Phaser.Scene {
     this.input.on("dragstart", this.onDragStart, this);
     this.input.on("drag", this.onDrag, this);
     this.input.on("dragend", this.onDragEnd, this);
+
+    // Create tooltip container (initially hidden)
+    const tooltipBackground = this.add.rectangle(0, 0, 200, 80, 0x000000, 0.8);
+    const tooltipText = this.add.text(0, 0, "", {
+      fontSize: "14px",
+      color: "#ffffff",
+      wordWrap: { width: 190 },
+    });
+    this.tooltip = {
+      container: this.add.container(0, 0, [tooltipBackground, tooltipText]).setVisible(false),
+      background: tooltipBackground,
+      text: tooltipText,
+    };
+
+    // Add hover handlers to show tooltips
+    const showTooltip = (
+      item: { type: { name: string; description?: string }; quantity: number },
+      x: number,
+      y: number,
+    ) => {
+      const tooltipContent = `${item.type.name}\n${item.type.description || ""}`;
+      this.tooltip.text.setText(tooltipContent);
+
+      // Adjust background size based on text
+      const padding = 10;
+      const bounds = this.tooltip.text.getBounds();
+      this.tooltip.background.setSize(bounds.width + padding * 2, bounds.height + padding * 2);
+
+      // Position tooltip relative to item
+      this.tooltip.text.setPosition(-bounds.width / 2, -bounds.height / 2);
+      this.tooltip.container.setPosition(x, y - 50);
+      this.tooltip.container.setVisible(true);
+    };
+
+    const hideTooltip = () => {
+      this.tooltip.container.setVisible(false);
+    };
 
     // Create inventory slots and items
     const items = this.inventoryManager.getItems();
@@ -107,10 +150,15 @@ export class InventoryMenu extends Phaser.Scene {
       img.on("pointerover", () => {
         if (!this.dragState.item) {
           rectangle.setVisible(true);
+          const itemData = items[i];
+          if (itemData) {
+            showTooltip(itemData, img.x, img.y);
+          }
         }
       });
       img.on("pointerout", () => {
         rectangle.setVisible(false);
+        hideTooltip();
       });
 
       // Create quantity text
@@ -147,9 +195,24 @@ export class InventoryMenu extends Phaser.Scene {
       img.setInteractive();
       img.on("pointerover", () => {
         rectangle.setVisible(true);
+        // Show recipe tooltip
+        const tooltipContent = `${recipe.result.type.name}\nRequires:\n${recipe.ingredients
+          .map(ing => `${ing.quantity}x ${ing.type.name}`)
+          .join("\n")}`;
+        this.tooltip.text.setText(tooltipContent);
+
+        const padding = 10;
+        const bounds = this.tooltip.text.getBounds();
+        this.tooltip.background.setSize(bounds.width + padding * 2, bounds.height + padding * 2);
+
+        this.tooltip.text.setPosition(-bounds.width / 2, -bounds.height / 2);
+        this.tooltip.container.setPosition(offsetX, offsetY - 50);
+        this.tooltip.container.setVisible(true);
       });
+
       img.on("pointerout", () => {
         rectangle.setVisible(false);
+        this.tooltip.container.setVisible(false);
       });
       img.on("pointerdown", () => {
         const itemsNotNull = this.inventoryManager.getItemsNotNull();
@@ -344,6 +407,13 @@ export class InventoryMenu extends Phaser.Scene {
 
     // Clean up the inventory menu background
     if (this.inventoryMenu) this.inventoryMenu.destroy();
+
+    // Clean up tooltip
+    if (this.tooltip) {
+      this.tooltip.background.destroy();
+      this.tooltip.text.destroy();
+      this.tooltip.container.destroy();
+    }
 
     // Reset drag state
     this.dragState.item = null;
