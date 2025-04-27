@@ -83,15 +83,15 @@ export default function SellPage() {
   ];
 
   const inputStyles =
-    "block w-full rounded-lg border-0 px-4 py-3 bg-amber-50 text-amber-800 shadow-md ring-1 ring-inset ring-amber-200 placeholder:text-amber-400 focus:ring-2 focus:ring-inset focus:ring-amber-500 transition-all duration-200";
+    "block w-full rounded-lg border-0 px-4 py-3 bg-indigo-50 text-indigo-800 shadow-md ring-1 ring-inset ring-indigo-200 placeholder:text-indigo-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-200 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#1a1c2c] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-amber-600 to-amber-500 text-white p-8">
+        <div className="bg-indigo-900 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-700 to-purple-700 text-white p-8">
             <h1 className="text-3xl font-bold text-center">List Your Item</h1>
-            <p className="text-center text-amber-100 mt-2">Create your listing to sell on the marketplace</p>
+            <p className="text-center text-indigo-100 mt-2">Create your listing to sell on the marketplace</p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8">
@@ -99,7 +99,7 @@ export default function SellPage() {
               {/* Left Column - Image Upload */}
               <div className="space-y-6">
                 <div
-                  className={`relative border-2 ${dragActive ? "border-amber-500 bg-amber-100" : "border-dashed border-amber-300 bg-amber-50"} rounded-2xl flex flex-col items-center justify-center p-8 transition-all duration-200 h-80`}
+                  className={`relative border-2 ${dragActive ? "border-indigo-500 bg-indigo-100" : "border-dashed border-indigo-400 bg-indigo-50"} rounded-2xl flex flex-col items-center justify-center p-8 transition-all duration-200 h-80`}
                   onDragEnter={handleDrag}
                   onDragLeave={handleDrag}
                   onDragOver={handleDrag}
@@ -132,9 +132,9 @@ export default function SellPage() {
                     </div>
                   ) : (
                     <>
-                      <div className="text-amber-500 text-6xl mb-4">📸</div>
-                      <p className="text-amber-700 text-center font-medium mb-2">Drag & drop your image here</p>
-                      <p className="text-amber-500 text-sm text-center mb-4">or</p>
+                      <div className="text-indigo-500 text-6xl mb-4">📸</div>
+                      <p className="text-indigo-700 text-center font-medium mb-2">Drag & drop your image here</p>
+                      <p className="text-indigo-500 text-sm text-center mb-4">or</p>
                       <input
                         type="file"
                         accept="image/*"
@@ -144,7 +144,7 @@ export default function SellPage() {
                       />
                       <label
                         htmlFor="image-upload"
-                        className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-lg font-medium transition-colors transform hover:scale-105 shadow-md"
+                        className="cursor-pointer bg-[#c6c607] hover:bg-[#b2b206] text-indigo-900 px-6 py-3 rounded-lg font-medium transition-colors transform hover:scale-105 shadow-md"
                       >
                         Choose Image
                       </label>
@@ -153,7 +153,7 @@ export default function SellPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-amber-700 mb-2">Category</label>
+                  <label className="block text-sm font-medium text-indigo-100 mb-2">Category</label>
                   <div className="grid grid-cols-5 gap-2">
                     {categories.map(cat => (
                       <div
@@ -161,8 +161,8 @@ export default function SellPage() {
                         onClick={() => setFormData(prev => ({ ...prev, category: cat.value }))}
                         className={`cursor-pointer flex flex-col items-center justify-center p-3 rounded-lg shadow-sm ${
                           formData.category === cat.value
-                            ? "bg-amber-200 border-0 text-amber-800 shadow-md scale-105"
-                            : "bg-amber-50 text-amber-600 hover:bg-amber-100"
+                            ? "bg-indigo-200 border-0 text-indigo-800 shadow-md scale-105"
+                            : "bg-indigo-800 text-indigo-200 hover:bg-indigo-700"
                         } transition-all duration-200`}
                       >
                         <span className="text-2xl mb-1">{cat.icon}</span>
@@ -176,7 +176,7 @@ export default function SellPage() {
               {/* Right Column - Details */}
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-amber-700 mb-2">Item Name</label>
+                  <label className="block text-sm font-medium text-indigo-100 mb-2">Item Name</label>
                   <input
                     type="text"
                     required
@@ -190,7 +190,7 @@ export default function SellPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-amber-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-indigo-100 mb-2">Description</label>
                   <textarea
                     required
                     value={formData.description}
@@ -205,10 +205,10 @@ export default function SellPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-amber-700 mb-2">Price (ETH)</label>
+                    <label className="block text-sm font-medium text-indigo-100 mb-2">Price (ETH)</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <span className="text-amber-500 font-bold">Ξ</span>
+                        <span className="text-indigo-500 font-bold">Ξ</span>
                       </div>
                       <input
                         type="number"
@@ -225,14 +225,14 @@ export default function SellPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-amber-700 mb-2">Quantity</label>
+                    <label className="block text-sm font-medium text-indigo-100 mb-2">Quantity</label>
                     <div className="relative flex items-center">
                       <button
                         type="button"
                         onClick={() =>
                           setFormData(prev => ({ ...prev, quantity: String(Math.max(1, Number(prev.quantity) - 1)) }))
                         }
-                        className="bg-amber-200 hover:bg-amber-300 text-amber-800 rounded-l-lg px-4 py-3 transition-colors shadow-md"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-l-lg px-4 py-3 transition-colors shadow-md"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -255,12 +255,12 @@ export default function SellPage() {
                         onChange={(e: ChangeEvent<HTMLInputElement>) =>
                           setFormData(prev => ({ ...prev, quantity: e.target.value }))
                         }
-                        className="block w-full text-center py-3 bg-amber-50 text-amber-800 border-0 ring-1 ring-inset ring-amber-200 focus:ring-2 focus:ring-inset focus:ring-amber-500"
+                        className="block w-full text-center py-3 bg-indigo-50 text-indigo-800 border-0 ring-1 ring-inset ring-indigo-200 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                       />
                       <button
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, quantity: String(Number(prev.quantity) + 1) }))}
-                        className="bg-amber-200 hover:bg-amber-300 text-amber-800 rounded-r-lg px-4 py-3 transition-colors shadow-md"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-r-lg px-4 py-3 transition-colors shadow-md"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -281,11 +281,11 @@ export default function SellPage() {
               </div>
             </div>
 
-            <div className="mt-10 flex justify-between items-center pt-6 border-t border-amber-100">
+            <div className="mt-10 flex justify-between items-center pt-6 border-t border-indigo-800">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="text-amber-700 hover:text-amber-900 font-medium flex items-center transition-colors py-2 px-4 rounded-lg hover:bg-amber-50"
+                className="text-indigo-200 hover:text-indigo-100 font-medium flex items-center transition-colors py-2 px-4 rounded-lg hover:bg-indigo-800"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -307,8 +307,8 @@ export default function SellPage() {
                 disabled={loading || !formData.image}
                 className={`flex items-center justify-center px-8 py-3 rounded-lg font-medium shadow-lg transition-all duration-200 ${
                   loading || !formData.image
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-white transform hover:-translate-y-1"
+                    ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                    : "bg-[#c6c607] hover:bg-[#d7d708] text-indigo-900 transform hover:-translate-y-1"
                 }`}
               >
                 {loading ? (

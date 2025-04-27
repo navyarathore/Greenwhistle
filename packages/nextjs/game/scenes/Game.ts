@@ -3,10 +3,9 @@ import SystemManager from "../SystemManager";
 import Player from "../entities/Player";
 import GridEngine from "grid-engine";
 import { Scene } from "phaser";
-import { loadLayerMapping } from "~~/game/utils/layer-utils";
+import { LayerName, loadLayerMapping } from "~~/game/utils/layer-utils";
 
 export const MAP_SCALE = 3;
-export const COLLISION_LAYER = "Collision Layer";
 
 export default class Game extends Scene {
   camera!: Phaser.Cameras.Scene2D.Camera;
@@ -33,10 +32,12 @@ export default class Game extends Scene {
     const tileset = this.map.addTilesetImage("tileset", "tiles");
 
     if (tileset) {
-      console.log(this.map.layers);
       for (let i = 0; i < this.map.layers.length; i++) {
         const layer = this.map.createLayer(i, "tileset", 0, 0)!;
         layer.scale = MAP_SCALE;
+        if (layer.name === LayerName.COLLISION_LAYER) {
+          layer.visible = false;
+        }
       }
     }
 

@@ -7,6 +7,7 @@ import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { WagmiProvider } from "wagmi";
+import { RouteGuard } from "~~/app/wallet/RouteGuard";
 import { Footer } from "~~/components/Footer";
 import { Header } from "~~/components/Header";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
@@ -68,7 +69,9 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
             },
           }}
         >
-          <ScaffoldEthApp>{children}</ScaffoldEthApp>
+          <ScaffoldEthApp>
+            <RouteGuard>{children}</RouteGuard>
+          </ScaffoldEthApp>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

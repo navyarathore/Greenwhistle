@@ -4,6 +4,7 @@ import { HotbarIndex } from "./managers/InventoryManager";
 import { Item } from "./resources/Item";
 import { Direction, Position } from "grid-engine";
 import { Recipe } from "~~/game/managers/CraftingManager";
+import { PlantedCrop } from "~~/game/managers/FarmingManager";
 
 /**
  * Types for all events used in the Greenwhistle game
@@ -88,10 +89,6 @@ export interface ResourceMinedEvent {
 }
 
 export interface SoilTilledEvent {
-  position: Position;
-}
-
-export interface CropWateredEvent {
   position: Position;
 }
 
@@ -184,29 +181,17 @@ export interface ItemSwappedEvent {
 }
 
 // Farming events
-export interface DayChangedEvent {
-  day: number;
-}
-
 export interface CropPlantedEvent {
   position: Position;
-  seedId: string;
-  cropId: string;
-  growthStage: number;
-  daysUntilNextStage: number;
-  isWatered: boolean;
+  crop: PlantedCrop;
+}
+
+export interface CropWateredEvent {
+  crop: PlantedCrop;
 }
 
 export interface CropGrownEvent {
-  cropId: string;
-  position: Position;
-}
-
-export interface ShowCropStateEvent {
-  position: Position;
-  isWatered: boolean;
-  isGrown: boolean;
-  growthProgress: number;
+  crop: PlantedCrop;
 }
 
 // Crafting events
@@ -236,7 +221,6 @@ export interface EventMap {
   "crop-watered": CropWateredEvent;
   "crop-harvested": CropHarvestedEvent;
   "crop-grown": CropGrownEvent;
-  "show-crop-state": ShowCropStateEvent;
   "food-consumed": FoodConsumedEvent;
   "hotbar-selection-changed": HotbarSelectionChangedEvent;
   "hotbar-item-changed": HotbarItemChangedEvent;
@@ -246,7 +230,6 @@ export interface EventMap {
   "item-dropped": ItemDroppedEvent;
   "item-picked-up": ItemPickedUpEvent;
   "inventory-transfer": InventoryTransferEvent;
-  "day-changed": DayChangedEvent;
   "crop-planted": CropPlantedEvent;
   "craft-item": CraftItemEvent;
   "item-added": ItemAddedEvent;

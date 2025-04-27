@@ -1,25 +1,29 @@
 import { EventBus } from "../EventBus";
-import { Item, MaterialCategory } from "../resources/Item";
+import { Item, Material, MaterialCategory } from "../resources/Item";
 import MaterialManager from "./MaterialManager";
-import { CropHarvestedEvent, CropWateredEvent } from "~~/game/EventTypes";
+import { Position } from "grid-engine";
+import Resources from "~~/game/resources/resource.json";
+import Game from "~~/game/scenes/Game";
+import { LayerName, isPositionEmpty } from "~~/game/utils/layer-utils";
 
 export interface Crop {
-  seedId: string;
-  cropId: string;
-  growthTime: number; // in in-game days
-  waterRequirement: number; // water needed per day
+  name: string;
+  seed: Material;
+  tileIndex: number;
+  growthTime: number;
+  yield: Record<string, number>;
 }
 
 export interface PlantedCrop {
   id: string;
-  position: { x: number; y: number };
+  position: Position;
   cropData: Crop;
-  plantedDay: number;
-  lastWateredDay: number;
-  waterLevel: number;
-  isWatered: boolean;
-  isGrown: boolean;
+  plantedTimestamp: number;
+  lastWateredTime: number;
+  growthLevel: number;
 }
+
+const FARMABLE_TILE_ID = 413;
 
 /**
  * FarmingManager class responsible for managing crop planting, growth, and harvesting
@@ -27,124 +31,114 @@ export interface PlantedCrop {
 export default class FarmingManager {
   private crops: Map<string, Crop> = new Map();
   private plantedCrops: Map<string, PlantedCrop> = new Map();
-  private currentDay = 1;
-  private farmableTiles: Set<string> = new Set();
 
-  constructor(private materialManager: MaterialManager) {
-    this.initializeEventListeners();
-  }
-
-  /**
-   * Initialize event listeners
-   */
-  private initializeEventListeners(): void {
-    // Listen for day changes to update crop growth
-    EventBus.on("day-changed", this.onDayChanged.bind(this));
-
-    // Listen for crop interaction events from the InteractionManager
-    EventBus.on("crop-watered", (event: CropWateredEvent) => {
-      // Additional visual effects or state updates when crops are watered
-      this.showCropState(event.position.x, event.position.y);
-    });
-
-    EventBus.on("crop-harvested", (event: CropHarvestedEvent) => {
-      // Additional effects or state updates when crops are harvested
-      this.resetFarmTile(event.position.x, event.position.y);
-    });
-  }
+  constructor(
+    private game: Game,
+    private materialManager: MaterialManager,
+  ) {}
 
   /**
    * Register a new crop type
    */
-  public registerCrop(crop: Crop): void {
-    this.crops.set(crop.seedId, crop);
+  public registerCrop(id: string, crop: Crop): void {
+    this.crops.set(id, crop);
   }
 
   /**
    * Load available crops from materials
    */
   public loadCrops(): void {
-    // Get all seed type materials
-    const seeds = this.materialManager.getMaterialByCategory(MaterialCategory.SEED);
+    try {
+      Object.entries(Resources.crops).forEach(([id, cropData]: [string, any]) => {
+        const crop: Crop = {
+          ...cropData,
+          seed: this.materialManager.getMaterial(cropData.seed)!,
+        };
 
-    // For each seed, check if there's a corresponding crop
-    seeds.forEach(seed => {
-      // Try to find crop with an ID that might be related to the seed
-      const cropId = seed.id.replace("seed_", "crop_");
-      const crop = this.materialManager.getMaterial(cropId);
+        this.registerCrop(id, crop);
+      });
 
-      if (crop && crop.category === MaterialCategory.CROP) {
-        // Register the crop with default values
-        this.registerCrop({
-          seedId: seed.id,
-          cropId: crop.id,
-          growthTime: seed.growthTime || 3, // Default 3 days if not specified
-          waterRequirement: seed.waterRequirement || 1, // Default 1 water per day if not specified
-        });
-      }
-    });
-
-    console.log(`Loaded ${this.crops.size} crops from materials`);
+      console.log(`Loaded ${this.crops.size} crops from resource.json`);
+    } catch (error) {
+      console.error("Error loading crops:", error);
+    }
   }
 
-  /**
-   * Register a farmable tile position
-   */
-  public registerFarmableTile(x: number, y: number): void {
-    this.farmableTiles.add(`${x},${y}`);
+  public getCrop(id: string): Crop | undefined {
+    return this.crops.get(id);
+  }
+
+  public getCrops(): Crop[] {
+    return Array.from(this.crops.values());
+  }
+
+  public getPlantedCropAt(x: number, y: number): PlantedCrop | undefined {
+    const tileKey = `${x}:${y}`;
+    return this.plantedCrops.get(tileKey);
+  }
+
+  public getPlantedCrops(): PlantedCrop[] {
+    return Array.from(this.plantedCrops.values());
+  }
+
+  public setFarmableTile(x: number, y: number): void {
+    if (!isPositionEmpty(this.game.map, x, y)) {
+      throw new Error("Cannot set farmable tile, tile on other layers already exists");
+    }
+
+    [LayerName.GROUND_TEXTURE, LayerName.GRASS_TILE].forEach(layer => {
+      this.game.map.removeTileAt(x, y, true, true, layer);
+    });
+    this.game.map.putTileAt(FARMABLE_TILE_ID, x, y, false, LayerName.GROUND);
   }
 
   /**
    * Check if a tile is farmable
    */
   public isFarmableTile(x: number, y: number): boolean {
-    return this.farmableTiles.has(`${x},${y}`);
+    return this.game.map.getTileAt(x, y, false, LayerName.GROUND)?.index === FARMABLE_TILE_ID;
   }
 
   /**
    * Plant a seed at the specified position
    */
   public plantSeed(seedItem: Item, x: number, y: number): boolean {
-    // Check if the tile is farmable
+    if (seedItem.type.category !== MaterialCategory.SEED || !seedItem.type.cropId) {
+      throw new Error("Invalid seed item");
+    }
+
+    // Check if the seed is valid
+    const cropData = this.crops.get(seedItem.type.cropId);
+    if (!cropData) {
+      throw new Error(`Invalid crop ID: ${seedItem.type.cropId}`);
+    }
+
+    if (this.plantedCrops.has(`${x}:${y}`)) {
+      return false;
+    }
+
     if (!this.isFarmableTile(x, y)) {
       return false;
     }
 
-    // Check if the tile already has a crop
-    const tileKey = `${x},${y}`;
-    if (Array.from(this.plantedCrops.values()).some(crop => `${crop.position.x},${crop.position.y}` === tileKey)) {
-      return false;
-    }
+    this.game.map.putTileAt(cropData.tileIndex, x, y, true, "Height 1");
 
-    // Check if the seed is valid
-    const cropData = this.crops.get(seedItem.type.id);
-    if (!cropData) {
-      return false;
-    }
-
-    // Create a new planted crop
+    const time = new Date().getTime();
     const plantedCrop: PlantedCrop = {
-      id: `crop_${Date.now()}`,
+      id: `${x}:${y}`,
       position: { x, y },
       cropData,
-      plantedDay: this.currentDay,
-      lastWateredDay: 0,
-      waterLevel: 0,
-      isWatered: false,
-      isGrown: false,
+      plantedTimestamp: time,
+      lastWateredTime: time,
+      growthLevel: 0,
     };
 
-    // Add to planted crops
-    this.plantedCrops.set(plantedCrop.id, plantedCrop);
+    this.plantedCrops.set(`${x}:${y}`, plantedCrop);
 
     // Emit event that a crop was planted
     EventBus.emit("crop-planted", {
-      position: { x: plantedCrop.position.x, y: plantedCrop.position.y },
-      seedId: plantedCrop.cropData.seedId,
-      cropId: plantedCrop.id,
-      growthStage: 0,
-      daysUntilNextStage: plantedCrop.cropData.growthTime,
-      isWatered: plantedCrop.isWatered,
+      position: { x, y },
+      crop: plantedCrop,
     });
 
     return true;
@@ -154,136 +148,50 @@ export default class FarmingManager {
    * Water a crop at the specified position
    */
   public waterCrop(x: number, y: number): boolean {
-    const tileKey = `${x},${y}`;
-    const plantedCrop = Array.from(this.plantedCrops.values()).find(
-      crop => `${crop.position.x},${crop.position.y}` === tileKey,
-    );
+    const plantedCrop = this.getPlantedCropAt(x, y);
 
-    if (!plantedCrop || plantedCrop.lastWateredDay === this.currentDay) {
+    if (!plantedCrop) {
       return false;
     }
 
     // Update the crop's water level
-    plantedCrop.waterLevel += 1;
-    plantedCrop.lastWateredDay = this.currentDay;
-    plantedCrop.isWatered = true;
+    plantedCrop.lastWateredTime = new Date().getTime();
 
     // Emit event that a crop was watered
     EventBus.emit("crop-watered", {
-      position: plantedCrop.position,
+      crop: plantedCrop,
     });
 
     return true;
   }
 
-  /**
-   * Harvest a crop at the specified position
-   */
-  public harvestCrop(x: number, y: number): Item | null {
-    const tileKey = `${x},${y}`;
-    const plantedCrop = Array.from(this.plantedCrops.values()).find(
-      crop => `${crop.position.x},${crop.position.y}` === tileKey,
-    );
-
-    // Check if there's a crop and if it's fully grown
-    if (!plantedCrop || !plantedCrop.isGrown) {
-      return null;
-    }
-
-    // Get the crop material
-    const cropMaterial = this.materialManager.getMaterial(plantedCrop.cropData.cropId);
-    if (!cropMaterial) {
-      return null;
-    }
-
-    // Remove the planted crop
-    this.plantedCrops.delete(plantedCrop.id);
-
-    // Emit event that a crop was harvested
-    EventBus.emit("crop-harvested", {
-      position: plantedCrop.position,
-      cropId: plantedCrop.cropData.cropId,
-    });
-
-    // Return the harvested crop item
-    return new Item(cropMaterial, 1);
-  }
-
-  /**
-   * Handle day change for crop growth
-   */
-  private onDayChanged(data: { day: number }): void {
-    this.currentDay = data.day;
-
-    // Update all planted crops
+  public update(time: number, delta: number): void {
     this.plantedCrops.forEach(crop => {
-      // Reset watered status
-      crop.isWatered = false;
+      if (crop.growthLevel === 3) return;
+      const time = new Date().getTime();
+      const timeSincePlanting = time - crop.plantedTimestamp;
+      const timeSinceWatering = time - crop.lastWateredTime;
+      const growthProgress = timeSincePlanting / crop.cropData.growthTime;
+      const isWateredRecently = timeSinceWatering < 24000; // Consider watered if within last 24 seconds
 
-      // Check if the crop has been watered enough today
-      if (crop.waterLevel >= crop.cropData.waterRequirement) {
-        // Calculate days since planted
-        const daysSincePlanted = this.currentDay - crop.plantedDay;
+      // Only grow if the crop has been watered recently
+      if (isWateredRecently) {
+        // Calculate new growth level (0-3 representing growth stages)
+        const newGrowthLevel = Math.min(3, Math.floor(growthProgress * 4));
 
-        // Check if the crop is fully grown
-        const wasGrown = crop.isGrown;
-        crop.isGrown = daysSincePlanted >= crop.cropData.growthTime;
+        if (newGrowthLevel > crop.growthLevel) {
+          crop.growthLevel = newGrowthLevel;
 
-        // Emit event if the crop just finished growing
-        if (!wasGrown && crop.isGrown) {
-          EventBus.emit("crop-grown", {
-            cropId: crop.id,
-            position: crop.position,
-          });
+          const tileIndex = crop.cropData.tileIndex + crop.growthLevel;
+          this.game.map.putTileAt(tileIndex, crop.position.x, crop.position.y, true, "Height 1");
+
+          if (crop.growthLevel === 3) {
+            EventBus.emit("crop-grown", {
+              crop: crop,
+            });
+          }
         }
       }
-
-      // Reduce water level for the new day
-      crop.waterLevel = Math.max(0, crop.waterLevel - crop.cropData.waterRequirement);
     });
-  }
-
-  /**
-   * Get all planted crops
-   */
-  public getPlantedCrops(): PlantedCrop[] {
-    return Array.from(this.plantedCrops.values());
-  }
-
-  /**
-   * Get a specific planted crop at position
-   */
-  public getPlantedCropAt(x: number, y: number): PlantedCrop | undefined {
-    const tileKey = `${x},${y}`;
-    return Array.from(this.plantedCrops.values()).find(crop => `${crop.position.x},${crop.position.y}` === tileKey);
-  }
-
-  /**
-   * Show visual indication of crop state (visual feedback)
-   */
-  private showCropState(x: number, y: number): void {
-    const crop = this.getPlantedCropAt(x, y);
-    if (!crop) return;
-
-    // Here you could trigger visual effects like:
-    // - Water particles
-    // - Growth stage changes
-    // - Status indicators
-
-    // For example, emit an event for the game scene to handle
-    EventBus.emit("show-crop-state", {
-      position: { x, y },
-      isWatered: crop.isWatered,
-      isGrown: crop.isGrown,
-      growthProgress: (this.currentDay - crop.plantedDay) / crop.cropData.growthTime,
-    });
-  }
-
-  /**
-   * Reset a farm tile after harvesting
-   */
-  private resetFarmTile(x: number, y: number): void {
-    // The tile remains farmable after harvesting
-    // This method could handle any additional cleanup or state reset
   }
 }
