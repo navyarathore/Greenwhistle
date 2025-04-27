@@ -134,6 +134,17 @@ contract GameSave is Ownable, ReentrancyGuard, Pausable {
         );
     }
 
+    function getInventory(address user)
+        external
+        view
+        whenNotPaused
+        returns (InventoryItem[] memory inventory)
+    {
+        require(hasSave[user], "No save data found for this address");
+
+        return gameSaves[user].inventory;
+    }
+
     /**
      * @dev Check if the player has a saved game
      * @return Whether the player has a saved game
