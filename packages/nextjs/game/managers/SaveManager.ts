@@ -1,16 +1,16 @@
-// filepath: /run/media/abhigya/SSD/Github/Greenwhistle/packages/nextjs/game/managers/SaveManager.ts
 import { EventBus } from "../EventBus";
 import SystemManager from "../SystemManager";
 import { SPRITE_ID } from "../entities/Player";
 import { Item } from "../resources/Item";
 import Game from "../scenes/Game";
+import BlockchainSaveManager from "./BlockchainSaveManager";
 import { HotbarIndex, PLAYER_INVENTORY } from "./InventoryManager";
 import { Position } from "grid-engine";
 
 const SAVE_KEY = "greenwhistle_save";
-const AUTO_SAVE_INTERVAL = 5000; // 5 seconds
+const AUTO_SAVE_INTERVAL = 30000; // 5 seconds
 
-interface GameSave {
+export interface GameSave {
   version: number;
 
   timestamp: number;
@@ -21,41 +21,37 @@ interface GameSave {
     selectedHotbarSlot: HotbarIndex;
   };
 
-  inventory: {
+  inventory: Array<{
     slotIndex: number;
     itemId: string;
     quantity: number;
-  }[];
+  }>;
 
-  farming: {
+  farming: Array<{
     position: Position;
     cropId: string;
     growthStage: number;
     plantedTime: number;
     lastWateredTime: number;
-  }[];
+  }>;
 
-  mapChanges: {
+  mapChanges: Array<{
     layer: string;
     position: Position;
     tileIndex: number;
-  }[];
+  }>;
 }
 
+type DataAdaptorProvider = "localstorage" | "blockchain";
+
 export default class SaveManager {
-  private scene: Game;
+  private scene!: Game;
   private lastSaveTime = 0;
   private autoSaveTimerId: number | null = null;
   private isLoading = false;
 
-  constructor(scene: Game) {
+  public setup(scene: Game): void {
     this.scene = scene;
-
-    // Listen for events that should trigger a save
-    EventBus.on("player-health-changed", () => this.saveGame());
-    EventBus.on("inventory-updated", () => this.saveGame());
-    EventBus.on("crop-planted", () => this.saveGame());
-    EventBus.on("crop-harvested", () => this.saveGame());
   }
 
   /**
@@ -64,10 +60,15 @@ export default class SaveManager {
   public startAutoSave(): void {
     this.autoSaveTimerId = this.scene.time.addEvent({
       delay: AUTO_SAVE_INTERVAL,
-      callback: this.saveGame,
+      callback: this.saveGameToBlockchain,
       callbackScope: this,
       loop: true,
     }).elapsed;
+
+    EventBus.on("player-health-changed", this.saveGameToBlockchain.bind(this));
+    EventBus.on("inventory-updated", this.saveGameToBlockchain.bind(this));
+    EventBus.on("crop-planted", this.saveGameToBlockchain.bind(this));
+    EventBus.on("crop-harvested", this.saveGameToBlockchain.bind(this));
   }
 
   /**
@@ -80,16 +81,42 @@ export default class SaveManager {
     }
   }
 
-  /**
-   * Save the current game state
-   */
-  saveGame(): void {
+  async saveData(provider: DataAdaptorProvider, gameSave: GameSave): Promise<boolean> {
+    try {
+      if (provider === "localstorage") {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(gameSave));
+        return true;
+      } else {
+        return await BlockchainSaveManager.saveToBlockchain(gameSave);
+      }
+    } catch (error) {
+      console.error("Error saving game data:", error);
+      return false;
+    }
+  }
+
+  async retrieveData(provider: DataAdaptorProvider): Promise<GameSave | null> {
+    if (provider === "localstorage") {
+      const saveItem = localStorage.getItem(SAVE_KEY);
+      if (saveItem) {
+        return JSON.parse(saveItem) as GameSave;
+      }
+    } else {
+      const saveData = await BlockchainSaveManager.loadFromBlockchain();
+      if (saveData) {
+        return saveData;
+      }
+    }
+    return null;
+  }
+
+  async saveGame(provider: DataAdaptorProvider): Promise<boolean> {
     // Avoid saving during loading to prevent overwriting with partial data
-    if (this.isLoading) return;
+    if (this.isLoading) return false;
 
     // Throttle saves to avoid excessive operations
     const now = Date.now();
-    if (now - this.lastSaveTime < 1000) return; // Don't save more than once per second
+    if (now - this.lastSaveTime < 1000) return false; // Don't save more than once per second
 
     this.lastSaveTime = now;
 
@@ -100,7 +127,7 @@ export default class SaveManager {
 
       if (!player || !gridEngine) {
         console.warn("Unable to save: missing player or grid engine");
-        return;
+        return false;
       }
 
       // Create save data structure
@@ -117,61 +144,54 @@ export default class SaveManager {
         mapChanges: this.packMapChanges(),
       };
 
-      // Save to localStorage
-      localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
-
+      const success = this.saveData(provider, saveData);
+      if (!success) {
+        console.error("Failed to save game data");
+        return false;
+      }
       console.log("Game saved successfully");
+      return success;
     } catch (error) {
       console.error("Error saving game:", error);
+      return false;
     }
   }
 
   /**
-   * Load game from saved state
-   * @returns true if successful, false otherwise
+   * Save the current game state
    */
-  loadGame(): boolean {
-    try {
-      this.isLoading = true;
+  async saveGameToLocal(): Promise<boolean> {
+    return this.saveGame("localstorage");
+  }
 
-      const saveJson = localStorage.getItem(SAVE_KEY);
-      if (!saveJson) {
+  /**
+   * Save the current game state to the blockchain
+   * @returns Promise that resolves to true if successful, false otherwise
+   */
+  async saveGameToBlockchain(): Promise<boolean> {
+    return this.saveGame("blockchain");
+  }
+
+  async loadGame(provider: DataAdaptorProvider): Promise<boolean> {
+    this.isLoading = true;
+    try {
+      const saveData = await this.retrieveData(provider);
+
+      if (!saveData) {
         console.log("No save data found");
         this.isLoading = false;
         return false;
       }
-
-      const saveData: GameSave = JSON.parse(saveJson);
-      console.log(saveData);
 
       // Version check
       if (saveData.version !== 1) {
         console.warn("Save version mismatch, attempting to load anyway");
       }
 
-      const systemManager = SystemManager.instance;
-      const player = this.scene.player;
-      const gridEngine = this.scene.gridEngine;
-
-      if (!player || !gridEngine) {
-        console.error("Unable to load: missing player or grid engine");
+      if (!this.unpackData(saveData)) {
         this.isLoading = false;
         return false;
       }
-
-      // Load player state
-      gridEngine.setPosition(SPRITE_ID, saveData.player.position);
-      player.health = saveData.player.health;
-      player.selectedHotbarSlot = saveData.player.selectedHotbarSlot;
-
-      // Load inventory
-      this.unpackInventory(systemManager, saveData.inventory);
-
-      // Load farming data
-      this.unpackFarmingData(systemManager, saveData.farming);
-
-      // Load map changes
-      this.unpackMapChanges(saveData.mapChanges);
 
       console.log("Game loaded successfully");
 
@@ -182,6 +202,22 @@ export default class SaveManager {
       this.isLoading = false;
       return false;
     }
+  }
+
+  /**
+   * Load game from saved state
+   * @returns true if successful, false otherwise
+   */
+  async loadGameFromLocal(): Promise<boolean> {
+    return this.loadGame("localstorage");
+  }
+
+  /**
+   * Load game state from the blockchain
+   * @returns Promise that resolves to true if successful, false otherwise
+   */
+  async loadGameFromBlockchain(): Promise<boolean> {
+    return this.loadGame("blockchain");
   }
 
   /**
@@ -206,6 +242,59 @@ export default class SaveManager {
     });
 
     return packedInventory;
+  }
+
+  /**
+   * Pack farming data into a compact format for saving
+   */
+  private packFarmingData(systemManager: SystemManager): GameSave["farming"] {
+    return systemManager.farmingManager.getPlantedCrops().map(crop => ({
+      position: crop.position,
+      cropId: crop.cropData.seed.cropId || "",
+      growthStage: crop.growthLevel,
+      plantedTime: crop.plantedTimestamp,
+      lastWateredTime: crop.lastWateredTime,
+    }));
+  }
+
+  /**
+   * Pack map changes into a compact format for saving
+   */
+  private packMapChanges(): GameSave["mapChanges"] {
+    // Get changed tiles from the mapStateTracker
+    const systemManager = SystemManager.instance;
+    return systemManager.mapStateTracker.getAllChanges().map(change => ({
+      layer: change.layer,
+      position: change.position,
+      tileIndex: change.tileIndex,
+    }));
+  }
+
+  unpackData(saveData: GameSave): boolean {
+    const systemManager = SystemManager.instance;
+    const player = this.scene.player;
+    const gridEngine = this.scene.gridEngine;
+
+    if (!player || !gridEngine) {
+      console.error("Unable to load: missing player or grid engine");
+      this.isLoading = false;
+      return false;
+    }
+
+    // Load player state
+    gridEngine.setPosition(SPRITE_ID, saveData.player.position);
+    player.health = saveData.player.health;
+    player.selectedHotbarSlot = saveData.player.selectedHotbarSlot;
+
+    // Load inventory
+    this.unpackInventory(systemManager, saveData.inventory);
+
+    // Load farming data
+    this.unpackFarmingData(systemManager, saveData.farming);
+
+    // Load map changes
+    this.unpackMapChanges(saveData.mapChanges);
+    return true;
   }
 
   /**
@@ -249,19 +338,6 @@ export default class SaveManager {
   }
 
   /**
-   * Pack farming data into a compact format for saving
-   */
-  private packFarmingData(systemManager: SystemManager): GameSave["farming"] {
-    return systemManager.farmingManager.getPlantedCrops().map(crop => ({
-      position: crop.position,
-      cropId: crop.cropData.seed.cropId || "",
-      growthStage: crop.growthLevel,
-      plantedTime: crop.plantedTimestamp,
-      lastWateredTime: crop.lastWateredTime,
-    }));
-  }
-
-  /**
    * Unpack farming data from save format and apply to game
    */
   private unpackFarmingData(systemManager: SystemManager, farmingData: GameSave["farming"]): void {
@@ -274,19 +350,6 @@ export default class SaveManager {
     farmingData.forEach(crop => {
       farmingManager.restoreCrop(crop.position, crop.cropId, crop.growthStage, crop.plantedTime, crop.lastWateredTime);
     });
-  }
-
-  /**
-   * Pack map changes into a compact format for saving
-   */
-  private packMapChanges(): GameSave["mapChanges"] {
-    // Get changed tiles from the mapStateTracker
-    const systemManager = SystemManager.instance;
-    return systemManager.mapStateTracker.getAllChanges().map(change => ({
-      layer: change.layer,
-      position: change.position,
-      tileIndex: change.tileIndex,
-    }));
   }
 
   /**
@@ -321,17 +384,37 @@ export default class SaveManager {
   /**
    * Check if a save exists
    */
-  hasSaveData(): boolean {
+  hasSaveDataOnLocal(): boolean {
     return localStorage.getItem(SAVE_KEY) !== null;
+  }
+
+  /**
+   * Check if a save exists on the blockchain
+   * @returns Promise that resolves to true if blockchain save exists
+   */
+  async hasSaveDataOnBlockchain(): Promise<boolean> {
+    return await BlockchainSaveManager.hasSaveDataOnBlockchain();
   }
 
   /**
    * Delete the current save
    */
-  deleteSaveData(): void {
+  deleteSaveDataFromLocal(): void {
     localStorage.removeItem(SAVE_KEY);
     console.log("Save data deleted");
-    EventBus.emit("system-update", { time: Date.now(), delta: 0 });
+  }
+
+  /**
+   * Delete the current save from the blockchain
+   * @returns Promise that resolves to true if successful
+   */
+  async deleteSaveDataFromBlockchain(): Promise<boolean> {
+    const success = await BlockchainSaveManager.deleteSaveDataFromBlockchain();
+    if (success) {
+      console.log("Save data deleted from blockchain");
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -341,9 +424,9 @@ export default class SaveManager {
     this.stopAutoSave();
 
     // Remove event listeners using properly bound functions
-    EventBus.off("player-health-changed", this.saveGame);
-    EventBus.off("inventory-updated", this.saveGame);
-    EventBus.off("crop-planted", this.saveGame);
-    EventBus.off("crop-harvested", this.saveGame);
+    EventBus.off("player-health-changed", this.saveGameToBlockchain);
+    EventBus.off("inventory-updated", this.saveGameToBlockchain);
+    EventBus.off("crop-planted", this.saveGameToBlockchain);
+    EventBus.off("crop-harvested", this.saveGameToBlockchain);
   }
 }

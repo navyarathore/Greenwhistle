@@ -1,6 +1,7 @@
 import { EventBus } from "../EventBus";
 import SystemManager from "../SystemManager";
 import Player from "../entities/Player";
+import { GameSave } from "../managers/SaveManager";
 import MapExtension from "../utils/map-extension";
 import GridEngine from "grid-engine";
 import { Scene } from "phaser";
@@ -14,13 +15,15 @@ export default class Game extends Scene {
   player!: Player;
   cursor!: Phaser.Types.Input.Keyboard.CursorKeys;
   gridEngine!: GridEngine;
+  private gameData: GameSave | null = null;
 
   constructor() {
     super("Game");
   }
 
-  init() {
+  init(data: { gameData: GameSave | null }) {
     this.gridEngine = (this as any).gridEngine;
+    this.gameData = data.gameData;
   }
 
   preload() {
@@ -70,8 +73,10 @@ export default class Game extends Scene {
       inventoryManager: SystemManager.instance.inventoryManager,
     });
 
-    // Try to load saved game if it exists
-    this.loadGameIfExists();
+    if (this.gameData) {
+      SystemManager.instance.saveManager.unpackData(this.gameData);
+      this.gameData = null;
+    }
 
     SystemManager.instance.saveManager.startAutoSave();
 
@@ -84,31 +89,6 @@ export default class Game extends Scene {
       // Clean up event listeners from the HUD scene\
       EventBus.clearEventHistory();
       EventBus.destroy();
-      // EventBus.removeAllListeners("player-health-changed");
-      // EventBus.removeAllListeners("hotbar-selection-changed");
-      // EventBus.removeAllListeners("hotbar-item-changed");
-      // EventBus.removeAllListeners("inventory-updated");
-      // EventBus.removeAllListeners("player-created");
-      // EventBus.removeAllListeners("current-scene-ready");
-
-      // Clean up and stop active scenes
-      // if (this.scene.isActive("HUD")) {
-      //   // Call custom cleanup method on the HUD scene
-      //   const hudScene = this.scene.get("HUD") as any;
-      //   if (hudScene && typeof hudScene.cleanupResources === "function") {
-      //     hudScene.cleanupResources();
-      //   }
-      //   this.scene.stop("HUD");
-      // }
-
-      // if (this.scene.isActive("InventoryMenu")) {
-      //   // Call custom cleanup method on the InventoryMenu scene
-      //   const inventoryMenuScene = this.scene.get("InventoryMenu") as any;
-      //   if (inventoryMenuScene && typeof inventoryMenuScene.cleanupResources === "function") {
-      //     inventoryMenuScene.cleanupResources();
-      //   }
-      //   this.scene.stop("InventoryMenu");
-      // }
 
       // Destroy any remaining game objects
       this.children.removeAll(true);
@@ -125,29 +105,6 @@ export default class Game extends Scene {
 
   changeScene() {
     this.scene.start("GameOver");
-  }
-
-  /**
-   * Attempts to load a saved game if one exists
-   * Called automatically when the game starts
-   */
-  private loadGameIfExists(): void {
-    const saveManager = SystemManager.instance.saveManager;
-
-    if (saveManager.hasSaveData()) {
-      console.log("Found saved game data, loading...");
-      const success = saveManager.loadGame();
-
-      if (success) {
-        console.log("Game loaded successfully on startup");
-        // Show a brief notification to the player
-        this.showLoadNotification();
-      } else {
-        console.warn("Failed to load saved game");
-      }
-    } else {
-      console.log("No saved game found, starting new game");
-    }
   }
 
   /**

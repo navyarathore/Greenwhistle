@@ -21,10 +21,10 @@ export default class SystemManager {
   readonly materialManager: MaterialManager;
   readonly craftingManager: CraftingManager;
   readonly mapStateTracker: MapStateTracker;
+  readonly saveManager: SaveManager;
   private _farmingManager!: FarmingManager;
   private _interactionManager!: InteractionManager;
   private _controlsManager!: ControlsManager;
-  private _saveManager!: SaveManager;
 
   /**
    * Get the singleton instance of SystemManager
@@ -45,6 +45,7 @@ export default class SystemManager {
     this.materialManager = new MaterialManager();
     this.craftingManager = new CraftingManager(this.inventoryManager);
     this.mapStateTracker = new MapStateTracker();
+    this.saveManager = new SaveManager();
   }
 
   loadResources() {
@@ -61,8 +62,7 @@ export default class SystemManager {
     this._interactionManager = new InteractionManager(scene, scene.gridEngine);
     this.controlsManager.setupControls();
 
-    // Initialize the save manager
-    this._saveManager = new SaveManager(scene);
+    this.saveManager.setup(scene);
 
     EventBus.emit("systems-ready", { systemManager: this });
   }
@@ -79,10 +79,6 @@ export default class SystemManager {
     return this._interactionManager;
   }
 
-  get saveManager(): SaveManager {
-    return this._saveManager;
-  }
-
   /**
    * Update method called every frame
    */
@@ -96,7 +92,6 @@ export default class SystemManager {
     this.farmingManager.update(time, delta);
 
     // Emit a system update event for any systems that need to respond
-    // EventBus.emit("system-update", { time, delta });
   }
 
   /**
@@ -107,8 +102,8 @@ export default class SystemManager {
     console.log("Cleaning up SystemManager resources");
 
     // Clean up all managers in reverse order of creation
-    if (this._saveManager) {
-      this._saveManager.destroy();
+    if (this.saveManager) {
+      this.saveManager.destroy();
     }
 
     if (this._interactionManager) {

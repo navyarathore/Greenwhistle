@@ -15,11 +15,6 @@ export interface SystemsReadyEvent {
   systemManager: SystemManager;
 }
 
-export interface SystemUpdateEvent {
-  time: number;
-  delta: number;
-}
-
 // Scene events
 export interface CurrentSceneReadyEvent {
   scene: Phaser.Scene;
@@ -203,7 +198,6 @@ export interface CraftItemEvent {
 // Event type mapping
 export interface EventMap {
   "systems-ready": SystemsReadyEvent;
-  "system-update": SystemUpdateEvent;
   "current-scene-ready": CurrentSceneReadyEvent;
   "player-created": PlayerCreatedEvent;
   "player-movement-started": PlayerMovementStartedEvent;

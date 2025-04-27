@@ -6,6 +6,497 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
   31337: {
+    GameSave: {
+      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      abi: [
+        {
+          inputs: [],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "EnforcedPause",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "ExpectedPause",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+          ],
+          name: "OwnableInvalidOwner",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "OwnableUnauthorizedAccount",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "ReentrancyGuardReentrantCall",
+          type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "player",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "GameLoaded",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "player",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "GameSaved",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "previousOwner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "OwnershipTransferred",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "Paused",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "player",
+              type: "address",
+            },
+          ],
+          name: "SaveDeleted",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "Unpaused",
+          type: "event",
+        },
+        {
+          inputs: [],
+          name: "deleteSaveData",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "hasSaveData",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "loadGame",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "version",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "positionX",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "positionY",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "health",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "selectedHotbarSlot",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct GameSave.PlayerData",
+              name: "player",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "slotIndex",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "itemId",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "quantity",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct GameSave.InventoryItem[]",
+              name: "inventory",
+              type: "tuple[]",
+            },
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "positionX",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "positionY",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "cropId",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "growthStage",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "plantedTime",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "lastWateredTime",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct GameSave.FarmingData[]",
+              name: "farming",
+              type: "tuple[]",
+            },
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "layer",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "positionX",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "positionY",
+                  type: "uint256",
+                },
+                {
+                  internalType: "int256",
+                  name: "tileIndex",
+                  type: "int256",
+                },
+              ],
+              internalType: "struct GameSave.MapChange[]",
+              name: "mapChanges",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "pause",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "paused",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "renounceOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_version",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_timestamp",
+              type: "uint256",
+            },
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "positionX",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "positionY",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "health",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "selectedHotbarSlot",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct GameSave.PlayerData",
+              name: "_player",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "slotIndex",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "itemId",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "quantity",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct GameSave.InventoryItem[]",
+              name: "_inventory",
+              type: "tuple[]",
+            },
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "positionX",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "positionY",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "cropId",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "growthStage",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "plantedTime",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "lastWateredTime",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct GameSave.FarmingData[]",
+              name: "_farming",
+              type: "tuple[]",
+            },
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "layer",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "positionX",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "positionY",
+                  type: "uint256",
+                },
+                {
+                  internalType: "int256",
+                  name: "tileIndex",
+                  type: "int256",
+                },
+              ],
+              internalType: "struct GameSave.MapChange[]",
+              name: "_mapChanges",
+              type: "tuple[]",
+            },
+          ],
+          name: "saveGame",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "transferOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "unpause",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {
+        owner: "@openzeppelin/contracts/access/Ownable.sol",
+        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+        paused: "@openzeppelin/contracts/utils/Pausable.sol",
+      },
+    },
     GameToken: {
       address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       abi: [
