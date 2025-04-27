@@ -11,7 +11,8 @@ import { useAccount } from "wagmi";
 import { useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
-import { notification } from "~~/utils/scaffold-eth";
+
+// import { notification } from "~~/utils/scaffold-eth";
 
 /**
  * Custom OnchainKit Connect Button (watch balance + custom design)
@@ -29,15 +30,15 @@ export const OnchainKitCustomConnectButton = () => {
     : undefined;
 
   useEffect(() => {
-    if (!isConnected) {
-      notification.warning(
-        <div className="flex flex-col gap-1">
-          <p className="my-0 font-bold">Wallet Not Connected</p>
-          <p className="my-0">Please connect your wallet to continue</p>
-        </div>,
-        { duration: 5000 },
-      );
-    }
+    // if (!isConnected) {
+    //   notification.warning(
+    //     <div className="flex flex-col gap-1">
+    //       <p className="my-0 font-bold">Wallet Not Connected</p>
+    //       <p className="my-0">Please connect your wallet to continue</p>
+    //     </div>,
+    //     { duration: 5000 },
+    //   );
+    // }
   }, [isConnected]);
 
   if (!isConnected) {

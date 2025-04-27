@@ -4,7 +4,6 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import { notification } from "~~/utils/scaffold-eth";
 
 // ~~/components/wallet/ProtectedRoute.tsx
 
@@ -31,37 +30,50 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [redirectCountdown, setRedirectCountdown] = useState(5);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   const isGameRoute = pathname === "/game" || pathname.startsWith("/game/");
 
+  // Handle the actual redirect in a separate effect
   useEffect(() => {
-    if (!isConnected) {
-      // Only show toast notification if NOT on game route
-      if (!isGameRoute) {
-        notification.warning(
-          <div className="flex flex-col gap-1">
-            <p className="my-0 font-bold">Wallet Not Connected</p>
-            <p className="my-0">Please connect your wallet to continue</p>
-          </div>,
-          { duration: 5000 },
-        );
-      }
-
-      // Countdown timer
-      const timer = setInterval(() => {
-        setRedirectCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            router.push("/");
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
+    if (shouldRedirect) {
+      router.push("/");
     }
-  }, [isConnected, router, isGameRoute]);
+  }, [shouldRedirect, router]);
+
+  useEffect(() => {
+    // Reset state when connection status changes
+    if (isConnected) {
+      setRedirectCountdown(5);
+      setShouldRedirect(false);
+      return;
+    }
+
+    // Only show toast notification if NOT on game route
+    // if (!isGameRoute) {
+    //   notification.warning(
+    //     <div className="flex flex-col gap-1">
+    //       <p className="my-0 font-bold">Wallet Not Connected</p>
+    //       <p className="my-0">Please connect your wallet to continue</p>
+    //     </div>,
+    //     { duration: 5000 },
+    //   );
+    // }
+
+    // Countdown timer
+    const timer = setInterval(() => {
+      setRedirectCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setShouldRedirect(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isConnected, isGameRoute]);
 
   if (!isConnected) {
     return (

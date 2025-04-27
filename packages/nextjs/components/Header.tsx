@@ -10,7 +10,8 @@ import { useAccount } from "wagmi";
 import { HomeIcon, ShoppingCartIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, OnchainKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
-import { notification } from "~~/utils/scaffold-eth";
+
+// import { notification } from "~~/utils/scaffold-eth";
 
 type HeaderMenuLink = {
   label: string;
@@ -69,15 +70,15 @@ export const Header = () => {
       e.preventDefault();
 
       // Only show notification if not suppressed
-      if (!link.suppressToast) {
-        notification.warning(
-          <div className="flex flex-col gap-1">
-            <p className="my-0 font-bold">Wallet Not Connected</p>
-            <p className="my-0">Please connect your wallet to access {link.label}</p>
-          </div>,
-          { duration: 5000 },
-        );
-      }
+      // if (!link.suppressToast) {
+      //   notification.warning(
+      //     <div className="flex flex-col gap-1">
+      //       <p className="my-0 font-bold">Wallet Not Connected</p>
+      //       <p className="my-0">Please connect your wallet to access {link.label}</p>
+      //     </div>,
+      //     { duration: 5000 },
+      //   );
+      // }
     }
   };
 
